@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.scss';
-import Hello from './components/Hello/hello';
+import RouterView from './router';
 
 function App() {
   return (
     <div className="App">
-      <Hello />
+      <RouterView />
     </div>
   );
 }

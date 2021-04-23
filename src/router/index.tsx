@@ -1,5 +1,5 @@
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
@@ -11,13 +11,14 @@ const RouterView = () => {
   return (
 
     <Router>
-      <Redirect to="/login"></Redirect>
+      <Redirect to="/home"></Redirect>
       <Switch>
         {routerMap.map((item, index) => (
-          <Route key={index} path={item.path} component={item.component}></Route>
+          <Route key={index} path={item.path} component={item.page}></Route>
         ))}
       </Switch>
     </Router>
+  
   );
 };
 
