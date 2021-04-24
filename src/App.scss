@@ -1,1 +1,21 @@
-@import '~antd/dist/antd.css'
+@import '~antd/dist/antd.css';
+
+.App {
+    .layout {
+        .header {
+
+        }
+
+        .content {
+            width: 95%;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 10px;
+
+        }
+
+        .footer {
+            text-align: center;
+        }
+    }
+}

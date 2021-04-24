@@ -1,3 +1,8 @@
+import { DataStrucTypes } from "../types";
+
+
+
+
 // 根据传入的时间获取多少时间前发布的
 export function getTime(time: string): string {
     const minutes = 1000 * 60

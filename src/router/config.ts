@@ -18,51 +18,51 @@ const routerView = [
         page: Home
     },
     {
-        path: "/home/array",
+        path: "/array",
         page: Array
     },
     {
-        path: "/home/avlTree",
+        path: "/avlTree",
         page: AVLTree
     },
     {
-        path: "/home/binarySearchTree",
+        path: "/binarySearchTree",
         page: BinarySearchTree
     },
     {
-        path: "/home/bPlusTree",
+        path: "/bPlusTree",
         page: BPlusTree
     },
     {
-        path: "/home/bTree",
+        path: "/bTree",
         page: BTree
     },
     {
-        path: "/home/graph",
+        path: "/graph",
         page: Graph
     },
     {
-        path: "/home/hashTable",
+        path: "/hashTable",
         page: HashTable
     },
     {
-        path: "/home/heap",
+        path: "/heap",
         page: Heap
     },
     {
-        path: "/home/linkedList",
+        path: "/linkedList",
         page: LinkedList
     },
     {
-        path: "/home/queue",
+        path: "/queue",
         page: Queue
     },
     {
-        path: "/home/redBlackTree",
+        path: "/redBlackTree",
         page: RedBlackTree
     },
     {
-        path: "/home/stack",
+        path: "/stack",
         page: Stack
     },
 ];
