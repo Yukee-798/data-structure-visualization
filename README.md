@@ -18,5 +18,5 @@
 * react
 * react-spring 动画库
 * react-three-fiber 构建 3d 模型
-* mbox 用于数据管理
+* mobx 用于数据管理
 * antd UI库
