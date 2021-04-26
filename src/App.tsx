@@ -1,8 +1,8 @@
 import { Layout } from 'antd';
 import RouterView from './router';
 import './App.scss';
-
 const { Header, Content, Footer } = Layout;
+
 function App() {
   return (
     <div className="App">
@@ -23,5 +23,7 @@ function App() {
     </div>
   );
 }
+
+
 
 export default App;
