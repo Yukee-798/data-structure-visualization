@@ -7,6 +7,7 @@ import './homeItem.scss'
 interface IHomeItemProps extends IBaseProps {
     /* 卡片标题 */
     title: string;
+    /* 数据结构类型 */
     type: DataStrucTypes;
     /* 图片资源 */
     src: string;
