@@ -2,19 +2,29 @@
 
 .App {
     .layout {
-        // .header {
+        width: 100%;
+        min-height: 100vh;
+        // display: flex;
+        // flex-direction: column;
 
-        // }
+        .header {
+            min-height: 10vh;
+        }
 
         .content {
+            // flex-grow: 1;
+            min-height: 80vh;
             width: 95%;
             margin: 30px auto;
             background-color: #fff;
             padding: 10px;
+            // display: flex;
+            // flex-direction: column;
 
         }
 
         .footer {
+            min-height: 10vh;
             text-align: center;
         }
     }
