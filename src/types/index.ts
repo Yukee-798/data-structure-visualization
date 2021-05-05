@@ -23,3 +23,8 @@ export enum DataStrucTypes {
     RedBlackTree,
     Stack
 }
+
+export interface ISortDetail {
+    type: 'active' | 'deactive' | 'swap' | 'lock' | 'done';
+    indexes?: number[];
+}

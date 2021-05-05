@@ -1,8 +1,3 @@
-import { DataStrucTypes } from "../types";
-
-
-
-
 // 根据传入的时间获取多少时间前发布的
 export function getTime(time: string): string {
     const minutes = 1000 * 60
@@ -33,4 +28,9 @@ export function getTime(time: string): string {
         }
     }
     return res
+}
+
+/* 随机生成一个 start ~ end 的整数 */
+export function randomNum(start: number, end: number): number {
+    return +(Math.random() * (end - start) + start).toFixed(0);
 }
