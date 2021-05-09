@@ -19,6 +19,7 @@
     "@types/three": "^0.127.0",
     "antd": "^4.15.0",
     "axios": "^0.21.1",
+    "immutable": "^4.0.0-rc.12",
     "node-sass": "^4.14.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
