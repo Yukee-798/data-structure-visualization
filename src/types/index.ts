@@ -24,7 +24,21 @@ export enum DataStrucTypes {
     Stack
 }
 
-export interface ISortDetail {
-    type: 'active' | 'deactive' | 'swap' | 'lock' | 'done';
-    indexes?: number[];
+export interface IColorConfig {
+    /* 默认颜色 */
+    defaultColor: string;
+    /* hover颜色 */
+    hoverColor: string;
+    /* active颜色 */
+    activeColor: string;
+    /* lock颜色 */
+    lockColor: string;
+}
+
+export interface ICube {
+    value: number;
+    strValue: string;
+    sortIndex: number;
+    isActive: boolean;
+    isLock: boolean;
 }
