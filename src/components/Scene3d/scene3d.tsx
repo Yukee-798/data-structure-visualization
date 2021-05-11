@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect, useState } from 'react';
-import { Environment, OrbitControls } from "@react-three/drei";
-
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { Box, Environment, OrbitControls, PerspectiveCamera, TransformControls } from "@react-three/drei";
+import { useSpring } from '@react-spring/three';
 
 const Scene3d: React.FC = (props) => {
 
@@ -11,51 +11,76 @@ const Scene3d: React.FC = (props) => {
         children
     } = props;
 
+    const cameraRef = useRef<THREE.PerspectiveCamera>();
+
+    // useEffect(() => {
+    //     cameraRef.current?.lookAt(new THREE.Vector3(10, 10, 1))
+    // })
+
+
     const [cameraPos, setCameraPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 5));
 
-    const upDate = () => {
-
-    }
+    // const upDate = () => {
+    //     // console.log(123);
+    //     // return new THREE.Camera()
+    // }
 
 
     const handleKeyDown = (ev: KeyboardEvent) => {
-        const speed = 10;
+        // const delta = new THREE.Clock(true).getDelta();
+        const moveDistance = 1;
         switch (ev.key) {
             case 'w':
-                setCameraPos(new THREE.Vector3(0, 0, cameraPos.z + speed))
-                console.log(cameraPos.z);
+                setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z - moveDistance)));
                 break;
             case 'a':
+                setCameraPos((pre) => (new THREE.Vector3(pre.x - moveDistance, pre.y, pre.z)));
                 break;
             case 'd':
+                setCameraPos((pre) => (new THREE.Vector3(pre.x + moveDistance, pre.y, pre.z)));
                 break;
             case 's':
+                setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z + moveDistance)));
+
                 break;
         }
     }
 
     useEffect(() => {
-        console.log(1);
-    }, [cameraPos])
-
-    useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
-        upDate()
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         }
     }, [])
 
 
+
     return (
         <Canvas
-            camera={{ fov: 100, near: 0.1, far: 1000, position: cameraPos, /* updateProjectionMatrix: upDate  */}}
+            
         >
+            <PerspectiveCamera
+                // ref={cameraRef}
+                makeDefault
+                position={[0, 0, 16]}
+            // position={cameraPos}
+            // lookAt={(v) => {
+            //     // v = cameraPos;
+            //     // console.log(v);
+            // }}
+
+            />
             <ambientLight intensity={0.3} />
             <directionalLight color="white" position={[1, 1, 1]} />
             <Suspense fallback={null}>
-                {children}
-                <OrbitControls />
+
+                {/* <TransformControls> */}
+                    {children}
+                {/* </TransformControls> */}
+
+                <OrbitControls
+                    maxDistance={20}
+                />
                 <Environment
                     // preset='warehouse'  
                     background
