@@ -1,5 +1,10 @@
 import React from "react";
 
+/* 设置 cube 之间的间距 */
+export const CUBE_INTERVAL_DISTANCE = 2;
+/* 设置 3d 物品在 scene 中的基准 y 轴坐标 */
+export const BASE_POSY = -2;
+
 
 export interface IBaseProps {
     style?: React.CSSProperties;
@@ -12,7 +17,6 @@ export enum DataStrucTypes {
     Array,
     AVLTree,
     BinarySearchTree,
-    BinaryTree,
     BPlusTree,
     BTree,
     Graph,
@@ -22,6 +26,15 @@ export enum DataStrucTypes {
     Queue,
     RedBlackTree,
     Stack
+}
+
+/* 3d几何体通用配置 */
+export interface IGeometryProps {
+    colorConfig?: IColorConfig
+    position?: any;
+    isActive?: boolean;
+    isLock?: boolean;
+    isReset?: boolean;
 }
 
 export interface IColorConfig {
@@ -35,6 +48,8 @@ export interface IColorConfig {
     lockColor: string;
 }
 
+
+
 export interface ICube {
     value: number;
     strValue: string;
@@ -42,3 +57,5 @@ export interface ICube {
     isActive: boolean;
     isLock: boolean;
 }
+
+export type Points = [number, number, number][];
