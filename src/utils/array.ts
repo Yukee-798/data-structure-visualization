@@ -6,7 +6,7 @@ import { ICube } from "../types";
 export function randomArr(): number[] {
     const arr = [];
     for (let i = 0; i < randomNum(3, 10); i++) {
-        arr.push(randomNum(0, 50));
+        arr.push(randomNum(3, 40));
     }
     return arr;
 }

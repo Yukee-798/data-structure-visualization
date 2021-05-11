@@ -5,7 +5,7 @@ import './array.scss'
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { bubbleSortSeq, getStartXPos, initCubes, randomArr } from '../../utils/array';
 import { Text } from '@react-three/drei';
-import { ICube } from '../../types';
+import { BASE_POSY, CUBE_INTERVAL_DISTANCE, ICube } from '../../types';
 import { Map, List } from 'immutable'
 import { animated, useSpring } from '@react-spring/three';
 import Test from '../../components/Test/test';
@@ -167,47 +167,49 @@ const Array = () => {
 
     return (
         <div className='array-warp'>
-            <Button
-                onClick={() => {
-                    dispatch({ type: ActionTypes.Random });
-                    setTimeout(() => {
-                        dispatch({ type: ActionTypes.RandomDone })
-                    }, 400)
-                }}
-                disabled={!state.randomDone || !state.sortDone}
-            >
-                {state.randomDone ? 'Random' : 'Randomizing...'}
-            </Button>
+            <div className='console-warp'>
+                <Button
+                    onClick={() => {
+                        dispatch({ type: ActionTypes.Random });
+                        setTimeout(() => {
+                            dispatch({ type: ActionTypes.RandomDone })
+                        }, 400)
+                    }}
+                    disabled={!state.randomDone || !state.sortDone}
+                >
+                    {state.randomDone ? 'Random' : 'Randomizing...'}
+                </Button>
 
-            <Button
-                disabled={!state.randomDone || !state.sortDone}
-            >
-                Add
-            </Button>
+                <Button
+                    disabled={!state.randomDone || !state.sortDone}
+                >
+                    Add
+                </Button>
 
-            <Button
-                disabled={!state.randomDone || !state.sortDone}
-            >
-                Delete
-            </Button>
+                <Button
+                    disabled={!state.randomDone || !state.sortDone}
+                >
+                    Delete
+                </Button>
 
-            <Button
-                onClick={handleSort}
-                disabled={!state.randomDone || !state.sortDone}
-            >
-                {state.sortDone ? 'Sort' : 'Sorting...'}
-            </Button>
+                <Button
+                    onClick={handleSort}
+                    disabled={!state.randomDone || !state.sortDone}
+                >
+                    {state.sortDone ? 'Sort' : 'Sorting...'}
+                </Button>
 
-            <Button
-                onClick={handleClick}
-                disabled={!state.randomDone || !state.sortDone}
-            >
-                Recover
-            </Button>
+                <Button
+                    onClick={handleClick}
+                    disabled={!state.randomDone || !state.sortDone}
+                >
+                    Recover
+                </Button>
+            </div>
 
             <Scene3d>
                 {
-                    state.cubes.map((item, index) => (
+                    state.cubes.map((item) => (
                         <Cuboid3d
                             arrCubeConfig={{
                                 sortIndex: item.sortIndex,
@@ -216,7 +218,7 @@ const Array = () => {
                             }}
                             isActive={item.isActive}
                             isLock={item.isLock}
-                            // position={[getStartXPos(state.cubes.length) + (index * 2.5), 0, 0]}
+                            // position={[getStartXPos(state.cubes.length) + (index * CUBE_INTERVAL_DISTANCE), 0, 0]}
                             isReset={!state.randomDone}
                         />
                     ))
@@ -227,13 +229,12 @@ const Array = () => {
                             fillOpacity={state.randomDone ? 1 : 0}
                             color='black'
                             fontSize={0.5}
-                            position={[getStartXPos(state.cubes.length) + (index * 2.5), -1, 0]}
+                            position={[getStartXPos(state.cubes.length) + (index * CUBE_INTERVAL_DISTANCE), -1 + BASE_POSY, 0]}
                         >
                             {index}
                         </Text>
                     ))
                 }
-                {/* <Test /> */}
             </Scene3d>
         </div>
     )

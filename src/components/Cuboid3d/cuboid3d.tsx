@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { animated, useSpring, config } from '@react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
-import { IColorConfig } from '../../types';
+import { BASE_POSY, CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../types';
 
 interface IArrCubeConfig {
     value: string
@@ -11,23 +11,15 @@ interface IArrCubeConfig {
     startPos: any;
 }
 
-interface ICuboid3d {
-    /* 颜色配置 */
-    colorConfig?: IColorConfig;
+interface ICuboid3dProps extends IGeometryProps {
     /* 数组cube配置 */
     arrCubeConfig?: IArrCubeConfig;
-
-    /* 通用配置 */
-    position?: any;
-    isActive?: boolean;
-    isLock?: boolean;
-    isReset?: boolean;
 }
 
 /**
  * 使用该组件时必须传入类型cubeConfig，否则不会渲染
  */
-const Cuboid3d: React.FC<ICuboid3d> = (props) => {
+const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
 
     const {
         position,
@@ -43,7 +35,7 @@ const Cuboid3d: React.FC<ICuboid3d> = (props) => {
     const meshRef = useRef<THREE.Mesh>(null!)
 
     // const [posX, setPosX] = useState<number>(() => {
-    //     if (arrCubeConfig) return (arrCubeConfig.startPos + (arrCubeConfig.sortIndex * 2.5))
+    //     if (arrCubeConfig) return (arrCubeConfig.startPos + (arrCubeConfig.sortIndex * CUBE_INTERVAL_DISTANCE))
     // })
 
 
@@ -62,7 +54,7 @@ const Cuboid3d: React.FC<ICuboid3d> = (props) => {
         reset: isReset,
         reverse: isReset,
         from: { scale: 0 },
-        to: { scale: isClick ? 1.15 : 1 },
+        to: { scale: isClick ? 1.10 : 1 },
         config: isReset ? config.default : config.wobbly
     })
 
@@ -75,30 +67,46 @@ const Cuboid3d: React.FC<ICuboid3d> = (props) => {
         )
     })
 
+    // const { height } = useSpring({
+    //     from: {height: 0},
+    //     to: { height: ((+(arrCubeConfig as IArrCubeConfig).value) as number) * 0.2}
+    // })
+
     /* 配置swap的动画效果 */
-    const { posX } = useSpring({
-        from: { posX: 0 },
-        // to: { posX: ((arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * 2.5)) as number }
-        to: { posX: 1 },
-        config: config.wobbly
-        // posX: ((arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * 2.5)) as number
-    })
+    // const { posX } = useSpring({
+    //     from: { posX: 0 },
+    //     // to: { posX: ((arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * CUBE_INTERVAL_DISTANCE)) as number }
+    //     to: { posX: 1 },
+    //     config: config.wobbly
+    //     // posX: ((arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * CUBE_INTERVAL_DISTANCE)) as number
+    // })
 
     // 开启渲染循环，让 mesh 沿着 x 轴转动
-    useFrame(({ clock }) => {
-        
-        // meshRef.current.position.x = clock.getElapsedTime();
-        // let temp = 
-        meshRef.current.position.x = (arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * 2.5);
-    })
+    // useFrame(({ clock }) => {
+
+    //     // meshRef.current.position.x = clock.getElapsedTime();
+    //     // let temp = 
+    //     meshRef.current.position.x = (arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * CUBE_INTERVAL_DISTANCE);
+    // })
+
+
+    const posX: number = (arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * CUBE_INTERVAL_DISTANCE);
+
+    useEffect(() => {
+        // meshRef.current.translateOnAxis(new THREE.Vector3(posX, 0, 0), 1)
+    }, [])
 
     if (arrCubeConfig) {
         return (
             <animated.mesh
-                ref={meshRef}
+
                 scale={scale}
+                ref={meshRef}
+                // scale={scale}
                 // position={position || [, 0, 0]}
-                position={position || [(arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * 2.5), 0, 0]}
+
+                // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
+                position={position || [posX, ((+arrCubeConfig.value as number) * 0.2) / 2 + BASE_POSY, 0]}
             // trans
             // ref={ref}
             >
@@ -109,7 +117,7 @@ const Cuboid3d: React.FC<ICuboid3d> = (props) => {
                     {arrCubeConfig?.value}
                 </Text>
                 <RoundedBox
-                    args={[2, 1, 1]}
+                    args={[1, (+arrCubeConfig.value as number) * 0.2, 1]}
                     onClick={() => {
                         setIsClick(!isClick)
                     }}
