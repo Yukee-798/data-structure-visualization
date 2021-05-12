@@ -1,17 +1,16 @@
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { Box, Environment, OrbitControls, PerspectiveCamera, TransformControls } from "@react-three/drei";
+import { Environment, OrbitControls, PerspectiveCamera, Reflector, TransformControls } from "@react-three/drei";
 import { useSpring } from '@react-spring/three';
+import './scene3d.scss'
 
 const Scene3d: React.FC = (props) => {
-
-
     const {
         children
     } = props;
 
-    const cameraRef = useRef<THREE.PerspectiveCamera>();
+    const cameraRef = useRef<THREE.PerspectiveCamera>(null!);
 
     // useEffect(() => {
     //     cameraRef.current?.lookAt(new THREE.Vector3(10, 10, 1))
@@ -31,7 +30,7 @@ const Scene3d: React.FC = (props) => {
         const moveDistance = 1;
         switch (ev.key) {
             case 'w':
-                setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z - moveDistance)));
+                // setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z - moveDistance)));
                 break;
             case 'a':
                 setCameraPos((pre) => (new THREE.Vector3(pre.x - moveDistance, pre.y, pre.z)));
@@ -55,42 +54,80 @@ const Scene3d: React.FC = (props) => {
 
 
 
+    // useEffect(() => {
+    //     if (cameraRef.current) {
+    //         cameraRef.current.lookAt(new THREE.Vector3(0, -10, 16))
+    //     }
+    //     // console.log(cameraRef.current);
+    //     // cameraRef.current?.lookAt(new THREE.Vector3(0, -10, 16))
+    // })
     return (
-        <Canvas
-            
-        >
-            <PerspectiveCamera
-                // ref={cameraRef}
-                makeDefault
-                position={[0, 0, 16]}
-            // position={cameraPos}
-            // lookAt={(v) => {
-            //     // v = cameraPos;
-            //     // console.log(v);
-            // }}
+        <div className='scene3d-warp'>
+            <Canvas>
+                <PerspectiveCamera
+                    ref={cameraRef}
+                    makeDefault
+                    position={[0, 0, 16]}
+                // position={cameraPos}
+                // lookAt={(v) => {
+                //     // v = cameraPos;
+                //     // console.log(v);
+                // }}
 
-            />
-            <ambientLight intensity={0.3} />
-            <directionalLight color="white" position={[1, 1, 1]} />
-            <Suspense fallback={null}>
+                />
+                <ambientLight intensity={0.3} />
+                <directionalLight color="white" position={[1, 1, 1]} />
 
-                {/* <TransformControls> */}
+                <Suspense fallback={null}>
+                    {/* <Reflector
+                    resolution={1024}
+                    args={[10, 10]}
+                    mirror={0.75}
+                    // mixBlur={mixBlur || 0}
+                    mixStrength={1}
+                    rotation={[-Math.PI / 2, 0, Math.PI / 2]}
+                    minDepthThreshold={0.8}
+                    maxDepthThreshold={1.2}
+                    // depthScale={depthScale || 0}
+                    depthToBlurRatioBias={0.2}
+                    debug={0}
+                    // distortion={distortion || 0}
+                    // distortionMap={distortionMap}
+                >
+                    
+                    {(Material, props) => (
+                        <Material
+                            color="#ddd"
+                            metalness={0}
+                            // roughnessMap={roughness}
+                            roughness={1}
+                            // normalMap={normal}
+                            // normalScale={_normalScale}
+                            {...props}
+                        />
+                    )}
+                </Reflector> */}
+                    {/* <TransformControls> */}
                     {children}
-                {/* </TransformControls> */}
+                    {/* </TransformControls> */}
 
-                <OrbitControls
-                    maxDistance={20}
-                />
-                <Environment
-                    // preset='warehouse'  
-                    background
-                    files={['ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg']}
-                    path='/test/'
 
-                />
-            </Suspense>
+                    <OrbitControls
+                        maxDistance={30}
+                    />
+                    <Environment
+                        // preset='warehouse'  
+                        background
+                        files={['ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg']}
+                        path='/envFiles/'
 
-        </Canvas>
+                    />
+                </Suspense>
+
+
+            </Canvas>
+        </div>
+
     )
 }
 
