@@ -14,7 +14,7 @@ const RouterView = () => {
       <Redirect to="/home"></Redirect>
       <Switch>
         {routerMap.map((item, index) => (
-          <Route key={index} path={item.path} component={item.page}></Route>
+          <Route key={index} path={item.path} component={item.page} />
         ))}
       </Switch>
     </Router>
