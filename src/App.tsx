@@ -8,7 +8,8 @@ function App() {
     <div className="App">
       <Layout className='layout'>
         <Header className='header'>
-
+          <a href="/home">Data Structure Visualization</a>
+          
         </Header>
 
         <Content className='content'>
@@ -19,7 +20,6 @@ function App() {
           DSV DC ©2021 Created by Dora and Conan
         </Footer>
       </Layout>
-
     </div>
   );
 }
@@ -27,3 +27,4 @@ function App() {
 
 
 export default App;
+

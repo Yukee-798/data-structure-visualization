@@ -8,7 +8,11 @@
         // flex-direction: column;
 
         .header {
-            min-height: 10vh;
+            min-height: 2vh;
+            color: #fff;
+            text-align: center;
+            font-size: 30px;
+            font-family: 'SilkscreenNormal';
         }
 
         .content {
@@ -24,7 +28,7 @@
         }
 
         .footer {
-            min-height: 10vh;
+            min-height: 2vh;
             text-align: center;
         }
     }
