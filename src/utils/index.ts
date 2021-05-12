@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react"
+
 // 根据传入的时间获取多少时间前发布的
 export function getTime(time: string): string {
     const minutes = 1000 * 60
@@ -34,3 +36,80 @@ export function getTime(time: string): string {
 export function randomNum(start: number, end: number): number {
     return +(Math.random() * (end - start) + start).toFixed(0);
 }
+
+export function useHover() {
+    const [value, setValue] = useState(false);
+    const ref = useRef<any>();
+    const handleMouseOver = () => setValue(true);
+    const handleMouseOut = () => setValue(false);
+    useEffect(
+        () => {
+            const node = ref.current;
+            if (node) {
+                node.addEventListener("mouseover", handleMouseOver);
+                node.addEventListener("mouseout", handleMouseOut);
+                return () => {
+                    node.removeEventListener("mouseover", handleMouseOver);
+                    node.removeEventListener("mouseout", handleMouseOut);
+                };
+            }
+        },
+        [ref.current] // Recall only if ref changes
+    );
+    return [ref, value];
+}
+
+/*
+    const data = [
+        [
+            {
+                src:
+                tag:
+                title:
+                type:
+                onClick
+            },
+            {},
+            {},
+            {}
+        ],
+        [
+            {},
+            {},
+            {},
+            {}
+        ],
+        [
+            {},
+            {},
+            {},
+            {}
+        ],
+        [
+            {},
+            {},
+            {},
+            {}
+        ]
+    ]
+*/
+
+/*
+0000   0
+1111   1
+2222   2
+3      3
+
+*/
+
+// export function getHomeItemData(): IHomeItemProps[][] {
+//     let length = DataStrucTypes.Stack as number + 1;
+    
+//     const data: IHomeItemProps[][] = [];
+//     for (let i = 0; i < Math.ceil(data.length / 4); i++) {
+//         data.push(new Array<IHomeItemProps>(4).map((item, i) => ({
+
+//         })))
+//     }
+    
+// }
