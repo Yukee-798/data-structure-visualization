@@ -11,22 +11,59 @@ export interface IBaseProps {
     className?: string;
 }
 
+/* 用于识别控制台类型 */
+export type HomeItemTypes = 'avlTree' | 'binaryHeap' | 'binarySearch' | 'binarySearchTree' | 'bPlusTree' | 'bTree' | 'graph' | 'graphTraverse' | 'hashTable' | 'linkedList' | 'queue' | 'redBlackTree' | 'sort' | 'stack';
 
-/* 数据结构类型枚举 */
+/* 控制台操作类型 */
+export enum OperaTypes {
+    // 增删改查
+    Add,
+    Delete,
+    Update,
+    Search,
+    Random,
+    Recover,
+
+    // 排序方面
+    BubbleSort,
+    SelectSort,
+    InsertSort,
+    QuickSort,
+    MergeSort,
+
+}
+
+/* 数据结构类型枚举同时也是tag的类型 */
 export enum DataStrucTypes {
+    Sort,
     Array,
-    AVLTree,
-    BinarySearchTree,
-    BPlusTree,
-    BTree,
-    Graph,
-    HashTable,
-    Heap,
+    BubbleSort,
+    SelectSort,
+    InsertSort,
+    QuickSort,
+    MergeSort,
+
     LinkedList,
     Queue,
+    Stack,
+
+    Search,
+    HashTable,
+    BinarySearch,
+
+    Tree,
+    BinarySearchTree,
+    BinaryHeap,
+    AVLTree,
+    BTree,
+    BPlusTree,
     RedBlackTree,
-    Stack
+
+    Graph,
+    Traverse,
 }
+
+
 
 /* 3d几何体通用配置 */
 export interface IGeometryProps {
