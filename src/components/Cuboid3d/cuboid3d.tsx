@@ -11,9 +11,16 @@ interface IArrCubeConfig {
     startPos: any;
 }
 
+interface ILinkCubeConfig {
+
+}
+
 interface ICuboid3dProps extends IGeometryProps {
     /* 数组cube配置 */
     arrCubeConfig?: IArrCubeConfig;
+
+    /* 链表cube配置 */
+    // linkCubeConfig?
 }
 
 /**
@@ -34,15 +41,6 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
     const [isClick, setIsClick] = useState(false)
     const meshRef = useRef<THREE.Mesh>(null!)
 
-    // const [posX, setPosX] = useState<number>(() => {
-    //     if (arrCubeConfig) return (arrCubeConfig.startPos + (arrCubeConfig.sortIndex * CUBE_INTERVAL_DISTANCE))
-    // })
-
-
-
-    useEffect(() => {
-        console.log(arrCubeConfig?.sortIndex, arrCubeConfig?.startPos);
-    }, [arrCubeConfig])
 
     /* 扫描数组的时候，如果改变了 active 属性，则给它设置一个点击效果 */
     useEffect(() => {
@@ -94,6 +92,7 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
 
     useEffect(() => {
         // meshRef.current.translateOnAxis(new THREE.Vector3(posX, 0, 0), 1)
+        
     }, [])
 
     if (arrCubeConfig) {
@@ -107,8 +106,8 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
 
                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
                 position={position || [posX, ((+arrCubeConfig.value as number) * 0.2) / 2 + BASE_POSY, 0]}
-            // trans
-            // ref={ref}
+                // trans
+                // ref={ref}
             >
                 <Text
                     fontSize={0.5}
@@ -138,6 +137,8 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
                 </RoundedBox>
             </animated.mesh>
         )
+    } else if (0) {
+        return <></>
     } else {
         return (
             <></>
