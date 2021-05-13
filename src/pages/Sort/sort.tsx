@@ -2,9 +2,9 @@ import Scene3d from '../../components/Scene3d/scene3d';
 import Cuboid3d from '../../components/Cuboid3d/cuboid3d'
 import { Button, PageHeader } from 'antd';
 import { useEffect, useReducer, useRef, useState } from 'react';
-import { bubbleSortSeq, getStartXPos, initCubes, randomArr } from '../../utils/sort';
+import { bubbleSortSeq, getStartXPos, initCubes, randomArr, selectSortSeq } from '../../utils/sort';
 import { Text } from '@react-three/drei';
-import { BASE_POSY, CUBE_INTERVAL_DISTANCE, ICube, OperaTypes } from '../../types';
+import { BASE_POSY, CUBE_INTERVAL_DISTANCE, ICube, OperaTypes, TRAVERSE_SPEED } from '../../types';
 import { Map, List } from 'immutable'
 import { animated, useSpring } from '@react-spring/three';
 import { useHistory } from 'react-router';
@@ -159,12 +159,26 @@ const Sort = () => {
 
             case OperaTypes.BubbleSort:
                 /* 处理排序：等间隔时间来 dispatch action  */
-                let sequence = bubbleSortSeq(state.cubes.map((item) => (item.value)));
-                sequence.forEach((event, i) => {
-                    setTimeout(() => {
-                        dispatch({ type: event.type, payload: event.indexes })
-                    }, i * 250);
-                });
+
+                {
+                    let sequence = bubbleSortSeq(state.values);
+                    sequence.forEach((event, i) => {
+                        setTimeout(() => {
+                            dispatch({ type: event.type, payload: event.indexes })
+                        }, i * TRAVERSE_SPEED);
+                    });
+                }
+                return;
+
+            case OperaTypes.SelectSort:
+                {
+                    let sequence = selectSortSeq(state.values);
+                    sequence.forEach((event, i) => {
+                        setTimeout(() => {
+                            dispatch({ type: event.type, payload: event.indexes })
+                        }, i * TRAVERSE_SPEED)
+                    })
+                }
                 return;
 
             case OperaTypes.Random:
@@ -200,8 +214,9 @@ const Sort = () => {
             <div className='sort-main'>
                 <Scene3d>
                     {
-                        state.cubes.map((item) => (
+                        state.cubes.map((item, index) => (
                             <Cuboid3d
+                                key={index + '@'}
                                 arrCubeConfig={{
                                     sortIndex: item.sortIndex,
                                     value: item.value + '',
@@ -217,6 +232,7 @@ const Sort = () => {
                     {
                         state.cubes.map((_, index) => (
                             <Text
+                                key={index + '*'}
                                 fillOpacity={state.randomDone ? 1 : 0}
                                 color='black'
                                 fontSize={0.5}

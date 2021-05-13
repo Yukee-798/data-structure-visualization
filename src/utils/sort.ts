@@ -32,6 +32,32 @@ export function bubbleSortSeq(arr: number[]) {
     return sortSeq;
 }
 
+/* 返回选择排序细节 */
+export function selectSortSeq(arr: number[]) {
+    let backup = [...arr];
+    let sortSeq = [];
+    for (let i = backup.length - 1; i >= 0; i--) {
+        let max = -Infinity;
+        let indexOfMax = -1;
+        for (let j = 0; j <= i; j++) {
+            sortSeq.push({ type: ActionTypes.Active, indexes: [j] });
+            if (backup[j] > max) {
+                max = backup[j];
+                indexOfMax = j;
+            }
+            sortSeq.push({ type: ActionTypes.Deactive, indexes: [j] });
+        }
+        sortSeq.push({ type: ActionTypes.Lock, indexes: [indexOfMax] })
+        let temp = backup[i];
+        backup[i] = max;
+        backup[indexOfMax] = temp;
+        sortSeq.push({ type: ActionTypes.Swap, indexes: [indexOfMax, i] })
+        sortSeq.push({ type: ActionTypes.Lock, indexes: [i] });
+    }
+    sortSeq.push({ type: ActionTypes.SortDone });
+    return sortSeq
+}
+
 /* 初始化 cubes */
 export function initCubes(values: number[]): ICube[] {
     return values.map((value, index) => ({
