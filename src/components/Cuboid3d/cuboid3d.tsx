@@ -1,17 +1,26 @@
 import * as THREE from 'three'
 import React, { useEffect, useRef, useState } from 'react'
-import { animated, useSpring, config } from '@react-spring/three'
+import { animated, useSpring, config } from 'react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
 import { BASE_POSY, CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../types';
 
 interface IArrCubeConfig {
-    value: string
+    value: string;
     sortIndex: number;
+    swapIndexes: [number, number] | [];
     startPos: any;
 }
 
 interface ILinkCubeConfig {
+
+}
+
+interface IStackCubeConfig {
+    value: string;
+}
+
+interface IQueueCubeConfig {
 
 }
 
@@ -20,7 +29,13 @@ interface ICuboid3dProps extends IGeometryProps {
     arrCubeConfig?: IArrCubeConfig;
 
     /* 链表cube配置 */
-    // linkCubeConfig?
+    linkCubeConfig?: ILinkCubeConfig;
+
+    /* 栈cube配置 */
+    stackCubeConfig?: IStackCubeConfig;
+
+    /* 队列cube配置 */
+    queueCubeConfig?: IQueueCubeConfig;
 }
 
 /**
@@ -34,6 +49,9 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
         isLock,
         isReset,
         arrCubeConfig,
+        stackCubeConfig,
+        queueCubeConfig,
+        linkCubeConfig,
         colorConfig,
     } = props;
 
@@ -88,12 +106,21 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
     // })
 
 
+    /* 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
+    const getPosX = (sortIndex: number) => (arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * CUBE_INTERVAL_DISTANCE);
     const posX: number = (arrCubeConfig as IArrCubeConfig).startPos + ((arrCubeConfig as IArrCubeConfig).sortIndex * CUBE_INTERVAL_DISTANCE);
 
     useEffect(() => {
+
         // meshRef.current.translateOnAxis(new THREE.Vector3(posX, 0, 0), 1)
-        
+
     }, [])
+
+    // useFrame(({ clock }) => {
+    //     const oldPosx = 1
+    //     /* 平移前一次的 posX 和最新的 posX 差值  */
+    //     // meshRef.current.translateX(clock.getElapsedTime())
+    // })
 
     if (arrCubeConfig) {
         return (
@@ -106,8 +133,8 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
 
                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
                 position={position || [posX, ((+arrCubeConfig.value as number) * 0.2) / 2 + BASE_POSY, 0]}
-                // trans
-                // ref={ref}
+            // trans
+            // ref={ref}
             >
                 <Text
                     fontSize={0.5}
@@ -137,12 +164,14 @@ const Cuboid3d: React.FC<ICuboid3dProps> = (props) => {
                 </RoundedBox>
             </animated.mesh>
         )
-    } else if (0) {
+    } else if (queueCubeConfig) {
         return <></>
-    } else {
+    } else if (stackCubeConfig) {
         return (
             <></>
         )
+    } else {
+        return <></>
     }
 }
 
