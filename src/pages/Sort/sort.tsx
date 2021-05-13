@@ -6,17 +6,23 @@ import { bubbleSortSeq, getStartXPos, initCubes, randomArr, selectSortSeq } from
 import { Text } from '@react-three/drei';
 import { BASE_POSY, CUBE_INTERVAL_DISTANCE, ICube, OperaTypes, TRAVERSE_SPEED } from '../../types';
 import { Map, List } from 'immutable'
-import { animated, useSpring } from '@react-spring/three';
 import { useHistory } from 'react-router';
-import './sort.scss'
 import Console from '../../components/Console/console';
+import './sort.scss'
+
 
 type IReducer = (state: IState, action: IAction) => IState;
 
 interface IState {
+    // 用来表示数组中各值的实时位置
     values: number[];
+    // 表示当前正在交换的两个下标
+    swapIndexes: [number, number] | [];
+    // 用来表示每个 cube 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
     cubes: ICube[];
+    // 是否排序完毕
     sortDone: boolean;
+    // 是否随机化完毕
     randomDone: boolean;
 }
 
@@ -24,6 +30,7 @@ export enum ActionTypes {
     Active,
     Deactive,
     Swap,
+    SwapDone,
     Lock,
     SortDone,
     RandomDone,
@@ -39,10 +46,9 @@ interface IAction {
 }
 
 const initState: IState = {
-    // 用来表示数组中各值的实时位置
     values: [],
-    // 用来表示每个 cube 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
     cubes: [],
+    swapIndexes: [],
     sortDone: true,
     randomDone: true,
 }
@@ -80,24 +86,37 @@ function reducer(state: IState = initState, action: IAction): IState {
             }
 
         case ActionTypes.Swap:
+            {
+                // 取出需要交换的两个下标
+                let index1 = (payload as number[])[0];
+                let index2 = (payload as number[])[1];
 
-            // 取出需要交换的两个下标
-            let index1 = (payload as number[])[0];
-            let index2 = (payload as number[])[1];
+                // 交换 values 的值
+                let newValues = [...state.values];
+                let temp = newValues[index1];
+                newValues[index1] = newValues[index2];
+                newValues[index2] = temp;
 
-            // 交换 values 的值
-            let newValues = [...state.values];
-            let temp = newValues[index1];
-            newValues[index1] = newValues[index2];
-            newValues[index2] = temp;
+                // 交换 cubes 中对应下标的 sortIndex
+                const newCubes: ICube[] = state.cubes.map((item) => {
+                    if (item.sortIndex === index1) return { ...item, sortIndex: index2 }
+                    else if (item.sortIndex === index2) return { ...item, sortIndex: index1 }
+                    return { ...item };
+                })
+                return { 
+                    ...state, 
+                    cubes: newCubes,
+                    swapIndexes: [index1, index2]
+                }
+            }
 
-            // 交换 cubes 中对应下标的 sortIndex
-            const newCubes: ICube[] = state.cubes.map((item) => {
-                if (item.sortIndex === index1) return { ...item, sortIndex: index2 }
-                else if (item.sortIndex === index2) return { ...item, sortIndex: index1 }
-                return { ...item };
-            })
-            return { ...state, cubes: newCubes }
+        case ActionTypes.SwapDone:
+            {
+                return {
+                    ...state,
+                    swapIndexes: []
+                }
+            }
 
         case ActionTypes.SortDone:
             return {
@@ -110,12 +129,14 @@ function reducer(state: IState = initState, action: IAction): IState {
         // case ActionTypes.Delete:
 
         case ActionTypes.RandomDone:
-            let newValues1 = randomArr();
-            return {
-                ...state,
-                cubes: initCubes(newValues1),
-                values: newValues1,
-                randomDone: true
+            {
+                let newValues = randomArr();
+                return {
+                    ...state,
+                    cubes: initCubes(newValues),
+                    values: newValues,
+                    randomDone: true
+                }
             }
 
         case ActionTypes.Random:
@@ -146,6 +167,7 @@ const Sort = () => {
     const startPos = getStartXPos(state.cubes.length);
 
 
+    /* 监听控制台的操作 */
     const handleConsole = (operaType: OperaTypes) => {
         switch (operaType) {
             case OperaTypes.Add:
@@ -220,7 +242,8 @@ const Sort = () => {
                                 arrCubeConfig={{
                                     sortIndex: item.sortIndex,
                                     value: item.value + '',
-                                    startPos
+                                    startPos,
+                                    swapIndexes: state.swapIndexes
                                 }}
                                 isActive={item.isActive}
                                 isLock={item.isLock}

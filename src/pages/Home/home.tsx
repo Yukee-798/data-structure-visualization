@@ -124,17 +124,17 @@ const Home = () => {
                 return history.replace('/sort');
             case DataStrucTypes.LinkedList:
                 return history.replace('/linkedList')
-            // case DataStrucTypes.BinarySearchTree:
-            //     return history.replace('/binarySearchTree')
+            case DataStrucTypes.BinarySearchTree:
+                return history.replace('/binarySearchTree')
 
         }
     }
     return (
         <div className='home-warp'>
-            {homeItemsConfig.map((row) => (
-                <Row gutter={{ xs: 8, sm: 16, md: 24 }}>
-                    {row.map((col) => (
-                        <Col xs={12} sm={12} md={6} lg={6} xl={6}>
+            {homeItemsConfig.map((row, i) => (
+                <Row gutter={{ xs: 8, sm: 16, md: 24 }} key={i + '&'}>
+                    {row.map((col, j) => (
+                        <Col xs={12} sm={12} md={6} lg={6} xl={6} key={i + '&' + j}>
                             <HomeItem
                                 src={col.src}
                                 tag={col.tag}

@@ -4,6 +4,8 @@ import React from "react";
 export const CUBE_INTERVAL_DISTANCE = 2;
 /* 设置 3d 物品在 scene 中的基准 y 轴坐标 */
 export const BASE_POSY = -2;
+/* 设置遍历节点时的速度 */
+export const TRAVERSE_SPEED = 300;
 
 
 export interface IBaseProps {

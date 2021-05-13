@@ -11,6 +11,26 @@ export function randomArr(): number[] {
     return arr;
 }
 
+/* 初始化 cubes */
+export function initCubes(values: number[]): ICube[] {
+    return values.map((value, index) => ({
+        value,
+        strValue: value + '&' + index,
+        isActive: false,
+        isLock: false,
+        sortIndex: index
+    }));
+}
+
+/* 根据数组长度，计算出第一个 cube 的 position 的 x 坐标 */
+export function getStartXPos(arrLen: number): number {
+    return -(arrLen - 1) * CUBE_INTERVAL_DISTANCE / 2;
+}
+/* 传入一组序列，判断其是否有序 */
+export function isSorted(values: number[]): boolean {
+    return false;
+}
+
 /* 返回冒泡排序细节 */
 export function bubbleSortSeq(arr: number[]) {
     let backup = [...arr];
@@ -58,18 +78,3 @@ export function selectSortSeq(arr: number[]) {
     return sortSeq
 }
 
-/* 初始化 cubes */
-export function initCubes(values: number[]): ICube[] {
-    return values.map((value, index) => ({
-        value,
-        strValue: value + '&' + index,
-        isActive: false,
-        isLock: false,
-        sortIndex: index
-    }));
-}
-
-/* 根据数组长度，计算出第一个 cube 的 position 的 x 坐标 */
-export function getStartXPos(arrLen: number): number {
-    return -(arrLen - 1) * CUBE_INTERVAL_DISTANCE / 2;
-}
