@@ -19,39 +19,30 @@ const Console: React.FC<IConsole> = (props) => {
         case 'sort':
             return (
                 // <div className='console-warp' >
-                <>
-                    <Button
-                        className='console-trigger'
-                    >
-                        操作台
-                    </Button>
-                    <Drawer
-                        className='console'
-                        title='操作台'
-                        placement='right'
-                        visible={false}
-                        getContainer={false}
-                    >
+                // <>
+                //     <Button
+                //         className='console-trigger'
+                //     >
+                //         操作台
+                //     </Button>
+                //     <Drawer
+                //         className='console'
+                //         title='操作台'
+                //         placement='right'
+                //         visible={false}
+                //         getContainer={false}
+                //     >
 
-                    </Drawer>
-                </>
+                //     </Drawer>
+                // </>
                 // </div>
-                // // <Menu
-                // //     className='console-warp'
-                // // >
-                //     {/* <Item key='1'
-
-                //     > */}
-
-                //     // {/* </Item> */}
-                //     {/* {disabled ? <>操作进行中...</> : <>
-                //         <Button onClick={() => { onOpera(OperaTypes.Random) }}>随机生成</Button>
-                //         <Button>添加</Button>
-                //         <Button>删除</Button>
-                //         <Button onClick={() => { onOpera(OperaTypes.BubbleSort) }}>冒泡排序</Button>
-                //         <Button onClick={() => { onOpera(OperaTypes.Recover) }}>恢复</Button>
-                //     </>} */}
-                // {/* </Menu> */}
+                disabled ? <>操作进行中...</> : <>
+                    <Button onClick={() => { onOpera(OperaTypes.Random) }}>随机生成</Button>
+                    <Button>添加</Button>
+                    <Button>删除</Button>
+                    <Button onClick={() => { onOpera(OperaTypes.BubbleSort) }}>冒泡排序</Button>
+                    <Button onClick={() => { onOpera(OperaTypes.Recover) }}>恢复</Button>
+                </>
             )
 
         case 'linkedList':

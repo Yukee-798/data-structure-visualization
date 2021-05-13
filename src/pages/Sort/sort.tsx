@@ -198,11 +198,6 @@ const Sort = () => {
             />
 
             <div className='sort-main'>
-                <Console
-                    onOpera={handleConsole}
-                    type='sort'
-                    disabled={!state.randomDone || !state.sortDone}
-                />
                 <Scene3d>
                     {
                         state.cubes.map((item) => (
@@ -232,6 +227,11 @@ const Sort = () => {
                         ))
                     }
                 </Scene3d>
+                <Console
+                    onOpera={handleConsole}
+                    type='sort'
+                    disabled={!state.randomDone || !state.sortDone}
+                />
             </div>
         </div>
     )
