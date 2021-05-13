@@ -31,10 +31,10 @@ const routerView = [
     //     path: "/avlTree",
     //     page: AVLTree
     // },
-    // {
-    //     path: "/binarySearchTree",
-    //     page: BinarySearchTree
-    // },
+    {
+        path: "/binarySearchTree",
+        page: BinarySearchTree
+    },
     // {
     //     path: "/bPlusTree",
     //     page: BPlusTree
