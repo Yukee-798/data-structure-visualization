@@ -1,6 +1,6 @@
 import { IColorConfig, IGeometryProps } from '../../types';
 import { Icosahedron, Text } from '@react-three/drei'
-import { animated } from '@react-spring/three';
+import { animated } from 'react-spring/three';
 
 interface ISphere3dProps extends IGeometryProps {
 
