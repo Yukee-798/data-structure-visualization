@@ -72,10 +72,10 @@ const routerView = [
     //     path: "/redBlackTree",
     //     page: RedBlackTree
     // },
-    // {
-    //     path: "/stack",
-    //     page: Stack
-    // },
+    {
+        path: "/stack",
+        page: Stack
+    },
 ];
 
 

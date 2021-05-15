@@ -1,38 +1,21 @@
 import React from "react";
 
-/** 设置 cube 之间的间距 */
-export const CUBE_INTERVAL_DISTANCE = 2;
+/** 设置 SortCube 之间的间距 */
+export const SORT_CUBE_INTERVAL_DISTANCE = 2;
+
+/** 设置 StackCube 之间的间距 */
+export const STACK_CUBE_INTERVAL_DISTANCE = 0.8;
+
 /** 设置 3d 物品在 scene 中的基准 y 轴坐标 */
 export const BASE_POSY = -2;
+
 /** 遍历细节数组，分发任务的间隔时间 */
-export const DISPATCH_INTERVAL = 300;
+export const DISPATCH_INTERVAL = 320;
 
 
 export interface IBaseProps {
     style?: React.CSSProperties;
     className?: string;
-}
-
-/** 用于识别控制台类型 */
-export type HomeItemTypes = 'avlTree' | 'binaryHeap' | 'binarySearch' | 'binarySearchTree' | 'bPlusTree' | 'bTree' | 'graph' | 'graphTraverse' | 'hashTable' | 'linkedList' | 'queue' | 'redBlackTree' | 'sort' | 'stack';
-
-/** 控制台操作类型 */
-export enum OperaTypes {
-    // 增删改查
-    Add,
-    Delete,
-    Update,
-    Search,
-    Random,
-    Recover,
-
-    // 排序方面
-    BubbleSort,
-    SelectSort,
-    InsertSort,
-    QuickSort,
-    MergeSort,
-
 }
 
 /** 数据结构类型枚举同时也是tag的类型 */
@@ -65,8 +48,6 @@ export enum DataStrucTypes {
     Traverse,
 }
 
-
-
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
     colorConfig?: IColorConfig
@@ -76,23 +57,38 @@ export interface IGeometryProps {
     isReset?: boolean;
 }
 
-export interface IColorConfig {
-    /** 默认颜色 */
-    defaultColor: string;
-    /** hover颜色 */
-    hoverColor: string;
-    /** active颜色 */
-    activeColor: string;
-    /** lock颜色 */
-    lockColor: string;
+export enum ActionTypes {
+    Pop,
+    PopDone,
+    Push,
+    PushDone,
+    Active,
+    Deactive,
+    Swap,
+    SwapDone,
+    Lock,
+    UnLock,
+    SortDone,
+    RandomDone,
+    Random,
+    Add,
+    Delete,
+    Search,
 }
 
-
+export interface IColorConfig {
+    /** 默认颜色 */
+    defaultColor?: string;
+    /** hover颜色 */
+    hoverColor?: string;
+    /** active颜色 */
+    activeColor?: string;
+    /** lock颜色 */
+    lockColor?: string;
+}
 
 export interface ICube {
-    value: number;
-    strValue: string;
-    sortIndex: number;
+    value: string;
     isActive: boolean;
     isLock: boolean;
 }
