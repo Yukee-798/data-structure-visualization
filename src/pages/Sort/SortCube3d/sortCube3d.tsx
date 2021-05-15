@@ -75,7 +75,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
         // 如果有需要交换的两个元素
         if (swapIndexes.includes(sortIndex as never)) {
-            const delta = Math.abs(oldPosX - targetPosX) / 18;
+            const delta = Math.abs(oldPosX - targetPosX) / 16;
 
             // mesh 需要往右移
             if (oldPosX - targetPosX < 0 && meshRef.current.position.x < targetPosX) {

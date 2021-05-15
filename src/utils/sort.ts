@@ -1,5 +1,5 @@
 import { randomNum } from ".";
-import {ISortCube } from "../pages/Sort/sort";
+import { ISortCube } from "../pages/Sort/sort";
 import { ActionTypes, SORT_CUBE_INTERVAL_DISTANCE } from "../types";
 
 /** 初始化 cubes */
@@ -54,8 +54,10 @@ export function selectSortSeq(arr: number[]) {
         for (let j = 0; j <= i; j++) {
             sortSeq.push({ type: ActionTypes.Active, indexes: [j] });
             if (backup[j] > max) {
+                sortSeq.push({ type: ActionTypes.UnLock, indexes: [indexOfMax] })
                 max = backup[j];
                 indexOfMax = j;
+                sortSeq.push({ type: ActionTypes.Lock, indexes: [j] })
             }
             sortSeq.push({ type: ActionTypes.Deactive, indexes: [j] });
         }
@@ -65,7 +67,6 @@ export function selectSortSeq(arr: number[]) {
         backup[indexOfMax] = temp;
         sortSeq.push({ type: ActionTypes.Swap, indexes: [indexOfMax, i] })
         sortSeq.push({ type: ActionTypes.SwapDone, indexes: [indexOfMax, i] });
-        sortSeq.push({ type: ActionTypes.Lock, indexes: [i] });
     }
     sortSeq.push({ type: ActionTypes.SortDone });
     return sortSeq
