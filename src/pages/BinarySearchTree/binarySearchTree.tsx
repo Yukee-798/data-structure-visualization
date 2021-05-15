@@ -22,7 +22,7 @@ const BinarySearchTree = () => {
 
             <Scene3d>
                 <Sphere3d position={[0, 8, 0]} />
-                {/* <Line3d points={[[0 - 0.65, 8 - 0.25, 0], [-4 + 0.65, 6 + 0.25, 0]]} /> */}
+                {/** <Line3d points={[[0 - 0.65, 8 - 0.25, 0], [-4 + 0.65, 6 + 0.25, 0]]} /> */}
                 <Sphere3d position={[-4, 6, 0]} />
                 <Sphere3d position={[4, 6, 0]} />
 

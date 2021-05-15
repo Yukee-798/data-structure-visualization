@@ -5,7 +5,7 @@ import './tags.scss'
 
 
 interface ITagsProps extends IBaseProps {
-    /* 标签组类型 */
+    /** 标签组类型 */
     type: DataStrucTypes
 }
 

@@ -78,7 +78,7 @@ const Scene3d: React.FC = (props) => {
                 <directionalLight color="white" position={[1, 1, 1]} />
 
                 <Suspense fallback={null}>
-                    {/* <Reflector
+                    {/** <Reflector
                     resolution={1024}
                     args={[10, 10]}
                     mirror={0.75}
@@ -106,9 +106,9 @@ const Scene3d: React.FC = (props) => {
                         />
                     )}
                 </Reflector> */}
-                    {/* <TransformControls> */}
+                    {/** <TransformControls> */}
                     {children}
-                    {/* </TransformControls> */}
+                    {/** </TransformControls> */}
 
 
                     <OrbitControls

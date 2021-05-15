@@ -6,7 +6,7 @@ import { DataStrucTypes } from '../../types';
 import Pic from '../../assets/homeItemCovers/84993086_p0.jpg'
 import './home.scss'
 
-/* home 的 item 数据配置 */
+/** home 的 item 数据配置 */
 export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
     // 第一排
     [
@@ -124,6 +124,8 @@ const Home = () => {
                 return history.replace('/sort');
             case DataStrucTypes.LinkedList:
                 return history.replace('/linkedList')
+            case DataStrucTypes.Stack:
+                return history.replace('/stack')
             case DataStrucTypes.BinarySearchTree:
                 return history.replace('/binarySearchTree')
 

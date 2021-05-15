@@ -8,21 +8,20 @@ import './homeItem.scss'
 import { useHover } from '../../utils'
 
 export interface IHomeItemProps extends IBaseProps {
-    /* 卡片标题 */
+    /** 卡片标题 */
     title: string;
-    /* 数据结构类型 */
+    /** 数据结构类型 */
     type: DataStrucTypes;
-    /* 图片资源 */
+    /** 图片资源 */
     src: string;
-    /* 标签 */
+    /** 标签 */
     tag: React.ReactNode;
-    /* 点击事件 */
+    /** 点击事件 */
     onClick: (type: DataStrucTypes) => void;
 }
 
 const HomeItem: React.FC<IHomeItemProps> = (props) => {
     const { title, src, tag, type, onClick } = props;
-
     // const [isClick, setIsClick] = useState(false);
     const [hoverRef, isHover] = useHover();
 
@@ -51,7 +50,6 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
     //     config: config.wobbly,
     // })
 
-
     return (
         <animated.div
             ref={hoverRef as any}
@@ -59,19 +57,9 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
             style={{ scale}}
         >
             <Card
-
                 hoverable
                 cover={<img src={src} alt='pic' />}
-                onClick={() => {
-                    // setIsClick(true);
-                    // setTimeout(() => {
-                    //     setIsClick(false);
-                    // }, 500)
-                    // setTimeout(() => {
-                        onClick(type);
-                    // }, 500)
-
-                }}
+                onClick={() => onClick(type)}
             >
                 <Card.Meta
                     title={title}
