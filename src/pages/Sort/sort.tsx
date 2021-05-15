@@ -1,16 +1,21 @@
 import Scene3d from '../../components/Scene3d/scene3d';
-import Cuboid3d from '../../components/Cuboid3d/cuboid3d'
 import { Button, PageHeader } from 'antd';
 import { useEffect, useReducer, useRef, useState } from 'react';
-import { bubbleSortSeq, getStartXPos, initCubes, randomArr, selectSortSeq } from '../../utils/sort';
+import { bubbleSortSeq, getStartXPos, initCubes, selectSortSeq } from '../../utils/sort';
+import { randomArr } from '../../utils/index'
 import { Text } from '@react-three/drei';
-import { BASE_POSY, CUBE_INTERVAL_DISTANCE, ICube, OperaTypes, TRAVERSE_SPEED } from '../../types';
+import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, ICube } from '../../types';
 import { Map, List } from 'immutable'
 import { useHistory } from 'react-router';
 import Console from '../../components/Console/console';
 import './sort.scss'
+import SortCube3d from './SortCube3d/sortCube3d';
 
 
+export interface ISortCube extends ICube {
+    strValue: string;
+    sortIndex: number;
+}
 type IReducer = (state: IState, action: IAction) => IState;
 
 interface IState {
@@ -19,26 +24,14 @@ interface IState {
     // 表示当前正在交换的两个下标
     swapIndexes: [number, number] | [];
     // 用来表示每个 cube 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
-    cubes: ICube[];
+    cubes: ISortCube[];
     // 是否排序完毕
     sortDone: boolean;
     // 是否随机化完毕
     randomDone: boolean;
 }
 
-export enum ActionTypes {
-    Active,
-    Deactive,
-    Swap,
-    SwapDone,
-    Lock,
-    SortDone,
-    RandomDone,
-    Random,
-    Add,
-    Delete,
-    Search,
-}
+
 
 interface IAction {
     type: ActionTypes;
@@ -57,7 +50,7 @@ function reducer(state: IState = initState, action: IAction): IState {
 
     const { type, payload } = action;
 
-    state.cubes = List(state.cubes).toJS().map((item) => Map(item).toJS()) as ICube[];
+    state.cubes = List(state.cubes).toJS().map((item) => Map(item).toJS()) as ISortCube[];
 
     switch (type) {
         case ActionTypes.Active:
@@ -91,6 +84,18 @@ function reducer(state: IState = initState, action: IAction): IState {
                 let index1 = (payload as number[])[0];
                 let index2 = (payload as number[])[1];
 
+                return {
+                    ...state,
+                    swapIndexes: [index1, index2]
+                }
+            }
+
+        case ActionTypes.SwapDone:
+            {
+                // 取出需要交换的两个下标
+                let index1 = (payload as number[])[0];
+                let index2 = (payload as number[])[1];
+
                 // 交换 values 的值
                 let newValues = [...state.values];
                 let temp = newValues[index1];
@@ -98,22 +103,14 @@ function reducer(state: IState = initState, action: IAction): IState {
                 newValues[index2] = temp;
 
                 // 交换 cubes 中对应下标的 sortIndex
-                const newCubes: ICube[] = state.cubes.map((item) => {
+                const newCubes: ISortCube[] = state.cubes.map((item) => {
                     if (item.sortIndex === index1) return { ...item, sortIndex: index2 }
                     else if (item.sortIndex === index2) return { ...item, sortIndex: index1 }
                     return { ...item };
                 })
-                return { 
-                    ...state, 
-                    cubes: newCubes,
-                    swapIndexes: [index1, index2]
-                }
-            }
-
-        case ActionTypes.SwapDone:
-            {
                 return {
                     ...state,
+                    cubes: newCubes,
                     swapIndexes: []
                 }
             }
@@ -163,65 +160,8 @@ const Sort = () => {
         }
     })
 
-    /* 传入数组长度，计算第一个元素的起始x坐标 */
-    const startPos = getStartXPos(state.cubes.length);
-
-
-    /* 监听控制台的操作 */
-    const handleConsole = (operaType: OperaTypes) => {
-        switch (operaType) {
-            case OperaTypes.Add:
-                return;
-            case OperaTypes.Delete:
-                return;
-            case OperaTypes.Update:
-                return;
-            case OperaTypes.Search:
-                return;
-
-            case OperaTypes.BubbleSort:
-                /* 处理排序：等间隔时间来 dispatch action  */
-
-                {
-                    let sequence = bubbleSortSeq(state.values);
-                    sequence.forEach((event, i) => {
-                        setTimeout(() => {
-                            dispatch({ type: event.type, payload: event.indexes })
-                        }, i * TRAVERSE_SPEED);
-                    });
-                }
-                return;
-
-            case OperaTypes.SelectSort:
-                {
-                    let sequence = selectSortSeq(state.values);
-                    sequence.forEach((event, i) => {
-                        setTimeout(() => {
-                            dispatch({ type: event.type, payload: event.indexes })
-                        }, i * TRAVERSE_SPEED)
-                    })
-                }
-                return;
-
-            case OperaTypes.Random:
-                /* 随机生成数据 */
-                dispatch({ type: ActionTypes.Random });
-                setTimeout(() => {
-                    dispatch({ type: ActionTypes.RandomDone })
-                }, 400);
-                return;
-
-            case OperaTypes.Recover:
-                return;
-        }
-    }
-
-    // const isSorted = (): boolean => {
-    //     for (let i = 0; i < state.values.length - 1; i++) {
-    //         if (state.values[i] > state.values[i + 1]) return false;
-    //     }
-    //     return true;
-    // }
+    /** 传入数组长度，计算第一个元素的起始x坐标 */
+    const startPosX = getStartXPos(state.cubes.length);
 
     return (
         <div className='sort-warp'>
@@ -237,17 +177,16 @@ const Sort = () => {
                 <Scene3d>
                     {
                         state.cubes.map((item, index) => (
-                            <Cuboid3d
+                            <SortCube3d
                                 key={index + '@'}
-                                arrCubeConfig={{
-                                    sortIndex: item.sortIndex,
-                                    value: item.value + '',
-                                    startPos,
-                                    swapIndexes: state.swapIndexes
-                                }}
+                                sortIndex={item.sortIndex}
+                                value={item.value + ''}
+                                startPosX={startPosX}
+                                swapIndexes={state.swapIndexes}
                                 isActive={item.isActive}
                                 isLock={item.isLock}
-                                // position={[getStartXPos(state.cubes.length) + (index * CUBE_INTERVAL_DISTANCE), 0, 0]}
+                                // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
+                                position={[startPosX + (index * SORT_CUBE_INTERVAL_DISTANCE), (+item.value * 0.2) / 2 + BASE_POSY, 0]}
                                 isReset={!state.randomDone}
                             />
                         ))
@@ -259,18 +198,42 @@ const Sort = () => {
                                 fillOpacity={state.randomDone ? 1 : 0}
                                 color='black'
                                 fontSize={0.5}
-                                position={[getStartXPos(state.cubes.length) + (index * CUBE_INTERVAL_DISTANCE), -1 + BASE_POSY, 0]}
+                                position={[getStartXPos(state.cubes.length) + (index * SORT_CUBE_INTERVAL_DISTANCE), -1 + BASE_POSY, 0]}
                             >
                                 {index}
                             </Text>
                         ))
                     }
                 </Scene3d>
-                <Console
-                    onOpera={handleConsole}
-                    type='sort'
-                    disabled={!state.randomDone || !state.sortDone}
-                />
+
+                <Console>
+                    <Button onClick={() => {
+                        /** 随机生成数据 */
+                        dispatch({ type: ActionTypes.Random });
+                        setTimeout(() => {
+                            dispatch({ type: ActionTypes.RandomDone })
+                        }, 400);
+                    }}>随机生成</Button>
+                    <Button>添加</Button>
+                    <Button>删除</Button>
+                    <Button onClick={() => {
+                        let sequence = bubbleSortSeq(state.values);
+                        sequence.forEach((event, i) => {
+                            setTimeout(() => {
+                                dispatch({ type: event.type, payload: event.indexes })
+                            }, i * DISPATCH_INTERVAL);
+                        });
+                    }}>冒泡排序</Button>
+                    <Button onClick={() => {
+                        let sequence = selectSortSeq(state.values);
+                        sequence.forEach((event, i) => {
+                            setTimeout(() => {
+                                dispatch({ type: event.type, payload: event.indexes })
+                            }, i * DISPATCH_INTERVAL)
+                        })
+                    }}>选择排序</Button>
+                    <Button onClick={() => { }}>恢复</Button>
+                </Console>
             </div>
         </div>
     )
