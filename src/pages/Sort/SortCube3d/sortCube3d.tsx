@@ -3,18 +3,17 @@ import React, { useEffect, useRef, useState } from 'react'
 import { animated, useSpring, config } from 'react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
-import { BASE_POSY, CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../types';
-import { quickSortSeq } from '../../utils/sort';
+import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../../types';
+import { quickSortSeq } from '../../../utils/sort';
 
-
-interface IArrayCube3dProps extends IGeometryProps {
+interface ISortCube3dProps extends IGeometryProps {
     value: string;
     sortIndex: number;
     swapIndexes: [number, number] | [];
-    startPos: any;
+    startPosX: any;
 }
 
-const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
+const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
     const {
         position,
@@ -23,7 +22,7 @@ const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
         isReset,
         value,
         sortIndex,
-        startPos,
+        startPosX,
         swapIndexes,
         colorConfig,
     } = props;
@@ -57,7 +56,7 @@ const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
     })
 
     /** 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
-    const getPosX = (sortIndex: number) => startPos + (sortIndex * CUBE_INTERVAL_DISTANCE);
+    const getPosX = (sortIndex: number) => startPosX + (sortIndex * SORT_CUBE_INTERVAL_DISTANCE);
 
     /** 交换元素时，获取其起始位置 */
     const getOrginPosX = () => {
@@ -69,27 +68,14 @@ const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
         return getPosX((swapIndexes[0] === sortIndex ? swapIndexes[1] : swapIndexes[0]) as number);
     }
 
-    const delta = 0.2;
     const oldPosX = getOrginPosX();
     const targetPosX = getTargetPosX();
 
-
-    useEffect(() => {
-        let a = [3,2,1, -2, 0, 11, 9];
-        quickSortSeq(a, 0, a.length - 1);
-        console.log(a);
-    }, [])
-
-    useFrame(({ clock }) => {
-
-
-        // 现在问题是，只要 swapIndexes 一变化
-
-
+    useFrame(() => {
 
         // 如果有需要交换的两个元素
         if (swapIndexes.includes(sortIndex as never)) {
-
+            const delta = Math.abs(oldPosX - targetPosX) / 18;
 
             // mesh 需要往右移
             if (oldPosX - targetPosX < 0 && meshRef.current.position.x < targetPosX) {
@@ -97,7 +83,7 @@ const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
                 if (meshRef.current.position.x >= targetPosX) {
                     meshRef.current.position.x = targetPosX;
                 }
-            } 
+            }
 
             // mesh 需要往左移
             else if (oldPosX - targetPosX > 0 && meshRef.current.position.x > targetPosX) {
@@ -107,13 +93,6 @@ const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
                 }
             }
         }
-
-        // let i = 
-        // console.log(clock.getDelta());
-        // console.log(clock.getElapsedTime());
-        // const oldPosx = 1
-        // /** 平移前一次的 posX 和最新的 posX 差值  */
-        // // meshRef.current.translateX(clock.getElapsedTime())
     })
 
     return (
@@ -150,7 +129,7 @@ const ArrayCube3d: React.FC<IArrayCube3dProps> = (props) => {
     )
 }
 
-ArrayCube3d.defaultProps = {
+SortCube3d.defaultProps = {
     colorConfig: {
         defaultColor: 'wheat',
         activeColor: 'orange',
@@ -159,4 +138,4 @@ ArrayCube3d.defaultProps = {
     }
 }
 
-export default React.memo(ArrayCube3d);
+export default React.memo(SortCube3d);
