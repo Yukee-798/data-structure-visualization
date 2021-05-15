@@ -23,14 +23,6 @@ const Console: React.FC<IConsole> = (props) => {
     )
 }
 
-/* 
-            <Button onClick={() => { onOpera(OperaTypes.Random) }}>随机生成</Button>
-            <Button>添加</Button>
-            <Button>删除</Button>
-            <Button onClick={() => { onOpera(OperaTypes.BubbleSort) }}>冒泡排序</Button>
-            <Button onClick={() => { onOpera(OperaTypes.SelectSort) }}>选择排序</Button>
-            <Button onClick={() => { onOpera(OperaTypes.Recover) }}>恢复</Button>
-*/
 
 
 
