@@ -4,12 +4,12 @@ import Scene3d from '../../components/Scene3d/scene3d'
 import './stack.scss'
 import StackCube3d from './StackCube3d/stackCube3d';
 import { useReducer, useState } from 'react';
-import { ActionTypes, ICube, STACK_CUBE_INTERVAL_DISTANCE } from '../../types';
+import { ActionTypes, IGeometryProps, STACK_CUBE_INTERVAL_DISTANCE } from '../../types';
 import { getStartYPos, initCubes } from '../../utils/stack';
 import { randomArr } from '../../utils';
 import Console from '../../components/Console/console';
 
-export interface IStackCube extends ICube {
+export interface IStackCube extends IGeometryProps {
 
 }
 

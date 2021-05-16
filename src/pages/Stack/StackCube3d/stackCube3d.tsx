@@ -8,7 +8,6 @@ import { quickSortSeq } from '../../../utils/sort';
 
 
 interface IStackCube3dProps extends IGeometryProps {
-    value: string;
     startPosY: any;
     isPop?: boolean
 }
