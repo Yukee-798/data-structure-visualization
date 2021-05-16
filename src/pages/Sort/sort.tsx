@@ -1,10 +1,10 @@
 import Scene3d from '../../components/Scene3d/scene3d';
 import { Button, PageHeader } from 'antd';
 import { useEffect, useReducer, useRef, useState } from 'react';
-import { bubbleSortSeq, getStartXPos, initCubes, selectSortSeq } from '../../utils/sort';
+import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
 import { randomArr } from '../../utils/index'
 import { Text } from '@react-three/drei';
-import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, ICube } from '../../types';
+import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
 import { Map, List } from 'immutable'
 import { useHistory } from 'react-router';
 import Console from '../../components/Console/console';
@@ -12,7 +12,7 @@ import './sort.scss'
 import SortCube3d from './SortCube3d/sortCube3d';
 
 
-export interface ISortCube extends ICube {
+export interface ISortCube extends IGeometryProps {
     strValue: string;
     sortIndex: number;
 }
@@ -30,8 +30,6 @@ interface IState {
     // 是否随机化完毕
     randomDone: boolean;
 }
-
-
 
 interface IAction {
     type: ActionTypes;
@@ -75,6 +73,14 @@ function reducer(state: IState = initState, action: IAction): IState {
                 ...state,
                 cubes: state.cubes.map(
                     (item) => payload?.includes(item.sortIndex) ? { ...item, isLock: true } : { ...item }
+                )
+            }
+
+        case ActionTypes.UnLock:
+            return {
+                ...state,
+                cubes: state.cubes.map(
+                    (item) => payload?.includes(item.sortIndex) ? { ...item, isLock: false } : { ...item }
                 )
             }
 
@@ -232,6 +238,17 @@ const Sort = () => {
                             }, i * DISPATCH_INTERVAL)
                         })
                     }}>选择排序</Button>
+                    <Button onClick={() => {
+                        let sequence: any[] = [];
+                        quickSortSeq([...state.values], 0, state.values.length - 1, sequence);
+
+                        console.log(sequence);
+                        sequence.forEach((event, i) => {
+                            setTimeout(() => {
+                                dispatch({ type: event.type, payload: event.indexes })
+                            }, i * DISPATCH_INTERVAL)
+                        })
+                    }}>快速排序</Button>
                     <Button onClick={() => { }}>恢复</Button>
                 </Console>
             </div>

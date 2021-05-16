@@ -1,4 +1,3 @@
-import { randomNum } from ".";
 import { ISortCube } from "../pages/Sort/sort";
 import { ActionTypes, SORT_CUBE_INTERVAL_DISTANCE } from "../types";
 
@@ -73,9 +72,7 @@ export function selectSortSeq(arr: number[]) {
 }
 
 /** 返回快速排序细节 */
-export function quickSortSeq(arr: number[], l: number, r: number) {
-    let backup = [...arr]
-    let sortSeq = [];
+export function quickSortSeq(arr: number[], l: number, r: number, sortSeq: any[]) {
     if (l >= r) return;
 
     let i = l - 1, j = r + 1, x = arr[l + r >> 1];
@@ -85,25 +82,25 @@ export function quickSortSeq(arr: number[], l: number, r: number) {
             sortSeq.push({ type: ActionTypes.Active, indexes: [i] });
             sortSeq.push({ type: ActionTypes.Deactive, indexes: [i] });
         } while (arr[i] < x);
-        sortSeq.push({ type: ActionTypes.Lock, indexes: [i] });
+        // sortSeq.push({ type: ActionTypes.Lock, indexes: [i] });
 
         do {
             j--;
             sortSeq.push({ type: ActionTypes.Active, indexes: [j] });
             sortSeq.push({ type: ActionTypes.Deactive, indexes: [j] });
         } while (arr[j] > x);
-        sortSeq.push({ type: ActionTypes.Lock, indexes: [i] });
+        // sortSeq.push({ type: ActionTypes.Lock, indexes: [j] });
 
         if (i < j) {
+            sortSeq.push({ type: ActionTypes.Swap, indexes: [i, j] })
             let temp = arr[i];
             arr[i] = arr[j];
             arr[j] = temp;
-            sortSeq.push({ type: ActionTypes.Swap, indexes: [i, j] })
             sortSeq.push({ type: ActionTypes.SwapDone, indexes: [i, j] });
         }
     }
-    quickSortSeq(arr, l, j);
-    quickSortSeq(arr, j + 1, r);
+    quickSortSeq(arr, l, j, sortSeq);
+    quickSortSeq(arr, j + 1, r, sortSeq);
 }
 
 

@@ -31,11 +31,21 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
     const [isClick, setIsClick] = useState(false)
     const meshRef = useRef<THREE.Mesh>(null!)
 
+    /** 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
+    const getPosX = (sortIndex: number) => startPosX + (sortIndex * SORT_CUBE_INTERVAL_DISTANCE);
 
-    /** 扫描数组的时候，如果改变了 active 属性，则给它设置一个点击效果 */
-    useEffect(() => {
-        isActive ? setIsClick(true) : setIsClick(false);
-    }, [isActive])
+    /** 交换元素时，获取其起始位置 */
+    const getOrginPosX = () => {
+        return getPosX(sortIndex as number);
+    }
+
+    /** 交换元素时，获取其目标位置 */
+    const getTargetPosX = () => {
+        return getPosX((swapIndexes[0] === sortIndex ? swapIndexes[1] : swapIndexes[0]) as number);
+    }
+
+    const oldPosX = getOrginPosX();
+    const targetPosX = getTargetPosX();
 
     /** 配置扩缩动画效果 */
     const { scale } = useSpring({
@@ -55,22 +65,12 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
         )
     })
 
-    /** 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
-    const getPosX = (sortIndex: number) => startPosX + (sortIndex * SORT_CUBE_INTERVAL_DISTANCE);
+    /** 扫描数组的时候，如果改变了 active 属性，则给它设置一个点击效果 */
+    useEffect(() => {
+        isActive ? setIsClick(true) : setIsClick(false);
+    }, [isActive])
 
-    /** 交换元素时，获取其起始位置 */
-    const getOrginPosX = () => {
-        return getPosX(sortIndex as number);
-    }
-
-    /** 交换元素时，获取其目标位置 */
-    const getTargetPosX = () => {
-        return getPosX((swapIndexes[0] === sortIndex ? swapIndexes[1] : swapIndexes[0]) as number);
-    }
-
-    const oldPosX = getOrginPosX();
-    const targetPosX = getTargetPosX();
-
+    
     useFrame(() => {
 
         // 如果有需要交换的两个元素
