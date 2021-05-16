@@ -19,13 +19,14 @@ const Line3d:React.FC<ILine3dProps> = (props) => {
         <Line
             lineWidth={lineWidth}
             points={points}
+            color={'gray'}
         />
 
     )
 }
 
 Line3d.defaultProps = {
-    lineWidth: 2
+    lineWidth: 1.5
 }
 
 export default Line3d;
