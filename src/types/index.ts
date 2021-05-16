@@ -50,6 +50,7 @@ export enum DataStrucTypes {
 
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
+    value: string;
     colorConfig?: IColorConfig
     position?: any;
     isActive?: boolean;
@@ -87,10 +88,5 @@ export interface IColorConfig {
     lockColor?: string;
 }
 
-export interface ICube {
-    value: string;
-    isActive: boolean;
-    isLock: boolean;
-}
 
 export type Points = [number, number, number][];
