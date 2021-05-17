@@ -1,5 +1,6 @@
 import { randomNum } from '.';
 import { ISphere } from '../pages/BinarySearchTree/binarySearchTree';
+import { ActionTypes } from '../types';
 import { log } from './math';
 
 /** 获取传入节点的左孩子数据值 */
@@ -22,7 +23,7 @@ export function setLChild<T>(binaryTree: T[], indexOfNode: number, lChild: T) {
 /** 为传入的节点设置右孩子 */
 export function setRChild<T>(binaryTree: T[], indexOfNode: number, rChild: T) {
     const root = binaryTree[indexOfNode];
-    if (root) binaryTree[indexOfNode * 2 + +2] = rChild;
+    if (root) binaryTree[indexOfNode * 2 + 2] = rChild;
     else throw 'node is null';
 }
 
@@ -74,8 +75,8 @@ export function randomBinaryTree(): (number | null)[] {
     return cache;
 }
 
-
-export function initSphere(values: (number | null)[]): ISphere[] {
+/** 初始化二叉树sphere */
+export function initSpheres(values: (number | null)[]): ISphere[] {
     return values.map((value, index) => ({
         sortIndex: index,
         value,
@@ -83,4 +84,30 @@ export function initSphere(values: (number | null)[]): ISphere[] {
         isLock: false,
     }))
 }
+
+/** 获取二叉树前序遍历的细节 */
+export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
+    sequence.push({ type: ActionTypes.Active, index: indexOfNode });
+    sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
+    sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
+    if (getLChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
+    if (getRChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
+}
+
+export function inOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
+    if (getLChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
+    sequence.push({ type: ActionTypes.Active, index: indexOfNode });
+    sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
+    sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
+    if (getRChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
+}
+
+export function postOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
+    if (getLChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
+    if (getRChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
+    sequence.push({ type: ActionTypes.Active, index: indexOfNode });
+    sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
+    sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
+}
+
 

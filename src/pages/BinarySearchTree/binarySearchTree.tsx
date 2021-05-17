@@ -4,8 +4,8 @@ import Console from '../../components/Console/console'
 import Line3d from '../../components/Line3d/line3d'
 import Scene3d from '../../components/Scene3d/scene3d'
 import Sphere3d from '../../components/Sphere3d/sphere3d'
-import { ActionTypes, IGeometryProps, Points } from '../../types'
-import { getDeepthByNodeIndex, getLChildValue, getRChildValue, initSphere, randomBinaryTree } from '../../utils/binaryTree'
+import { ActionTypes, DISPATCH_INTERVAL, IGeometryProps, Points } from '../../types'
+import { getDeepthByNodeIndex, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq, randomBinaryTree } from '../../utils/binaryTree'
 import './binarySearchTree.scss'
 
 
@@ -48,6 +48,39 @@ const initState: IState = {
 const reducer: IReducer = (state = initState, action) => {
     const { type, payload } = action;
     switch (type) {
+
+        case ActionTypes.Active:
+            return {
+                ...state,
+                spheres: state.spheres.map(
+                    (item) => payload === item.sortIndex ? { ...item, isActive: true } : { ...item }
+                )
+            }
+
+        case ActionTypes.Deactive:
+            return {
+                ...state,
+                spheres: state.spheres.map(
+                    (item) => payload === item.sortIndex ? { ...item, isActive: false } : { ...item }
+                )
+            }
+
+        case ActionTypes.Lock:
+            return {
+                ...state,
+                spheres: state.spheres.map(
+                    (item) => payload === item.sortIndex ? { ...item, isLock: true } : { ...item }
+                )
+            }
+
+        case ActionTypes.UnLock:
+            return {
+                ...state,
+                spheres: state.spheres.map(
+                    (item) => payload === item.sortIndex ? { ...item, isLock: false } : { ...item }
+                )
+            }
+
         case ActionTypes.Random:
 
             return {
@@ -61,7 +94,7 @@ const reducer: IReducer = (state = initState, action) => {
                 return {
                     ...state,
                     binaryTree: newBinaryTree,
-                    spheres: initSphere(newBinaryTree),
+                    spheres: initSpheres(newBinaryTree),
                     randomDone: true
                 }
             }
@@ -81,12 +114,50 @@ const BinarySearchTree = () => {
         return {
             ...state,
             binaryTree: initBinaryTree,
-            spheres: initSphere(initBinaryTree)
+            spheres: initSpheres(initBinaryTree)
         }
     });
 
-    // 获取二叉树的最大层数
+    /** 获取二叉树的最大层数 */
     const maxDeepth = getDeepthByNodeIndex(state.binaryTree.length - 1);
+
+    const handleRandom = () => {
+        /** 随机生成数据 */
+        dispatch({ type: ActionTypes.Random });
+        setTimeout(() => {
+            dispatch({ type: ActionTypes.RandomDone })
+        }, 400);
+    }
+
+    const handlePreorder = () => {
+        let sequence: any[] = [];
+        preOrderSeq(state.binaryTree, 0, sequence);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.index })
+            }, i * DISPATCH_INTERVAL)
+        })
+    }
+
+    const handleInorder = () => {
+        let sequence: any[] = [];
+        inOrderSeq(state.binaryTree, 0, sequence);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.index })
+            }, i * DISPATCH_INTERVAL)
+        })
+    }
+
+    const handlePostorder = () => {
+        let sequence: any[] = [];
+        postOrderSeq(state.binaryTree, 0, sequence);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.index })
+            }, i * DISPATCH_INTERVAL)
+        })
+    }
 
     return (
         <div className='binarySearchTree-warp'>
@@ -135,24 +206,17 @@ const BinarySearchTree = () => {
             </Scene3d>
 
             <Console>
-                <Button>
+                <Button onClick={handlePreorder}>
                     Preorder
                 </Button>
-                <Button>
+                <Button onClick={handleInorder}>
                     Inorder
                 </Button>
-                <Button>
+                <Button onClick={handlePostorder}>
                     Postorder
-
                 </Button>
                 <Button
-                    onClick={() => {
-                        /** 随机生成数据 */
-                        dispatch({ type: ActionTypes.Random });
-                        setTimeout(() => {
-                            dispatch({ type: ActionTypes.RandomDone })
-                        }, 400);
-                    }}
+                    onClick={handleRandom}
                 >随机生成</Button>
             </Console>
         </div>
