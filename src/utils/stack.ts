@@ -2,8 +2,8 @@ import { IStackCube } from "../pages/Stack/stack";
 import { STACK_CUBE_INTERVAL_DISTANCE } from "../types";
 
 export function initCubes(values: number[]): IStackCube[] {
-    return values.map((value, index) => ({
-        value: value + '',
+    return values.map((value) => ({
+        value,
         isActive: false,
         isLock: false
     }))

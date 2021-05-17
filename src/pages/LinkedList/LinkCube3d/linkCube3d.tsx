@@ -8,7 +8,6 @@ import { quickSortSeq } from '../../../utils/sort';
 
 
 interface ILinkCube3dProps extends IGeometryProps {
-    value: string;
     startPosX: any;
 }
 

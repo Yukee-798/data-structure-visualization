@@ -7,7 +7,6 @@ import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../..
 import { quickSortSeq } from '../../../utils/sort';
 
 interface ISortCube3dProps extends IGeometryProps {
-    value: string;
     sortIndex: number;
     swapIndexes: [number, number] | [];
     startPosX: any;
@@ -108,7 +107,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
                 {value}
             </Text>
             <RoundedBox
-                args={[1, (+value) * 0.2, 1]}
+                args={[1, (value as number) * 0.2, 1]}
                 onClick={() => setIsClick(!isClick)}
                 onPointerOver={() => setIsHover(true)}
                 onPointerOut={() => setIsHover(false)}

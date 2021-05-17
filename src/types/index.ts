@@ -50,7 +50,7 @@ export enum DataStrucTypes {
 
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
-    value: string;
+    value: number | null;
     colorConfig?: IColorConfig
     position?: any;
     isActive?: boolean;

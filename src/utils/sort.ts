@@ -4,7 +4,7 @@ import { ActionTypes, SORT_CUBE_INTERVAL_DISTANCE } from "../types";
 /** 初始化 cubes */
 export function initCubes(values: number[]): ISortCube[] {
     return values.map((value, index) => ({
-        value: value + '',
+        value,
         strValue: value + '&' + index,
         isActive: false,
         isLock: false,

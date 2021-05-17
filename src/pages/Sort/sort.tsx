@@ -1,6 +1,6 @@
 import Scene3d from '../../components/Scene3d/scene3d';
 import { Button, PageHeader } from 'antd';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useReducer } from 'react';
 import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
 import { randomArr } from '../../utils/index'
 import { Text } from '@react-three/drei';
@@ -8,9 +8,8 @@ import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL,
 import { Map, List } from 'immutable'
 import { useHistory } from 'react-router';
 import Console from '../../components/Console/console';
-import './sort.scss'
 import SortCube3d from './SortCube3d/sortCube3d';
-
+import './sort.scss'
 
 export interface ISortCube extends IGeometryProps {
     strValue: string;
@@ -186,13 +185,13 @@ const Sort = () => {
                             <SortCube3d
                                 key={index + '@'}
                                 sortIndex={item.sortIndex}
-                                value={item.value + ''}
+                                value={item.value}
                                 startPosX={startPosX}
                                 swapIndexes={state.swapIndexes}
                                 isActive={item.isActive}
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
-                                position={[startPosX + (index * SORT_CUBE_INTERVAL_DISTANCE), (+item.value * 0.2) / 2 + BASE_POSY, 0]}
+                                position={[startPosX + (index * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
                                 isReset={!state.randomDone}
                             />
                         ))
