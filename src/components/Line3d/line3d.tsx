@@ -5,13 +5,15 @@ import { Points } from '../../types';
 
 interface ILine3dProps {
     points: Points;
-    lineWidth?: number
+    hidden: boolean;
+    lineWidth?: number;
 }
 
 const Line3d:React.FC<ILine3dProps> = (props) => {
 
     const {
         points,
+        hidden,
         lineWidth
     } = props;
 
@@ -20,6 +22,8 @@ const Line3d:React.FC<ILine3dProps> = (props) => {
             lineWidth={lineWidth}
             points={points}
             color={'gray'}
+            opacity={hidden ? 0 : 1}
+            transparent={true}
         />
 
     )
