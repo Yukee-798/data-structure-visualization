@@ -22,31 +22,16 @@ export interface IHomeItemProps extends IBaseProps {
 
 const HomeItem: React.FC<IHomeItemProps> = (props) => {
     const { title, src, tag, type, onClick } = props;
-    // const [isClick, setIsClick] = useState(false);
     const [hoverRef, isHover] = useHover();
 
     const { scale } = useSpring({
-        // scale: (
-        //     isHover ? 1.02 : 
-        //     isClick ? 20 : 1
-        // ),
+       
         scale: (
             isHover ? 1.05 : 1
         ),
         config: config.stiff
     });
 
-    // const { scale } = useSpring({
-
-    //     // from: { size: '20%', background: 'hotpink' },
-    //     // to: {
-    //     //     size: isClick ? '100%' : '40%',
-    //     //     // background: isClick ? 'white' : 'hotpink',
-    //     // },
-
-    //     scale: isHover ? 1.5 : 1,
-    //     config: config.wobbly,
-    // })
 
     return (
         <animated.div
@@ -57,7 +42,7 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
             <Card
                 hoverable
                 cover={<img src={src} alt='pic' />}
-                onClick={() => onClick(type)}
+                onClick={() => {setTimeout(()=>{onClick(type)}, 500)}}
             >
                 <Card.Meta
                     title={title}
