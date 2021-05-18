@@ -1,11 +1,13 @@
-import { Button } from 'antd'
+import { Button, PageHeader } from 'antd'
 import { Fragment, useEffect, useReducer } from 'react'
+import { useHistory } from 'react-router'
 import Console from '../../components/Console/console'
 import Line3d from '../../components/Line3d/line3d'
 import Scene3d from '../../components/Scene3d/scene3d'
 import Sphere3d from '../../components/Sphere3d/sphere3d'
 import { ActionTypes, DISPATCH_INTERVAL, IGeometryProps, Points } from '../../types'
-import { getDeepthByNodeIndex, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq, randomBinaryTree } from '../../utils/binaryTree'
+import { randomArr, randomNum } from '../../utils'
+import { randomBST, getDeepthByNodeIndex, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq } from '../../utils/binaryTree'
 import './binarySearchTree.scss'
 
 
@@ -82,7 +84,6 @@ const reducer: IReducer = (state = initState, action) => {
             }
 
         case ActionTypes.Random:
-
             return {
                 ...state,
                 randomDone: false
@@ -90,7 +91,7 @@ const reducer: IReducer = (state = initState, action) => {
 
         case ActionTypes.RandomDone:
             {
-                let newBinaryTree = randomBinaryTree();
+                let newBinaryTree = randomBST();
                 return {
                     ...state,
                     binaryTree: newBinaryTree,
@@ -108,9 +109,9 @@ const reducer: IReducer = (state = initState, action) => {
 
 
 const BinarySearchTree = () => {
-
+    const history = useHistory();
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
-        const initBinaryTree = randomBinaryTree();
+        const initBinaryTree = randomBST();
         return {
             ...state,
             binaryTree: initBinaryTree,
@@ -118,17 +119,22 @@ const BinarySearchTree = () => {
         }
     });
 
+    useEffect(() => {
+
+    }, [])
+
     /** 获取二叉树的最大层数 */
     const maxDeepth = getDeepthByNodeIndex(state.binaryTree.length - 1);
 
+    /** 随机生成数据 */
     const handleRandom = () => {
-        /** 随机生成数据 */
         dispatch({ type: ActionTypes.Random });
         setTimeout(() => {
             dispatch({ type: ActionTypes.RandomDone })
         }, 400);
     }
 
+    /** 前序遍历 */
     const handlePreorder = () => {
         let sequence: any[] = [];
         preOrderSeq(state.binaryTree, 0, sequence);
@@ -139,6 +145,7 @@ const BinarySearchTree = () => {
         })
     }
 
+    /** 中序遍历 */
     const handleInorder = () => {
         let sequence: any[] = [];
         inOrderSeq(state.binaryTree, 0, sequence);
@@ -149,6 +156,7 @@ const BinarySearchTree = () => {
         })
     }
 
+    /** 后序遍历 */
     const handlePostorder = () => {
         let sequence: any[] = [];
         postOrderSeq(state.binaryTree, 0, sequence);
@@ -159,20 +167,28 @@ const BinarySearchTree = () => {
         })
     }
 
+
     return (
         <div className='binarySearchTree-warp'>
+            <PageHeader
+                onBack={() => {
+                    history.goBack();
+                    window.location.reload();
+                }}
+                title='二叉搜索树'
+            />
             <Scene3d>
                 {state.spheres.map((sphere, i) => {
-                    // 当前节点所在层数
+                    // 当前结点所在层数
                     const curDeepth = getDeepthByNodeIndex(i);
 
-                    // 当前节点的左孩子值
+                    // 当前结点的左孩子值
                     const curLChildValue = getLChildValue(state.spheres, i)?.value;
 
-                    // 当前节点的右孩子值
+                    // 当前结点的右孩子值
                     const curRChildValue = getRChildValue(state.spheres, i)?.value;
 
-                    // 当前节点JSX
+                    // 当前结点JSX
                     let currentNodeJSX;
 
                     // 判空
@@ -215,9 +231,9 @@ const BinarySearchTree = () => {
                 <Button onClick={handlePostorder}>
                     Postorder
                 </Button>
-                <Button
-                    onClick={handleRandom}
-                >随机生成</Button>
+                <Button onClick={handleRandom}>
+                    随机生成
+                </Button>
             </Console>
         </div>
     )

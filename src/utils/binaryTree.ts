@@ -1,26 +1,31 @@
-import { randomNum } from '.';
+import { randomArr, randomNum } from '.';
 import { ISphere } from '../pages/BinarySearchTree/binarySearchTree';
 import { ActionTypes } from '../types';
 import { log } from './math';
 
-/** 获取传入节点的左孩子数据值 */
+/** 获取传入结点的父结点数据值 */
+export function getFatherValue<T>(binaryTree: T[], indexOfNode: number) {
+    return binaryTree[Math.floor((indexOfNode - 1) / 2)];
+}
+
+/** 获取传入结点的左孩子数据值 */
 export function getLChildValue<T>(binaryTree: T[], indexOfNode: number) {
     return binaryTree[indexOfNode * 2 + 1];
 }
 
-/** 获取传入节点的右孩子数据值 */
+/** 获取传入结点的右孩子数据值 */
 export function getRChildValue<T>(binaryTree: T[], indexOfNode: number) {
     return binaryTree[indexOfNode * 2 + 2]
 }
 
-/** 为传入的节点设置左孩子 */
+/** 为传入的结点设置左孩子 */
 export function setLChild<T>(binaryTree: T[], indexOfNode: number, lChild: T) {
     const root = binaryTree[indexOfNode];
     if (root) binaryTree[indexOfNode * 2 + 1] = lChild;
     else throw 'node is null';
 }
 
-/** 为传入的节点设置右孩子 */
+/** 为传入的结点设置右孩子 */
 export function setRChild<T>(binaryTree: T[], indexOfNode: number, rChild: T) {
     const root = binaryTree[indexOfNode];
     if (root) binaryTree[indexOfNode * 2 + 2] = rChild;
@@ -63,6 +68,58 @@ export function randomBinaryTree(): (number | null)[] {
         cache.fill(null);
         cache[0] = randomNum(1, 80);
         binaryTreeGenerator(randomNum(5, 15), cache, 0);
+
+        // 找到 cache 中最后一个不为 null 的元素的下标
+        for (let i = 500; i >= 0; i--) {
+            if (cache[i] !== null) {
+                cache.length = i + 1;
+                break;
+            }
+        }
+    }
+    return cache;
+}
+
+/** 为二叉搜索树添加结点 */
+export function addToBST(bts: any[], indexOfRoot: number ,nodeV: number) {
+    // 传入的 bts 必须有一个根结点
+    if (bts.length === 0) throw 'the length of bts is 0';
+
+    if (!bts[indexOfRoot]) return;
+
+    // 判断传入结点的值和当前子树根结点的值的关系
+    if (nodeV > bts[indexOfRoot]) {
+        // 当前结点的右孩子不存在，则直接挂上去
+        if (!getRChildValue(bts, indexOfRoot)) {
+            setRChild(bts, indexOfRoot, nodeV);
+        } else {
+            addToBST(bts, indexOfRoot * 2 + 2, nodeV);
+        }
+    } else {
+        // 当前结点的左孩子不存在，则直接挂上去
+        if (!getLChildValue(bts, indexOfRoot)) {
+            setLChild(bts, indexOfRoot, nodeV);
+        } else {
+            addToBST(bts, indexOfRoot * 2 + 1, nodeV);
+        }
+    }
+}
+
+/** 生成二叉搜索树结点数在 5 ~ 15，且层数小于3的二叉搜索树 */
+export function randomBST() {
+    // 初始化 cache
+    let cache = new Array(500);
+
+    // 如果生成的二叉搜索树的层数大于了3则重新生成
+    while (getDeepthByNodeIndex(cache.length - 1) > 3) {
+        const arr = randomArr(randomNum(5, 15));
+        cache.fill(null);
+        cache[0] = randomNum(20, 80);
+
+        // 用 arr 向 cache 中添加结点
+        arr.forEach((value) => {
+            addToBST(cache, 0, value)
+        })
 
         // 找到 cache 中最后一个不为 null 的元素的下标
         for (let i = 500; i >= 0; i--) {
