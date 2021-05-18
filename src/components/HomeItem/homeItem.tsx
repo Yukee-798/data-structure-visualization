@@ -36,8 +36,6 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
         config: config.stiff
     });
 
-    // console.log(isHover);
-
     // const { scale } = useSpring({
 
     //     // from: { size: '20%', background: 'hotpink' },

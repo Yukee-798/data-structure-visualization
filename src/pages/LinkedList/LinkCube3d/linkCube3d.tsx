@@ -4,11 +4,10 @@ import { animated, useSpring, config } from 'react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
 import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../../types';
-import { quickSortSeq } from '../../../utils/sort';
 
 
 interface ILinkCube3dProps extends IGeometryProps {
-    startPosX: any;
+    startPosX?: any;
 }
 
 const LinkCube3d: React.FC<ILinkCube3dProps> = (props) => {

@@ -1,7 +1,5 @@
 import { Line } from '@react-three/drei'
 import { Points } from '../../types';
-// import { animated } from '@react-spring/three'
-
 
 interface ILine3dProps {
     points: Points;

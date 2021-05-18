@@ -39,7 +39,7 @@ export function getDeepthByNodeIndex(indexOfNode: number) {
 
 /** 随机生成结点数为n的二叉树 */
 function binaryTreeGenerator(n: number, binaryTree: (number | null)[], indexOfRoot: number) {
-    if (n == 0) return;
+    if (n === 0) return;
 
     // 左孩子的值
     const lChildV = randomNum(1, 80);
