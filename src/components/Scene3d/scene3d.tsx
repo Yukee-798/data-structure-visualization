@@ -1,12 +1,20 @@
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { Environment, OrbitControls, PerspectiveCamera, Reflector, TransformControls } from "@react-three/drei";
+import { Environment, Html, OrbitControls, PerspectiveCamera, Reflector, TransformControls, useProgress } from "@react-three/drei";
 import './scene3d.scss'
+import { SceneLoader } from '../../configs/loading';
 
-const Scene3d: React.FC = (props) => {
+
+interface IScene3dProps {
+    /** 场景加载完毕后的回调 */
+    onLoaded?: () => void;
+}
+
+const Scene3d: React.FC<IScene3dProps> = (props) => {
     const {
-        children
+        children,
+        onLoaded
     } = props;
 
     const cameraRef = useRef<THREE.PerspectiveCamera>(null!);
@@ -24,32 +32,32 @@ const Scene3d: React.FC = (props) => {
     // }
 
 
-    const handleKeyDown = (ev: KeyboardEvent) => {
-        // const delta = new THREE.Clock(true).getDelta();
-        const moveDistance = 1;
-        switch (ev.key) {
-            case 'w':
-                // setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z - moveDistance)));
-                break;
-            case 'a':
-                setCameraPos((pre) => (new THREE.Vector3(pre.x - moveDistance, pre.y, pre.z)));
-                break;
-            case 'd':
-                setCameraPos((pre) => (new THREE.Vector3(pre.x + moveDistance, pre.y, pre.z)));
-                break;
-            case 's':
-                setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z + moveDistance)));
+    // const handleKeyDown = (ev: KeyboardEvent) => {
+    //     // const delta = new THREE.Clock(true).getDelta();
+    //     const moveDistance = 1;
+    //     switch (ev.key) {
+    //         case 'w':
+    //             // setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z - moveDistance)));
+    //             break;
+    //         case 'a':
+    //             setCameraPos((pre) => (new THREE.Vector3(pre.x - moveDistance, pre.y, pre.z)));
+    //             break;
+    //         case 'd':
+    //             setCameraPos((pre) => (new THREE.Vector3(pre.x + moveDistance, pre.y, pre.z)));
+    //             break;
+    //         case 's':
+    //             setCameraPos((pre) => (new THREE.Vector3(pre.x, pre.y, pre.z + moveDistance)));
 
-                break;
-        }
-    }
+    //             break;
+    //     }
+    // }
 
-    useEffect(() => {
-        document.addEventListener('keydown', handleKeyDown);
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        }
-    }, [])
+    // useEffect(() => {
+    //     document.addEventListener('keydown', handleKeyDown);
+    //     return () => {
+    //         document.removeEventListener('keydown', handleKeyDown);
+    //     }
+    // }, [])
 
 
 
@@ -60,6 +68,8 @@ const Scene3d: React.FC = (props) => {
     //     // console.log(cameraRef.current);
     //     // cameraRef.current?.lookAt(new THREE.Vector3(0, -10, 16))
     // })
+
+
     return (
         <div className='scene3d-warp'>
             <Canvas>
@@ -77,7 +87,7 @@ const Scene3d: React.FC = (props) => {
                 <ambientLight intensity={0.3} />
                 <directionalLight color="white" position={[1, 1, 1]} />
 
-                <Suspense fallback={null}>
+                <Suspense fallback={<SceneLoader onLoaded={onLoaded} />}>
                     {/** <Reflector
                     resolution={1024}
                     args={[10, 10]}
@@ -119,11 +129,8 @@ const Scene3d: React.FC = (props) => {
                         background
                         files={['ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg']}
                         path='/envFiles/'
-
                     />
                 </Suspense>
-
-
             </Canvas>
         </div>
 
