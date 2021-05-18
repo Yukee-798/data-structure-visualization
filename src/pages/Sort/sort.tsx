@@ -1,14 +1,20 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, PageHeader } from 'antd';
+import { Button, Drawer, Input, PageHeader } from 'antd';
 import { Map, List } from 'immutable'
 import { Text } from '@react-three/drei';
-import Console from '../../components/Console/console';
+import Console, { Item, SubMenu } from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
 import Scene3d from '../../components/Scene3d/scene3d';
 import { randomArr, randomNum } from '../../utils/index'
 import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
 import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
+import {
+    BarChartOutlined,
+    DotChartOutlined,
+    MinusSquareOutlined,
+    PlusSquareOutlined,
+} from '@ant-design/icons';
 import './sort.scss'
 
 export interface ISortCube extends IGeometryProps {
@@ -154,6 +160,8 @@ function reducer(state: IState = initState, action: IAction): IState {
     }
 }
 
+
+
 const Sort = () => {
     const history = useHistory();
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
@@ -165,8 +173,20 @@ const Sort = () => {
         }
     })
 
+    /** 控制抽屉是否展开 */
+    const [isUnfold, setIsUnfold] = useState(false);
+
+    /** 场景是否加载完毕 */
+    const [isSceneLoaded, setIsSceneLoaded] = useState(false);
+
     /** 传入数组长度，计算第一个元素的起始x坐标 */
     const startPosX = getStartXPos(state.cubes.length);
+
+
+    /** 处理场景加载完毕回调 */
+    const handleSceneLoaded = () => {
+        setIsSceneLoaded(true);
+    }
 
     /** 随机生成数据 */
     const handleRandom = () => {
@@ -216,9 +236,8 @@ const Sort = () => {
                 }}
                 title='排序'
             />
-
-            <div className='sort-main'>
-                <Scene3d>
+            <div className='main'>
+                <Scene3d onLoaded={handleSceneLoaded}>
                     {
                         state.cubes.map((item, index) => (
                             <SortCube3d
@@ -249,16 +268,59 @@ const Sort = () => {
                         ))
                     }
                 </Scene3d>
+                <Console
+                    onUnFold={() => { setIsUnfold(true) }}
+                    style={{ display: isSceneLoaded ? 'inline-block' : 'none'}}
+                >
+                    <Item
+                        icon={<DotChartOutlined />}
+                        onClick={handleRandom}
+                    >
+                        随机生成
+                    </Item>
 
-                <Console>
-                    <Button onClick={handleRandom}>随机生成</Button>
+                    <SubMenu
+                        key='2'
+                        icon={<BarChartOutlined />}
+                        title='排序'
+                    >
+                        <Item onClick={handleBubbleSort}>冒泡排序</Item>
+                        <Item onClick={handleSelectSort}>选择排序</Item>
+                        <Item>插入排序</Item>
+                        <Item onClick={handleQuickSort}>快速排序</Item>
+                        <Item>归并排序</Item>
+                    </SubMenu>
+
+                    <SubMenu
+                        icon={<PlusSquareOutlined />}
+                    >
+                        <Item>
+                            <Input />
+                            <Button>添加</Button>
+                        </Item>
+                    </SubMenu>
+
+                    <Item icon={<MinusSquareOutlined />}>删除</Item>
+
+                </Console>
+                <Drawer
+                    className='console-drawer'
+                    title='操作台'
+                    visible={isUnfold}
+                    placement='left'
+                    mask={false}
+                    onClose={() => { setIsUnfold(false) }}
+                >
+                    <Button>随机生成</Button>
+                    <Button>冒泡排序</Button>
+                    <Button>选择排序</Button>
+                    <Button>插入排序</Button>
+                    <Button>快速排序</Button>
+                    <Button>归并排序</Button>
                     <Button>添加</Button>
                     <Button>删除</Button>
-                    <Button onClick={handleBubbleSort}>冒泡排序</Button>
-                    <Button onClick={handleSelectSort}>选择排序</Button>
-                    <Button onClick={handleQuickSort}>快速排序</Button>
-                    <Button onClick={() => { }}>恢复</Button>
-                </Console>
+
+                </Drawer>
             </div>
         </div>
     )

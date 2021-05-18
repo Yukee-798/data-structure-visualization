@@ -1,12 +1,15 @@
-// .console-trigger {
-//     position: absolute !important;
-//     right: 0;
-//     top: 0;
-//     z-index: 3000;
-// }
-
 .console-warp {
+    // width: 60px;
+    // z-index: 5000;
     // height: 80vh !important;
-    // position: absolute;
-    // top: 0;
+    position: absolute;
+    top: 0;
+    .console {
+        // z-index: 3000;
+    }
+}
+
+.console-drawer {
+    // position: absolute !important;
+    // left: -10px !important;
 }
