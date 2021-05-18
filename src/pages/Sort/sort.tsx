@@ -1,14 +1,14 @@
-import Scene3d from '../../components/Scene3d/scene3d';
-import { Button, PageHeader } from 'antd';
 import { useReducer } from 'react';
-import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
-import { randomArr } from '../../utils/index'
-import { Text } from '@react-three/drei';
-import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
-import { Map, List } from 'immutable'
 import { useHistory } from 'react-router';
+import { Button, PageHeader } from 'antd';
+import { Map, List } from 'immutable'
+import { Text } from '@react-three/drei';
 import Console from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
+import Scene3d from '../../components/Scene3d/scene3d';
+import { randomArr, randomNum } from '../../utils/index'
+import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
+import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
 import './sort.scss'
 
 export interface ISortCube extends IGeometryProps {
@@ -132,7 +132,7 @@ function reducer(state: IState = initState, action: IAction): IState {
 
         case ActionTypes.RandomDone:
             {
-                let newValues = randomArr();
+                let newValues = randomArr(randomNum(4, 10));
                 return {
                     ...state,
                     cubes: initCubes(newValues),
@@ -157,7 +157,7 @@ function reducer(state: IState = initState, action: IAction): IState {
 const Sort = () => {
     const history = useHistory();
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
-        let initValues = randomArr();
+        let initValues = randomArr(randomNum(4, 10));
         return {
             ...state,
             values: initValues,
@@ -167,6 +167,45 @@ const Sort = () => {
 
     /** 传入数组长度，计算第一个元素的起始x坐标 */
     const startPosX = getStartXPos(state.cubes.length);
+
+    /** 随机生成数据 */
+    const handleRandom = () => {
+        dispatch({ type: ActionTypes.Random });
+        setTimeout(() => {
+            dispatch({ type: ActionTypes.RandomDone })
+        }, 400);
+    }
+
+    /** 处理冒泡排序 */
+    const handleBubbleSort = () => {
+        let sequence = bubbleSortSeq(state.values);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.indexes })
+            }, i * DISPATCH_INTERVAL);
+        });
+    }
+
+    /** 处理选择排序 */
+    const handleSelectSort = () => {
+        let sequence = selectSortSeq(state.values);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.indexes })
+            }, i * DISPATCH_INTERVAL)
+        })
+    }
+
+    /** 处理快速排序 */
+    const handleQuickSort = () => {
+        let sequence: any[] = [];
+        quickSortSeq([...state.values], 0, state.values.length - 1, sequence);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.indexes })
+            }, i * DISPATCH_INTERVAL)
+        })
+    }
 
     return (
         <div className='sort-warp'>
@@ -212,42 +251,12 @@ const Sort = () => {
                 </Scene3d>
 
                 <Console>
-                    <Button onClick={() => {
-                        /** 随机生成数据 */
-                        dispatch({ type: ActionTypes.Random });
-                        setTimeout(() => {
-                            dispatch({ type: ActionTypes.RandomDone })
-                        }, 400);
-                    }}>随机生成</Button>
+                    <Button onClick={handleRandom}>随机生成</Button>
                     <Button>添加</Button>
                     <Button>删除</Button>
-                    <Button onClick={() => {
-                        let sequence = bubbleSortSeq(state.values);
-                        sequence.forEach((event, i) => {
-                            setTimeout(() => {
-                                dispatch({ type: event.type, payload: event.indexes })
-                            }, i * DISPATCH_INTERVAL);
-                        });
-                    }}>冒泡排序</Button>
-                    <Button onClick={() => {
-                        let sequence = selectSortSeq(state.values);
-                        sequence.forEach((event, i) => {
-                            setTimeout(() => {
-                                dispatch({ type: event.type, payload: event.indexes })
-                            }, i * DISPATCH_INTERVAL)
-                        })
-                    }}>选择排序</Button>
-                    <Button onClick={() => {
-                        let sequence: any[] = [];
-                        quickSortSeq([...state.values], 0, state.values.length - 1, sequence);
-
-                        console.log(sequence);
-                        sequence.forEach((event, i) => {
-                            setTimeout(() => {
-                                dispatch({ type: event.type, payload: event.indexes })
-                            }, i * DISPATCH_INTERVAL)
-                        })
-                    }}>快速排序</Button>
+                    <Button onClick={handleBubbleSort}>冒泡排序</Button>
+                    <Button onClick={handleSelectSort}>选择排序</Button>
+                    <Button onClick={handleQuickSort}>快速排序</Button>
                     <Button onClick={() => { }}>恢复</Button>
                 </Console>
             </div>

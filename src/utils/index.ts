@@ -5,10 +5,10 @@ export function randomNum(start: number, end: number): number {
     return +(Math.random() * (end - start) + start).toFixed(0);
 }
 
-/** 随机生成长度为 3 ～ 10 的数组 */
-export function randomArr(): number[] {
+/** 随机生成指定长度的数组 */
+export function randomArr(length: number): number[] {
     const arr = [];
-    for (let i = 0; i < randomNum(3, 10); i++) {
+    for (let i = 0; i < length; i++) {
         arr.push(randomNum(3, 40));
     }
     return arr;

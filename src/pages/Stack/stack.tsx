@@ -6,7 +6,7 @@ import StackCube3d from './StackCube3d/stackCube3d';
 import { useReducer, useState } from 'react';
 import { ActionTypes, IGeometryProps, STACK_CUBE_INTERVAL_DISTANCE } from '../../types';
 import { getStartYPos, initCubes } from '../../utils/stack';
-import { randomArr } from '../../utils';
+import { randomArr, randomNum } from '../../utils';
 import Console from '../../components/Console/console';
 
 export interface IStackCube extends IGeometryProps {
@@ -62,7 +62,7 @@ function reducer(state: IState = initState, action: IAction): IState {
         case ActionTypes.RandomDone:
             return {
                 ...state,
-                cubes: initCubes(randomArr()),
+                cubes: initCubes(randomArr(randomNum(4, 10))),
                 randomDone: true
             }
         default:
@@ -74,7 +74,7 @@ function reducer(state: IState = initState, action: IAction): IState {
 const Stack = () => {
     const history = useHistory();
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => ({
-        cubes: initCubes(randomArr()),
+        cubes: initCubes(randomArr(randomNum(4, 10))),
         popDone: true,
         randomDone: true
     }));
