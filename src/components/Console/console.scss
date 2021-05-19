@@ -1,15 +1,24 @@
 .console-warp {
-    // width: 60px;
-    // z-index: 5000;
-    // height: 80vh !important;
     position: absolute;
     top: 0;
-    .console {
-        // z-index: 3000;
-    }
+
+
 }
 
 .console-drawer {
-    // position: absolute !important;
-    // left: -10px !important;
+    .ant-drawer-body {
+        display: flex;
+
+        .operation {
+            border: black 1px solid;
+            height: 100%;
+            flex: 1;
+        }
+
+        .displayer {
+            border: black 1px solid;
+            height: 100%;
+            flex: 1;
+        }
+    }
 }

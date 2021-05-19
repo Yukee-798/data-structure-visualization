@@ -4,8 +4,6 @@
     .layout {
         width: 100%;
         min-height: 100vh;
-        // display: flex;
-        // flex-direction: column;
 
         .header {
             min-height: 2vh;
@@ -16,15 +14,18 @@
         }
 
         .content {
-            // flex-grow: 1;
             min-height: 80vh;
             width: 95%;
-            margin: 30px auto;
+            margin: 20px auto;
             background-color: #fff;
-            padding: 10px;
-            // display: flex;
-            // flex-direction: column;
+            padding: 0 10px 10px 10px;
+            .main {
+                position: relative;
+            }
 
+            .ant-page-header {
+                padding: 10px !important;
+            }
         }
 
         .footer {
@@ -32,8 +33,4 @@
             text-align: center;
         }
     }
-}
-
-.main {
-    position: relative;
 }

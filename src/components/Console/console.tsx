@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Input, Menu, InputNumber, Button } from "antd";
+import { useEffect, useState } from "react";
+import { Input, Menu, InputNumber, Button, Drawer } from "antd";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useHover } from "../../utils";
 import { IBaseProps } from "../../types";
@@ -9,40 +9,31 @@ import './console.scss'
 const { Item, SubMenu } = Menu;
 
 interface IConsoleProps extends IBaseProps {
-    /** 点击了展开按钮的回调 */
-    onUnFold?: () => void;
+    /** 打开控制台时里面的结点 */
+    drawer?: React.ReactNode;
 }
-
-// const InputItem: React.FC = (props) => {
-//     return (
-//         <Item>
-//             <Input bordered={false} width={20} />
-//             <Button>添加</Button>
-//         </Item>
-//     )
-// }
 
 const Console: React.FC<IConsoleProps> = (props) => {
 
     const {
         children,
         style,
-        onUnFold,
+        drawer
     } = props;
 
     const [hoverRef, isHover] = useHover();
+    const [isUnfold, setIsUnfold] = useState(false);
 
     const { opacity } = useSpring({
         opacity: isHover ? 0.7 : 0.2,
-        config: config.slow
+        config: config.gentle
     })
 
     return (
-
         <animated.div
             className='console-warp'
             ref={hoverRef as any}
-            style={{...style ,opacity}}
+            style={{ ...style, opacity }}
         >
             <Menu
                 className='console'
@@ -50,47 +41,36 @@ const Console: React.FC<IConsoleProps> = (props) => {
                 theme="dark"
                 inlineCollapsed={true}
                 selectable={false}
+                style={{ display: isUnfold ? 'none' : 'inline-block' }}
             >
                 <Item
                     icon={<MenuUnfoldOutlined />}
-                    key={`menuItem0`}
-                    onClick={() => onUnFold?.()}
+                    key='item0'
+                    onClick={() => {
+                        setIsUnfold(true);
+                    }}
                 >
                     展开操作台
                 </Item>
                 {children}
-
             </Menu>
-
+            <Drawer
+                className='console-drawer'
+                title='操作台'
+                height={256}
+                visible={isUnfold}
+                placement='bottom'
+                mask={false}
+                onClose={() => { setIsUnfold(false) }}
+            >
+                {drawer}
+            </Drawer>
         </animated.div>
     )
 }
 
 export { Item, SubMenu };
 export default Console;
-
-
-
-// interface IConsole extends IBaseProps {
-//     /** 是否禁用控制台操作 */
-//     disabled?: boolean;
-//     /** 禁用控制台操作时的结点渲染 */
-//     occupition?: React.ReactNode
-// }
-
-// const Console: React.FC<IConsole> = (props) => {
-//     const { disabled, occupition, children } = props;
-
-//     return (
-//         <div className='console-warp'>
-//             {disabled ?
-//                 <div className='mask'>
-//                     {occupition}
-//                 </div> : <></>}
-//             {children}
-//         </div>
-//     )
-// }
 
 
 
