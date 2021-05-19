@@ -1,10 +1,7 @@
-@import '~antd/dist/antd.css';
-
 .App {
     .layout {
         width: 100%;
         min-height: 100vh;
-
         .header {
             min-height: 2vh;
             color: #fff;
@@ -12,7 +9,6 @@
             font-size: 30px;
             font-family: 'SilkscreenNormal';
         }
-
         .content {
             min-height: 80vh;
             width: 95%;
@@ -27,7 +23,6 @@
                 padding: 10px !important;
             }
         }
-
         .footer {
             min-height: 2vh;
             text-align: center;

@@ -41,11 +41,11 @@ const Home = () => {
     const { size, opacity } = useSpring({
         from: {
             size: '20%',
-            opacity: '0'
+            opacity: '0',
         },
         to: {
             size: open ? '20%' : '100%',
-            opacity: open ? '0' : '1'
+            opacity: open ? '0' : '1',
         },
         config: config.stiff
     })
