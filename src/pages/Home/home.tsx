@@ -31,11 +31,11 @@ const Home = () => {
     const {size, opacity} = useSpring({
         from: {
             size: '20%',
-            opacity: '0'
+            opacity: '0',
         },
         to: {
             size: open ? '20%' : '100%',
-            opacity: open ? '0' : '1'
+            opacity: open ? '0' : '1',
         },
         config: config.stiff
     })
@@ -45,7 +45,7 @@ const Home = () => {
                 <Row gutter={{ xs: 8, sm: 16, md: 24 }} key={i + '&'}>
                     {row.map((col, j) => (
                         <Col xs={12} sm={12} md={6} lg={6} xl={6} key={i + '&' + j}>
-                            <animated.div style={{width:size, height: size, opacity:opacity}} onClick={() => {setOpen(true)}}>
+                            <animated.div style={{width:size, height: size, opacity}} onClick={() => {setOpen(true)}}>
                                 <HomeItem
                                     src={col.src}
                                     tag={col.tag}
