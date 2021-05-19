@@ -11,6 +11,8 @@ const { Item, SubMenu } = Menu;
 interface IConsoleProps extends IBaseProps {
     /** 打开控制台时里面的结点 */
     drawer?: React.ReactNode;
+    /** drawer的高度 */
+    drawerHeight?: number;
 }
 
 const Console: React.FC<IConsoleProps> = (props) => {
@@ -18,7 +20,8 @@ const Console: React.FC<IConsoleProps> = (props) => {
     const {
         children,
         style,
-        drawer
+        drawer,
+        drawerHeight
     } = props;
 
     const [hoverRef, isHover] = useHover();
@@ -57,7 +60,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
             <Drawer
                 className='console-drawer'
                 title='操作台'
-                height={256}
+                height={drawerHeight}
                 visible={isUnfold}
                 placement='bottom'
                 mask={false}

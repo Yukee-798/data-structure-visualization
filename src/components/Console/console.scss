@@ -6,17 +6,66 @@
 }
 
 .console-drawer {
+    .ant-drawer-header {
+        padding: 10px 24px;
+    }
+
     .ant-drawer-body {
         display: flex;
+        padding: 10px;
 
         .operation {
-            border: black 1px solid;
+            // padding: 5px;
+            // border: black 1px solid;
             height: 100%;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+
+            .btn-group {
+                .row {
+                    display: flex;
+                    justify-content: center;
+
+                    button {
+                        margin: 5px 5px;
+                    }
+                }
+            }
+
+            .input-group {
+                display: flex;
+                justify-content: center;
+
+                label {
+                    display: flex;
+                    align-items: center;
+                    margin-right: 10px;
+                    .lable-name {
+                        font-weight: bold;
+                        color: rgb(103, 101, 101);
+                        height: 32px;
+                        width: 40px;
+                        text-align: center;
+                        background-color: #FAFAFA;
+                        font-size: 14px;
+                        line-height: 32px;
+                        border: #d9d9d9 1px solid;
+                        border-radius: 2px;
+                        display: inline-block;
+                    }
+                }
+                button {
+                    margin-right: 5px;
+                }
+
+            }
         }
 
         .displayer {
-            border: black 1px solid;
+            padding: 10px;
+            border-left: 2px solid rgb(218, 215, 215);
             height: 100%;
             flex: 1;
         }

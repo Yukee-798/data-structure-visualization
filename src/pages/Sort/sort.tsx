@@ -277,21 +277,28 @@ const Sort = () => {
                     drawer={(
                         <>
                             <div className='operation'>
-                                <Button icon={<BarChartOutlined />}>随机生成</Button>
-                                <Button icon={<BarChartOutlined />}>冒泡排序</Button>
-                                <Button icon={<BarChartOutlined />}>选择排序</Button>
-                                <Button icon={<BarChartOutlined />}>插入排序</Button>
-                                <Button icon={<BarChartOutlined />}>快速排序</Button>
-                                <Button icon={<BarChartOutlined />}>归并排序</Button>
 
-                                <div>
+                                <div className='btn-group'>
+                                    <div className='row'>
+                                        <Button icon={<BarChartOutlined />}>随机生成</Button>
+                                        <Button icon={<BarChartOutlined />}>冒泡排序</Button>
+                                        <Button icon={<BarChartOutlined />}>选择排序</Button>
+                                    </div>
+                                    <div className='row'>
+                                        <Button icon={<BarChartOutlined />}>插入排序</Button>
+                                        <Button icon={<BarChartOutlined />}>快速排序</Button>
+                                        <Button icon={<BarChartOutlined />}>归并排序</Button>
+                                    </div>
+                                </div>
+
+                                <div className='input-group'>
                                     <label>
-                                        数值：
-                                    <InputNumber onChange={(value) => setValue(value as number)} />
+                                        <span className='lable-name'>数值:</span>
+                                        <InputNumber onChange={(value) => setValue(value as number)} />
                                     </label>
                                     <label>
-                                        下标：
-                                    <InputNumber onChange={(index) => setIndex(index as number)} />
+                                        <span className='lable-name'>序号:</span>
+                                        <InputNumber onChange={(index) => setIndex(index as number)} />
                                     </label>
                                     <Button type='primary' onClick={handleAddEle}>添加</Button>
                                     <Button onClick={handleDeleteEle}>删除</Button>
