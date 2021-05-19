@@ -1,6 +1,6 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, Drawer, Input, PageHeader } from 'antd';
+import { Button, InputNumber, PageHeader } from 'antd';
 import { Map, List } from 'immutable'
 import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
@@ -12,8 +12,6 @@ import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL,
 import {
     BarChartOutlined,
     DotChartOutlined,
-    MinusSquareOutlined,
-    PlusSquareOutlined,
 } from '@ant-design/icons';
 import './sort.scss'
 
@@ -160,8 +158,6 @@ function reducer(state: IState = initState, action: IAction): IState {
     }
 }
 
-
-
 const Sort = () => {
     const history = useHistory();
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
@@ -173,15 +169,15 @@ const Sort = () => {
         }
     })
 
-    /** 控制抽屉是否展开 */
-    const [isUnfold, setIsUnfold] = useState(false);
-
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
 
+    /** 控制台的添加删除元素的value和index */
+    const [value, setValue] = useState(0);
+    const [index, setIndex] = useState(0);
+
     /** 传入数组长度，计算第一个元素的起始x坐标 */
     const startPosX = getStartXPos(state.cubes.length);
-
 
     /** 处理场景加载完毕回调 */
     const handleSceneLoaded = () => {
@@ -227,6 +223,14 @@ const Sort = () => {
         })
     }
 
+    const handleAddEle = () => {
+        console.log(value, index);
+    }
+
+    const handleDeleteEle = () => {
+
+    }
+
     return (
         <div className='sort-warp'>
             <PageHeader
@@ -269,10 +273,39 @@ const Sort = () => {
                     }
                 </Scene3d>
                 <Console
-                    onUnFold={() => { setIsUnfold(true) }}
-                    style={{ display: isSceneLoaded ? 'inline-block' : 'none'}}
+                    style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    drawer={(
+                        <>
+                            <div className='operation'>
+                                <Button icon={<BarChartOutlined />}>随机生成</Button>
+                                <Button icon={<BarChartOutlined />}>冒泡排序</Button>
+                                <Button icon={<BarChartOutlined />}>选择排序</Button>
+                                <Button icon={<BarChartOutlined />}>插入排序</Button>
+                                <Button icon={<BarChartOutlined />}>快速排序</Button>
+                                <Button icon={<BarChartOutlined />}>归并排序</Button>
+
+                                <div>
+                                    <label>
+                                        数值：
+                                    <InputNumber onChange={(value) => setValue(value as number)} />
+                                    </label>
+                                    <label>
+                                        下标：
+                                    <InputNumber onChange={(index) => setIndex(index as number)} />
+                                    </label>
+                                    <Button type='primary' onClick={handleAddEle}>添加</Button>
+                                    <Button onClick={handleDeleteEle}>删除</Button>
+                                </div>
+                            </div>
+
+                            <div className='displayer'>
+                                显示器
+                            </div>
+                        </>
+                    )}
                 >
                     <Item
+                        key='item1'
                         icon={<DotChartOutlined />}
                         onClick={handleRandom}
                     >
@@ -280,7 +313,7 @@ const Sort = () => {
                     </Item>
 
                     <SubMenu
-                        key='2'
+                        key='item2'
                         icon={<BarChartOutlined />}
                         title='排序'
                     >
@@ -290,37 +323,7 @@ const Sort = () => {
                         <Item onClick={handleQuickSort}>快速排序</Item>
                         <Item>归并排序</Item>
                     </SubMenu>
-
-                    <SubMenu
-                        icon={<PlusSquareOutlined />}
-                    >
-                        <Item>
-                            <Input />
-                            <Button>添加</Button>
-                        </Item>
-                    </SubMenu>
-
-                    <Item icon={<MinusSquareOutlined />}>删除</Item>
-
                 </Console>
-                <Drawer
-                    className='console-drawer'
-                    title='操作台'
-                    visible={isUnfold}
-                    placement='left'
-                    mask={false}
-                    onClose={() => { setIsUnfold(false) }}
-                >
-                    <Button>随机生成</Button>
-                    <Button>冒泡排序</Button>
-                    <Button>选择排序</Button>
-                    <Button>插入排序</Button>
-                    <Button>快速排序</Button>
-                    <Button>归并排序</Button>
-                    <Button>添加</Button>
-                    <Button>删除</Button>
-
-                </Drawer>
             </div>
         </div>
     )
