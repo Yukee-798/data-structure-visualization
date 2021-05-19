@@ -133,7 +133,6 @@ const Queue = () => {
 
                 </Scene3d>
                 <Console
-                    onUnFold={() => { setIsUnfold(true) }}
                     style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
                 >
                     <Item
@@ -167,24 +166,6 @@ const Queue = () => {
                     <Item icon={<MinusSquareOutlined />}>删除</Item>
 
                 </Console>
-                <Drawer
-                    className='console-drawer'
-                    title='操作台'
-                    visible={isUnfold}
-                    placement='left'
-                    mask={false}
-                    onClose={() => { setIsUnfold(false) }}
-                >
-                    <Button>随机生成</Button>
-                    <Button>冒泡排序</Button>
-                    <Button>选择排序</Button>
-                    <Button>插入排序</Button>
-                    <Button>快速排序</Button>
-                    <Button>归并排序</Button>
-                    <Button>添加</Button>
-                    <Button>删除</Button>
-
-                </Drawer>
 
             </div>
 

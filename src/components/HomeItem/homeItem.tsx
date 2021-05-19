@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { useSpring, animated, useSpringRef, config } from 'react-spring'
-
+import { useSpring, animated, config } from 'react-spring'
 import { Card } from 'antd'
 import { DataStrucTypes, IBaseProps } from '../../types'
-import Tags from '../Tags/tags'
-import './homeItem.scss'
 import { useHover } from '../../utils'
+import './homeItem.scss'
 
 export interface IHomeItemProps extends IBaseProps {
     /** 卡片标题 */
@@ -25,24 +22,22 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
     const [hoverRef, isHover] = useHover();
 
     const { scale } = useSpring({
-       
         scale: (
             isHover ? 1.05 : 1
         ),
         config: config.stiff
     });
 
-
     return (
         <animated.div
             ref={hoverRef as any}
             className='homeItem'
-            style={{ scale}}
+            style={{ scale }}
         >
             <Card
                 hoverable
                 cover={<img src={src} alt='pic' />}
-                onClick={() => {setTimeout(()=>{onClick(type)}, 500)}}
+                onClick={() => { setTimeout(() => { onClick(type) }, 500) }}
             >
                 <Card.Meta
                     title={title}

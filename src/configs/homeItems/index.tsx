@@ -51,12 +51,6 @@ export  const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
         {
             src: Pic,
             tag: <Tags type={DataStrucTypes.BinarySearchTree} />,
-            title: '二分查找',
-            type: DataStrucTypes.BinarySearchTree
-        },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.BinarySearchTree} />,
             title: '二叉搜索树',
             type: DataStrucTypes.BinarySearchTree
         },
@@ -66,15 +60,15 @@ export  const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             title: '二叉堆',
             type: DataStrucTypes.BinaryHeap
         },
-    ],
-    // 第三排
-    [
         {
             src: Pic,
             tag: <Tags type={DataStrucTypes.AVLTree} />,
             title: 'AVL树',
             type: DataStrucTypes.AVLTree
         },
+    ],
+    // 第三排
+    [
         {
             src: Pic,
             tag: <Tags type={DataStrucTypes.RedBlackTree} />,
@@ -93,21 +87,12 @@ export  const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             title: 'B+树',
             type: DataStrucTypes.BPlusTree
         },
-
-    ],
-    // 第四排
-    [
         {
             src: Pic,
             tag: <Tags type={DataStrucTypes.Graph} />,
             title: '图结构',
             type: DataStrucTypes.Graph
         },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.Graph} />,
-            title: '图遍历',
-            type: DataStrucTypes.Graph
-        },
+
     ],
 ];

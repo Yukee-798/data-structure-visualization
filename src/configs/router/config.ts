@@ -11,8 +11,6 @@ import LinkedList from '../../pages/LinkedList/linkedList'
 import RedBlackTree from '../../pages/RedBlackTree/redBlackTree'
 import BPlusTree from '../../pages/BPlusTree/bPlusTree'
 import BinarySearchTree from '../../pages/BinarySearchTree/binarySearchTree'
-import GraphTraverse from '../../pages/GraphTraverse/graphTraverse'
-import BinarySearch from '../../pages/BinarySearch/binarySearch'
 
 const routerView = [
     {
@@ -27,54 +25,46 @@ const routerView = [
         path: "/linkedList",
         page: LinkedList
     },
-    // {
-    //     path: "/avlTree",
-    //     page: AVLTree
-    // },
-    {
-        path: "/binarySearchTree",
-        page: BinarySearchTree
-    },
-    // {
-    //     path: "/bPlusTree",
-    //     page: BPlusTree
-    // },
-    // {
-    //     path: "/bTree",
-    //     page: BTree
-    // },
-    // {
-    //     path: "/graph",
-    //     page: Graph
-    // },
-    // {
-    //     path: "/graphTraverse",
-    //     page: GraphTraverse
-    // },
-    // {
-    //     path: "/binarySearch",
-    //     page: BinarySearch
-    // },
-    // {
-    //     path: "/binaryHeap",
-    //     page: BinaryHeap
-    // },
-    // {
-    //     path: "/hashTable",
-    //     page: HashTable
-    // },
-
     {
         path: "/queue",
         page: Queue
     },
-    // {
-    //     path: "/redBlackTree",
-    //     page: RedBlackTree
-    // },
     {
         path: "/stack",
         page: Stack
+    },
+    {
+        path: "/binarySearchTree",
+        page: BinarySearchTree
+    },
+    {
+        path: "/binaryHeap",
+        page: BinaryHeap
+    },
+    {
+        path: "/hashTable",
+        page: HashTable
+    },
+    {
+        path: "/avlTree",
+        page: AVLTree
+    },
+    {
+        path: "/redBlackTree",
+        page: RedBlackTree
+    },
+    {
+        path: "/bTree",
+        page: BTree
+    },
+
+    {
+        path: "/bPlusTree",
+        page: BPlusTree
+    },
+    {
+        path: "/graph",
+        page: Graph
     },
 ];
 

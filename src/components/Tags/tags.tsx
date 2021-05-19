@@ -40,7 +40,7 @@ const Tags: React.FC<ITagsProps> = (props) => {
 
         case DataStrucTypes.Graph:
             return (<div className='tags-warp'>
-                <Tag color="magenta">图</Tag>
+                <Tag color="magenta">图论</Tag>
             </div>);
 
         case DataStrucTypes.HashTable:

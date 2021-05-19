@@ -118,15 +118,8 @@ const BinarySearchTree = () => {
         }
     });
 
-    /** 控制抽屉是否展开 */
-    const [isUnfold, setIsUnfold] = useState(false);
-
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
-
-    /** 传入数组长度，计算第一个元素的起始x坐标 */
-    // const startPosX = getStartXPos(state.cubes.length);
-
 
     /** 处理场景加载完毕回调 */
     const handleSceneLoaded = () => {
@@ -234,7 +227,6 @@ const BinarySearchTree = () => {
                     })}
                 </Scene3d>
                 <Console
-                    onUnFold={() => { setIsUnfold(true) }}
                     style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
                 >
                     <Item
@@ -266,32 +258,7 @@ const BinarySearchTree = () => {
                     <Item icon={<MinusSquareOutlined />}>删除</Item>
 
                 </Console>
-                <Drawer
-                    className='console-drawer'
-                    title='操作台'
-                    visible={isUnfold}
-                    placement='left'
-                    mask={false}
-                    onClose={() => { setIsUnfold(false) }}
-                >
- 
-                </Drawer>
 
-                
-                {/* <Console>
-                    <Button onClick={handlePreorder}>
-                        Preorder
-                </Button>
-                    <Button onClick={handleInorder}>
-                        Inorder
-                </Button>
-                    <Button onClick={handlePostorder}>
-                        Postorder
-                </Button>
-                    <Button onClick={handleRandom}>
-                        随机生成
-                </Button>
-                </Console> */}
             </div>
         </div>
     )
