@@ -37,7 +37,7 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
             <Card
                 hoverable
                 cover={<img src={src} alt='pic' />}
-                onClick={() => { setTimeout(() => { onClick(type) }, 500) }}
+                onClick={() => { setTimeout(() => { onClick(type) }, 250) }}
             >
                 <Card.Meta
                     title={title}
