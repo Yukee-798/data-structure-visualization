@@ -101,9 +101,19 @@ const BinaryHeap = () => {
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
 
-    /** 传入数组长度，计算第一个元素的起始x坐标 */
-    // const startPosX = getStartXPos(state.cubes.length);
+    /** 控制台的添加删除元素的value和index */
+    const [value, setValue] = useState(0);
+    const [index, setIndex] = useState(0);
 
+    /** 添加元素 */
+    const handleAddEle = () => {
+        console.log(value, index);
+    }
+
+    /** 删除元素 */
+    const handleDeleteEle = () => {
+
+    }
 
     /** 处理场景加载完毕回调 */
     const handleSceneLoaded = () => {
@@ -152,17 +162,6 @@ const BinaryHeap = () => {
                         <Item>快速排序</Item>
                         <Item>归并排序</Item>
                     </SubMenu>
-
-                    <SubMenu
-                        icon={<PlusSquareOutlined />}
-                    >
-                        <Item>
-                            <Input />
-                            <Button>添加</Button>
-                        </Item>
-                    </SubMenu>
-
-                    <Item icon={<MinusSquareOutlined />}>删除</Item>
 
                 </Console>
             </div>

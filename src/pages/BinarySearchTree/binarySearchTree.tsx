@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useReducer, useState } from 'react'
 import { useHistory } from 'react-router'
-import { Button, Drawer, Input, PageHeader } from 'antd'
+import { Button, Input, PageHeader } from 'antd'
 import { BarChartOutlined, DotChartOutlined, MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons'
 import Console, { Item, SubMenu } from '../../components/Console/console'
 import Line3d from '../../components/Line3d/line3d'
@@ -121,6 +121,10 @@ const BinarySearchTree = () => {
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
 
+    /** 控制台的添加删除元素的value和index */
+    const [value, setValue] = useState(0);
+    const [index, setIndex] = useState(0);
+
     /** 处理场景加载完毕回调 */
     const handleSceneLoaded = () => {
         setIsSceneLoaded(true);
@@ -128,6 +132,16 @@ const BinarySearchTree = () => {
 
     /** 获取二叉树的最大层数 */
     const maxDeepth = getDeepthByNodeIndex(state.binaryTree.length - 1);
+
+    /** 添加元素 */
+    const handleAddEle = () => {
+        console.log(value, index);
+    }
+
+    /** 删除元素 */
+    const handleDeleteEle = () => {
+
+    }
 
     /** 随机生成数据 */
     const handleRandom = () => {

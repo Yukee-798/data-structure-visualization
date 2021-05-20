@@ -1,5 +1,9 @@
 .home-warp {
-    .homeItem {
-        margin: 12px 12px;
+    .homeItem-warp {
+        will-change: opacity width height;
+        .homeItem {
+            margin: 12px 12px;
+        }
     }
+
 }
