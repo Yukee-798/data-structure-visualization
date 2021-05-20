@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, InputNumber, PageHeader } from 'antd';
+import { Button, InputNumber, PageHeader, Steps } from 'antd';
 import { Map, List } from 'immutable'
 import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
@@ -14,6 +14,8 @@ import {
     DotChartOutlined,
 } from '@ant-design/icons';
 import './sort.scss'
+
+const { Step } = Steps;
 
 export interface ISortCube extends IGeometryProps {
     strValue: string;
@@ -274,42 +276,50 @@ const Sort = () => {
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
-                    drawer={(
+                    operation={
                         <>
-                            <div className='operation'>
-
-                                <div className='btn-group'>
-                                    <div className='row'>
-                                        <Button icon={<BarChartOutlined />}>随机生成</Button>
-                                        <Button icon={<BarChartOutlined />}>冒泡排序</Button>
-                                        <Button icon={<BarChartOutlined />}>选择排序</Button>
-                                    </div>
-                                    <div className='row'>
-                                        <Button icon={<BarChartOutlined />}>插入排序</Button>
-                                        <Button icon={<BarChartOutlined />}>快速排序</Button>
-                                        <Button icon={<BarChartOutlined />}>归并排序</Button>
-                                    </div>
+                            <div className='btn-group'>
+                                <div className='row'>
+                                    <Button icon={<BarChartOutlined />}>随机生成</Button>
+                                    <Button icon={<BarChartOutlined />}>冒泡排序</Button>
+                                    <Button icon={<BarChartOutlined />}>选择排序</Button>
                                 </div>
-
-                                <div className='input-group'>
-                                    <label>
-                                        <span className='lable-name'>数值:</span>
-                                        <InputNumber onChange={(value) => setValue(value as number)} />
-                                    </label>
-                                    <label>
-                                        <span className='lable-name'>序号:</span>
-                                        <InputNumber onChange={(index) => setIndex(index as number)} />
-                                    </label>
-                                    <Button type='primary' onClick={handleAddEle}>添加</Button>
-                                    <Button onClick={handleDeleteEle}>删除</Button>
+                                <div className='row'>
+                                    <Button icon={<BarChartOutlined />}>插入排序</Button>
+                                    <Button icon={<BarChartOutlined />}>快速排序</Button>
+                                    <Button icon={<BarChartOutlined />}>归并排序</Button>
                                 </div>
                             </div>
 
-                            <div className='displayer'>
-                                显示器
+                            <div className='input-group'>
+                                <label>
+                                    <span className='lable-name'>数值:</span>
+                                    <InputNumber onChange={(value) => setValue(value as number)} />
+                                </label>
+                                <label>
+                                    <span className='lable-name'>序号:</span>
+                                    <InputNumber onChange={(index) => setIndex(index as number)} />
+                                </label>
+                                <Button type='primary' onClick={handleAddEle}>添加</Button>
+                                <Button onClick={handleDeleteEle}>删除</Button>
                             </div>
                         </>
-                    )}
+                    }
+
+                    displayer={
+                        <Steps direction="vertical" size="small" current={3}>
+                            <Step title="123" description="This is a description." />
+                            <Step title="123" description="This is a description." />
+                            <Step title="123" description="This is a description." />
+                            <Step title="123" description="This is a description." />
+                            <Step title="123" description="This is a description." />
+                            <Step title="123" description="This is a description." />
+
+                        </Steps>
+                        // <>
+                        //     <span>当前数组：[1,2,3,4,5]</span>
+                        // </>
+                    }
                 >
                     <Item
                         key='item1'
@@ -331,6 +341,7 @@ const Sort = () => {
                         <Item>归并排序</Item>
                     </SubMenu>
                 </Console>
+           
             </div>
         </div>
     )

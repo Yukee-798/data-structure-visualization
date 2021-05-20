@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input, Menu, InputNumber, Button, Drawer } from "antd";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useHover } from "../../utils";
@@ -9,8 +9,10 @@ import './console.scss'
 const { Item, SubMenu } = Menu;
 
 interface IConsoleProps extends IBaseProps {
-    /** 打开控制台时里面的结点 */
-    drawer?: React.ReactNode;
+    /** 控制台左边的操作界面 */
+    operation?: React.ReactNode;
+    /** 控制台右边的显示器 */
+    displayer?: React.ReactNode;
     /** drawer的高度 */
     drawerHeight?: number;
 }
@@ -20,17 +22,24 @@ const Console: React.FC<IConsoleProps> = (props) => {
     const {
         children,
         style,
-        drawer,
+        operation,
+        displayer,
         drawerHeight
     } = props;
 
     const [hoverRef, isHover] = useHover();
     const [isUnfold, setIsUnfold] = useState(false);
+    const displayConRef = useRef<HTMLDivElement>();
 
     const { opacity } = useSpring({
         opacity: isHover ? 0.7 : 0.2,
         config: config.gentle
     })
+
+    /** 当 displayer 里面的内容变多的时候，始终保持其滚动条位于底部 */
+    useEffect(() => {
+        if (displayConRef.current) displayConRef.current.scrollTop = displayConRef.current.scrollHeight;
+    }, [displayConRef.current?.scrollHeight])
 
     return (
         <animated.div
@@ -66,7 +75,16 @@ const Console: React.FC<IConsoleProps> = (props) => {
                 mask={false}
                 onClose={() => { setIsUnfold(false) }}
             >
-                {drawer}
+
+                <div className='operation'>
+                    {operation}
+                </div>
+
+                <div className='displayer'>
+                    <div className='content' ref={displayConRef as any}>
+                        {displayer}
+                    </div>
+                </div>
             </Drawer>
         </animated.div>
     )
