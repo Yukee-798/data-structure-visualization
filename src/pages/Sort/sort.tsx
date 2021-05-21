@@ -18,7 +18,9 @@ import './sort.scss'
 const { Step } = Steps;
 
 export interface ISortCube extends IGeometryProps {
-    strValue: string;
+    // 记录 cube 将要经历或者已经历过的下标
+    sortIndexes: number[];
+    // 记录 cube 当前页面中正处于的下标
     sortIndex: number;
 }
 type IReducer = (state: IState, action: IAction) => IState;
@@ -26,8 +28,6 @@ type IReducer = (state: IState, action: IAction) => IState;
 interface IState {
     // 用来表示数组中各值的实时位置
     values: number[];
-    // 表示当前正在交换的两个下标
-    swapIndexes: [number, number] | [];
     // 用来表示每个 cube 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
     cubes: ISortCube[];
     // 是否排序完毕
@@ -44,7 +44,6 @@ interface IAction {
 const initState: IState = {
     values: [],
     cubes: [],
-    swapIndexes: [],
     sortDone: true,
     randomDone: true,
 }
@@ -60,16 +59,17 @@ function reducer(state: IState = initState, action: IAction): IState {
             return {
                 ...state,
                 cubes: state.cubes.map(
-                    (item) => payload?.includes(item.sortIndex) ? { ...item, isActive: true } : { ...item }
+                    (item) => (payload?.includes(item.sortIndexes[item.sortIndexes.length - 1]) ? { ...item, isActive: true } : { ...item })
                 ),
                 sortDone: false
             }
+
 
         case ActionTypes.Deactive:
             return {
                 ...state,
                 cubes: state.cubes.map(
-                    (item) => payload?.includes(item.sortIndex) ? { ...item, isActive: false } : { ...item }
+                    (item) => payload?.includes(item.sortIndexes[item.sortIndexes.length - 1]) ? { ...item, isActive: false } : { ...item }
                 )
             }
 
@@ -77,7 +77,7 @@ function reducer(state: IState = initState, action: IAction): IState {
             return {
                 ...state,
                 cubes: state.cubes.map(
-                    (item) => payload?.includes(item.sortIndex) ? { ...item, isLock: true } : { ...item }
+                    (item) => payload?.includes(item.sortIndexes[item.sortIndexes.length - 1]) ? { ...item, isLock: true } : { ...item }
                 )
             }
 
@@ -85,25 +85,38 @@ function reducer(state: IState = initState, action: IAction): IState {
             return {
                 ...state,
                 cubes: state.cubes.map(
-                    (item) => payload?.includes(item.sortIndex) ? { ...item, isLock: false } : { ...item }
+                    (item) => payload?.includes(item.sortIndexes[item.sortIndexes.length - 1]) ? { ...item, isLock: false } : { ...item }
                 )
             }
 
         case ActionTypes.Swap:
             {
                 // 取出需要交换的两个下标
+                // 取出需要交换的两个下标
                 let index1 = (payload as number[])[0];
                 let index2 = (payload as number[])[1];
 
+                // 向 cube 对应的 sortIndexes 中 push 新的下标
+                const newCubes: ISortCube[] = state.cubes.map((item) => {
+                    const curSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
+                    if (curSortIndex === index1) {
+                        const newSortIndexes = [...item.sortIndexes, index2]
+                        return { ...item, sortIndexes: newSortIndexes }
+                    } else if (curSortIndex === index2) {
+                        const newSortIndexes = [...item.sortIndexes, index1]
+                        return { ...item, sortIndexes: newSortIndexes }
+                    }
+                    return { ...item };
+                })
+
                 return {
                     ...state,
-                    swapIndexes: [index1, index2]
+                    cubes: newCubes,
                 }
             }
 
         case ActionTypes.SwapDone:
             {
-                // 取出需要交换的两个下标
                 let index1 = (payload as number[])[0];
                 let index2 = (payload as number[])[1];
 
@@ -113,16 +126,17 @@ function reducer(state: IState = initState, action: IAction): IState {
                 newValues[index1] = newValues[index2];
                 newValues[index2] = temp;
 
-                // 交换 cubes 中对应下标的 sortIndex
+                // 交换完毕后，将对应的cube的sortIndex改为最新的sortIndex
                 const newCubes: ISortCube[] = state.cubes.map((item) => {
-                    if (item.sortIndex === index1) return { ...item, sortIndex: index2 }
-                    else if (item.sortIndex === index2) return { ...item, sortIndex: index1 }
-                    return { ...item };
+                    const newSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
+                    if (item.sortIndex !== newSortIndex) return { ...item, sortIndex: newSortIndex }
+                    return { ...item }
                 })
+
                 return {
                     ...state,
+                    values: newValues,
                     cubes: newCubes,
-                    swapIndexes: []
                 }
             }
 
@@ -233,6 +247,10 @@ const Sort = () => {
 
     }
 
+    const handleSliderChange = (value: number) => {
+        console.log(value);
+    }
+
     return (
         <div className='sort-warp'>
             <PageHeader
@@ -248,10 +266,10 @@ const Sort = () => {
                         state.cubes.map((item, index) => (
                             <SortCube3d
                                 key={index + '@'}
+                                sortIndexes={item.sortIndexes}
                                 sortIndex={item.sortIndex}
                                 value={item.value}
                                 startPosX={startPosX}
-                                swapIndexes={state.swapIndexes}
                                 isActive={item.isActive}
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
@@ -276,17 +294,18 @@ const Sort = () => {
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    onSliderChange={handleSliderChange}
                     operation={
                         <>
                             <div className='btn-group'>
                                 <div className='row'>
-                                    <Button icon={<BarChartOutlined />}>随机生成</Button>
-                                    <Button icon={<BarChartOutlined />}>冒泡排序</Button>
-                                    <Button icon={<BarChartOutlined />}>选择排序</Button>
+                                    <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
+                                    <Button icon={<BarChartOutlined />} onClick={handleBubbleSort}>冒泡排序</Button>
+                                    <Button icon={<BarChartOutlined />} onClick={handleSelectSort}>选择排序</Button>
                                 </div>
                                 <div className='row'>
                                     <Button icon={<BarChartOutlined />}>插入排序</Button>
-                                    <Button icon={<BarChartOutlined />}>快速排序</Button>
+                                    <Button icon={<BarChartOutlined />} onClick={handleQuickSort}>快速排序</Button>
                                     <Button icon={<BarChartOutlined />}>归并排序</Button>
                                 </div>
                             </div>
@@ -341,7 +360,7 @@ const Sort = () => {
                         <Item>归并排序</Item>
                     </SubMenu>
                 </Console>
-           
+
             </div>
         </div>
     )

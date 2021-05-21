@@ -5,9 +5,9 @@ import { ActionTypes, SORT_CUBE_INTERVAL_DISTANCE } from "../types";
 export function initCubes(values: number[]): ISortCube[] {
     return values.map((value, index) => ({
         value,
-        strValue: value + '&' + index,
         isActive: false,
         isLock: false,
+        sortIndexes: [index],
         sortIndex: index
     }));
 }

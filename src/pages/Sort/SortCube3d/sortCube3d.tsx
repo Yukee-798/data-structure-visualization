@@ -3,12 +3,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import { animated, useSpring, config } from 'react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
-import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../../types';
+import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps, DISPATCH_INTERVAL } from '../../../types';
 import { quickSortSeq } from '../../../utils/sort';
 
 interface ISortCube3dProps extends IGeometryProps {
+    sortIndexes: number[];
     sortIndex: number;
-    swapIndexes: [number, number] | [];
     startPosX: any;
 }
 
@@ -20,9 +20,9 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
         isLock,
         isReset,
         value,
+        sortIndexes,
         sortIndex,
         startPosX,
-        swapIndexes,
         colorConfig,
     } = props;
 
@@ -33,14 +33,14 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
     /** 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
     const getPosX = (sortIndex: number) => startPosX + (sortIndex * SORT_CUBE_INTERVAL_DISTANCE);
 
-    /** 交换元素时，获取其起始位置 */
+    /** 移动元素时，获取其起始位置 */
     const getOrginPosX = () => {
-        return getPosX(sortIndex as number);
+        return getPosX(sortIndex);
     }
 
-    /** 交换元素时，获取其目标位置 */
+    /** 移动元素时，获取其目标位置 */
     const getTargetPosX = () => {
-        return getPosX((swapIndexes[0] === sortIndex ? swapIndexes[1] : swapIndexes[0]) as number);
+        return getPosX(sortIndexes[sortIndexes.length - 1]);
     }
 
     const oldPosX = getOrginPosX();
@@ -72,10 +72,11 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
     
     useFrame(() => {
 
-        // 如果有需要交换的两个元素
-        if (swapIndexes.includes(sortIndex as never)) {
-            const delta = Math.abs(oldPosX - targetPosX) / 16;
+        const delta = Math.abs(oldPosX - targetPosX) / (DISPATCH_INTERVAL / 20);
 
+        // 如果当前 sortIndex 需要改变
+        if (delta) {
+        
             // mesh 需要往右移
             if (oldPosX - targetPosX < 0 && meshRef.current.position.x < targetPosX) {
                 meshRef.current.translateX(delta);
