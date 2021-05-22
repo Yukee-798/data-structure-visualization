@@ -24,6 +24,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
         sortIndex,
         startPosX,
         colorConfig,
+        disappear
     } = props;
 
     const [isHover, setIsHover] = useState(false)
@@ -48,11 +49,10 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
     /** 配置扩缩动画效果 */
     const { scale } = useSpring({
-        reset: isReset,
-        reverse: isReset,
+        reverse: disappear || isReset,
         from: { scale: 0 },
         to: { scale: isClick ? 1.10 : 1 },
-        config: isReset ? config.default : config.wobbly
+        config: (disappear || isReset) ? config.default : config.wobbly
     })
 
     /** 配置颜色过渡效果 */
@@ -69,14 +69,14 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
         isActive ? setIsClick(true) : setIsClick(false);
     }, [isActive])
 
-    
+
     useFrame(() => {
 
         const delta = Math.abs(oldPosX - targetPosX) / (DISPATCH_INTERVAL / 20);
 
         // 如果当前 sortIndex 需要改变
         if (delta) {
-        
+
             // mesh 需要往右移
             if (oldPosX - targetPosX < 0 && meshRef.current.position.x < targetPosX) {
                 meshRef.current.translateX(delta);
@@ -108,7 +108,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
                 {value}
             </Text>
             <RoundedBox
-                args={[1, (value as number) * 0.2, 1]}
+                args={[1, value ? value * 0.2 : 0, 1]}
                 onClick={() => setIsClick(!isClick)}
                 onPointerOver={() => setIsHover(true)}
                 onPointerOut={() => setIsHover(false)}

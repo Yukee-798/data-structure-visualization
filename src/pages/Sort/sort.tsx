@@ -7,8 +7,8 @@ import Console, { Item, SubMenu } from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
 import Scene3d from '../../components/Scene3d/scene3d';
 import { randomArr, randomNum } from '../../utils/index'
-import { addEleSeq, bubbleSortSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
-import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
+import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
+import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps, OpeDetailTypes } from '../../types';
 import {
     BarChartOutlined,
     DotChartOutlined,
@@ -36,6 +36,8 @@ interface IState {
     randomDone: boolean;
     // 第一个cube的起始x坐标
     startPosX: number;
+    // 记录当前操作的细节
+    opeDetails: { type: OpeDetailTypes, payload?: any }[]
 }
 
 interface IAction {
@@ -48,15 +50,14 @@ const initState: IState = {
     cubes: [],
     sortDone: true,
     randomDone: true,
-    startPosX: 0
+    startPosX: 0,
+    opeDetails: []
 }
 
 function reducer(state: IState = initState, action: IAction): IState {
 
     const { type, payload } = action;
-
     state.cubes = List(state.cubes).toJS().map((item) => Map(item).toJS()) as ISortCube[];
-
 
     switch (type) {
         case ActionTypes.Active:
@@ -67,7 +68,6 @@ function reducer(state: IState = initState, action: IAction): IState {
                 ),
                 sortDone: false
             }
-
 
         case ActionTypes.Deactive:
             return {
@@ -114,9 +114,12 @@ function reducer(state: IState = initState, action: IAction): IState {
                     return { ...item };
                 })
 
+                const newOpeDetail = { type: OpeDetailTypes.Swap, payload: [index1, index2] }
+
                 return {
                     ...state,
                     cubes: newCubes,
+                    opeDetails: [...state.opeDetails, newOpeDetail]
                 }
             }
 
@@ -168,8 +171,16 @@ function reducer(state: IState = initState, action: IAction): IState {
                     return { ...item }
                 })
 
-                // 扩容下标
-                const newValues = [...state.values, -1];
+
+                let newValues: number[] = [...state.values];
+                // 判断是扩容还是缩容
+                if (targetIndexes[0] > oldIndexes[0]) {
+                    // 扩容下标
+                    newValues.push(-1);
+                } else {
+                    // 缩容下标
+                    newValues.splice(oldIndexes[0], 1);
+                }
 
                 return {
                     ...state,
@@ -200,23 +211,57 @@ function reducer(state: IState = initState, action: IAction): IState {
                 })
 
                 // 添加新 cube
-                // newCubes.splice(targetIndex, 0, newCube);
                 newCubes.push(newCube);
-                console.log(newCube.sortIndex);
 
                 // 更新 values
                 let newValues = [...state.values];
                 newValues.splice(targetIndex, 0, newEle);
                 newValues.pop();
 
+                const newOpeDetail = { type: OpeDetailTypes.Swap, payload: { index: targetIndex, value: newEle } }
+
                 return {
                     ...state,
                     cubes: newCubes,
-                    values: newValues
+                    values: newValues,
+                    opeDetails: [...state.opeDetails, newOpeDetail]
                 }
             }
 
-        // case ActionTypes.Delete:
+        case ActionTypes.Delete:
+            {
+                const newCubes = state.cubes.map((item) => item.sortIndex === payload ? { ...item, disappear: true } : { ...item });
+
+                return {
+                    ...state,
+                    cubes: newCubes
+                }
+            }
+
+        case ActionTypes.DeleteDone:
+            {
+
+                let newCubes = [...state.cubes];
+
+                // 先把删除的元素真正意义上从 cubes 中删除
+                newCubes.splice(payload, 1);
+
+                // 更新 cube 的 sortIndex 到最新
+                newCubes = state.cubes.map((item, i) => {
+                    const curSortIndex = item.sortIndex;
+                    const newSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
+                    if (curSortIndex !== newSortIndex) {
+                        return { ...item, sortIndex: newSortIndex };
+                    }
+                    return { ...item };
+                })
+
+                return {
+                    ...state,
+                    cubes: newCubes
+                }
+
+            }
 
         case ActionTypes.RandomDone:
             {
@@ -234,10 +279,9 @@ function reducer(state: IState = initState, action: IAction): IState {
         case ActionTypes.Random:
             return {
                 ...state,
-                randomDone: false
+                randomDone: false,
+                opeDetails: []
             };
-
-        // case ActionTypes.Search:
 
         default:
             return state;
@@ -257,7 +301,6 @@ const Sort = () => {
             startPosX
         }
     })
-
 
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
@@ -310,6 +353,7 @@ const Sort = () => {
         })
     }
 
+    /** 处理添加元素 */
     const handleAddEle = () => {
         const sequence = addEleSeq(state.values, value, index);
         sequence.forEach((event, i) => {
@@ -319,12 +363,19 @@ const Sort = () => {
         })
     }
 
+    /** 处理删除元素 */
     const handleDeleteEle = () => {
-
+        const sequence = deleteEleSeq(state.values, index);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.payload })
+            }, i * DISPATCH_INTERVAL)
+        })
     }
 
+    /** 处理动画速度改变 */
     const handleSliderChange = (value: number) => {
-        console.log(value);
+        // console.log(value);
     }
 
 
@@ -352,6 +403,7 @@ const Sort = () => {
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
                                 position={[state.startPosX + (item.sortIndex * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
                                 isReset={!state.randomDone}
+                                disappear={item.disappear}
                             />
                         ))
                     }
@@ -403,18 +455,39 @@ const Sort = () => {
                     }
 
                     displayer={
-                        <Steps direction="vertical" size="small" current={3}>
-                            <Step title="123" description="This is a description." />
-                            <Step title="123" description="This is a description." />
-                            <Step title="123" description="This is a description." />
-                            <Step title="123" description="This is a description." />
-                            <Step title="123" description="This is a description." />
-                            <Step title="123" description="This is a description." />
+                        <Steps direction="vertical" size="small" current={state.opeDetails.length - 1}>
+                            {state.opeDetails.map((item) => {
+                                const { type, payload } = item;
+                                switch (type) {
+                                    case OpeDetailTypes.Swap:
+                                        return (
+                                            <Step
+                                                title={`交换元素: index1=${payload[0]}, index2=${payload[1]}`}
+                                                description={`当前数组: ${state.values.toString()}`}
+                                            />
+                                        )
+
+                                    case OpeDetailTypes.Add:
+                                        return (
+                                            <Step
+                                                title={`新增元素: index=${payload.index}, value=${payload.value}`}
+                                                description={`当前数组: ${state.values.toString()}`}
+                                            />
+                                        )
+
+                                    case OpeDetailTypes.Delete:
+                                        return (
+                                            <Step
+                                                title={`删除元素: index=${payload.index}, value=${payload.value}`}
+                                                description={`当前数组: ${state.values.toString()}`}
+                                            />
+                                        )
+                                    default:
+                                        return <></>
+                                }
+                            })}
 
                         </Steps>
-                        // <>
-                        //     <span>当前数组：[1,2,3,4,5]</span>
-                        // </>
                     }
                 >
                     <Item

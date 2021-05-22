@@ -58,11 +58,20 @@ export enum DataStrucTypes {
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
     value: number | null;
+    disappear?: boolean;
     colorConfig?: IColorConfig
     position?: any;
     isActive?: boolean;
     isLock?: boolean;
     isReset?: boolean;
+}
+
+/** 控制台操作细节类型 */
+export enum OpeDetailTypes {
+    Swap = '交换',
+    Add = '新增元素',
+    Delete = '删除元素'
+
 }
 
 export enum ActionTypes {
@@ -82,6 +91,7 @@ export enum ActionTypes {
     Add,
     AddDone,
     Delete,
+    DeleteDone,
     Search,
     Move,
 }
