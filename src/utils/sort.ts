@@ -13,12 +13,68 @@ export function initCubes(values: number[]): ISortCube[] {
 }
 
 /** 根据数组长度，计算出第一个 cube 的 position 的 x 坐标 */
-export function getStartXPos(arrLen: number): number {
+export function getStartPosX(arrLen: number): number {
     return -(arrLen - 1) * SORT_CUBE_INTERVAL_DISTANCE / 2;
 }
+
 /** 传入一组序列，判断其是否有序 */
 export function isSorted(values: number[]): boolean {
     return false;
+}
+
+/*
+    0 1 2 3 4 5 6 7 
+    0 1 2 3 x 4 5 6 7
+
+*/
+
+/** 返回向数组插值时，数组位移的细节 */
+export function addEleSeq(arr: number[], newEle: number, targetIndex: number) {
+
+    // 记录动画细节
+    const seq = [];
+
+    // 记录待位移的元素下标
+    const oldIndexes: number[] = [];
+    arr.forEach((_, i) => { i >= targetIndex && oldIndexes.push(i) });
+
+    // 记录位移元素的目标下标
+    const targetIndexes: number[] = [];
+    oldIndexes.forEach((value) => { targetIndexes.push(value + 1) });
+
+    // 先激活需要位移的元素
+    seq.push({ type: ActionTypes.Active, payload: oldIndexes })
+
+    // // 开始添加元素：扩容，出现新的下标
+    // seq.push({ type: ActionTypes.Add });
+
+    // 开始位移，并扩容出现新的下标
+    seq.push({
+        type: ActionTypes.Move,
+        payload: {
+            oldIndexes,
+            targetIndexes
+        }
+    });
+
+    // 取消激活
+    seq.push({ type: ActionTypes.Deactive, payload: targetIndexes })
+
+    // 在 targetIndex 处添加元素
+    seq.push({
+        type: ActionTypes.AddDone,
+        payload: {
+            newEle,
+            targetIndex
+        }
+    });
+
+    return seq;
+}
+
+/** 返回向数组删除元素时，数组位移的细节 */
+export function deleteEleSeq(arr: number[], targetIndex: number) {
+
 }
 
 /** 返回冒泡排序细节 */

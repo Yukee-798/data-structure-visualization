@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Button, InputNumber, PageHeader, Steps } from 'antd';
 import { Map, List } from 'immutable'
@@ -7,7 +7,7 @@ import Console, { Item, SubMenu } from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
 import Scene3d from '../../components/Scene3d/scene3d';
 import { randomArr, randomNum } from '../../utils/index'
-import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
+import { addEleSeq, bubbleSortSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
 import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
 import {
     BarChartOutlined,
@@ -34,11 +34,13 @@ interface IState {
     sortDone: boolean;
     // 是否随机化完毕
     randomDone: boolean;
+    // 第一个cube的起始x坐标
+    startPosX: number;
 }
 
 interface IAction {
     type: ActionTypes;
-    payload?: number[];
+    payload?: any;
 }
 
 const initState: IState = {
@@ -46,6 +48,7 @@ const initState: IState = {
     cubes: [],
     sortDone: true,
     randomDone: true,
+    startPosX: 0
 }
 
 function reducer(state: IState = initState, action: IAction): IState {
@@ -53,6 +56,7 @@ function reducer(state: IState = initState, action: IAction): IState {
     const { type, payload } = action;
 
     state.cubes = List(state.cubes).toJS().map((item) => Map(item).toJS()) as ISortCube[];
+
 
     switch (type) {
         case ActionTypes.Active:
@@ -91,6 +95,7 @@ function reducer(state: IState = initState, action: IAction): IState {
 
         case ActionTypes.Swap:
             {
+
                 // 取出需要交换的两个下标
                 // 取出需要交换的两个下标
                 let index1 = (payload as number[])[0];
@@ -146,18 +151,83 @@ function reducer(state: IState = initState, action: IAction): IState {
                 sortDone: true
             }
 
-        // case ActionTypes.Add:
+        case ActionTypes.Move:
+            {
+                const { oldIndexes, targetIndexes }: { oldIndexes: number[], targetIndexes: number[] } = payload;
+                // 把包含在 oldIndexes 中的 sortIndex 找出来
+                const newCubes = state.cubes.map((item) => {
+                    // 看 sortIndex 在 oldIndexes 中处于哪个位置，也对应 targetIndexes 的位置
+                    let i = oldIndexes.findIndex((value) => value === item.sortIndex);
+                    // 如果找到了，则往 sortIndexes 中添加 targetIndexes[i]
+                    if (i >= 0) {
+                        return {
+                            ...item,
+                            sortIndexes: [...item.sortIndexes, targetIndexes[i]]
+                        }
+                    }
+                    return { ...item }
+                })
+
+                // 扩容下标
+                const newValues = [...state.values, -1];
+
+                return {
+                    ...state,
+                    cubes: newCubes,
+                    values: newValues
+                }
+            }
+
+        case ActionTypes.AddDone:
+            {
+                const { newEle, targetIndex } = payload;
+
+                // 生成新 cube
+                const newCube: ISortCube = {
+                    sortIndex: targetIndex,
+                    sortIndexes: [targetIndex],
+                    value: newEle
+                }
+
+                // 更新 cube 的 sortIndex 到最新
+                let newCubes = state.cubes.map((item, i) => {
+                    const curSortIndex = item.sortIndex;
+                    const newSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
+                    if (curSortIndex !== newSortIndex) {
+                        return { ...item, sortIndex: newSortIndex };
+                    }
+                    return { ...item };
+                })
+
+                // 添加新 cube
+                // newCubes.splice(targetIndex, 0, newCube);
+                newCubes.push(newCube);
+                console.log(newCube.sortIndex);
+
+                // 更新 values
+                let newValues = [...state.values];
+                newValues.splice(targetIndex, 0, newEle);
+                newValues.pop();
+
+                return {
+                    ...state,
+                    cubes: newCubes,
+                    values: newValues
+                }
+            }
 
         // case ActionTypes.Delete:
 
         case ActionTypes.RandomDone:
             {
-                let newValues = randomArr(randomNum(4, 10));
+                let newValues = randomArr(randomNum(4, 8));
+                let newStartPosX = getStartPosX(newValues.length);
                 return {
                     ...state,
                     cubes: initCubes(newValues),
                     values: newValues,
-                    randomDone: true
+                    randomDone: true,
+                    startPosX: newStartPosX
                 }
             }
 
@@ -176,14 +246,18 @@ function reducer(state: IState = initState, action: IAction): IState {
 
 const Sort = () => {
     const history = useHistory();
+
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
         let initValues = randomArr(randomNum(4, 10));
+        let startPosX = getStartPosX(initValues.length);
         return {
             ...state,
             values: initValues,
             cubes: initCubes(initValues),
+            startPosX
         }
     })
+
 
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
@@ -191,9 +265,6 @@ const Sort = () => {
     /** 控制台的添加删除元素的value和index */
     const [value, setValue] = useState(0);
     const [index, setIndex] = useState(0);
-
-    /** 传入数组长度，计算第一个元素的起始x坐标 */
-    const startPosX = getStartXPos(state.cubes.length);
 
     /** 处理场景加载完毕回调 */
     const handleSceneLoaded = () => {
@@ -240,7 +311,12 @@ const Sort = () => {
     }
 
     const handleAddEle = () => {
-        console.log(value, index);
+        const sequence = addEleSeq(state.values, value, index);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch({ type: event.type, payload: event.payload })
+            }, i * DISPATCH_INTERVAL)
+        })
     }
 
     const handleDeleteEle = () => {
@@ -250,6 +326,7 @@ const Sort = () => {
     const handleSliderChange = (value: number) => {
         console.log(value);
     }
+
 
     return (
         <div className='sort-warp'>
@@ -269,23 +346,23 @@ const Sort = () => {
                                 sortIndexes={item.sortIndexes}
                                 sortIndex={item.sortIndex}
                                 value={item.value}
-                                startPosX={startPosX}
+                                startPosX={state.startPosX}
                                 isActive={item.isActive}
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
-                                position={[startPosX + (index * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
+                                position={[state.startPosX + (item.sortIndex * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
                                 isReset={!state.randomDone}
                             />
                         ))
                     }
                     {
-                        state.cubes.map((_, index) => (
+                        state.values.map((_, index) => (
                             <Text
                                 key={index + '*'}
                                 fillOpacity={state.randomDone ? 1 : 0}
                                 color='black'
                                 fontSize={0.5}
-                                position={[getStartXPos(state.cubes.length) + (index * SORT_CUBE_INTERVAL_DISTANCE), -1 + BASE_POSY, 0]}
+                                position={[state.startPosX + (index * SORT_CUBE_INTERVAL_DISTANCE), -1 + BASE_POSY, 0]}
                             >
                                 {index}
                             </Text>
