@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Input, Menu, InputNumber, Button, Drawer } from "antd";
+import { Input, Menu, InputNumber, Button, Drawer, Slider, InputNumberProps } from "antd";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useHover } from "../../utils";
 import { IBaseProps } from "../../types";
@@ -13,6 +13,8 @@ interface IConsoleProps extends IBaseProps {
     operation?: React.ReactNode;
     /** 控制台右边的显示器 */
     displayer?: React.ReactNode;
+    /** slider变化时的回调 */
+    onSliderChange?: (value: number) => void;
     /** drawer的高度 */
     drawerHeight?: number;
 }
@@ -24,7 +26,8 @@ const Console: React.FC<IConsoleProps> = (props) => {
         style,
         operation,
         displayer,
-        drawerHeight
+        drawerHeight,
+        onSliderChange
     } = props;
 
     const [hoverRef, isHover] = useHover();
@@ -77,6 +80,14 @@ const Console: React.FC<IConsoleProps> = (props) => {
             >
 
                 <div className='operation'>
+                    <div className='slider-warp'>
+                        动画速度：
+                        <Slider
+                            className='slider'
+                            defaultValue={32}
+                            onChange={(value: number) => onSliderChange?.(value)}
+                        />
+                    </div>
                     {operation}
                 </div>
 
