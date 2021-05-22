@@ -9,6 +9,13 @@ export const STACK_CUBE_INTERVAL_DISTANCE = 0.8;
 /** 设置 3d 物品在 scene 中的基准 y 轴坐标 */
 export const BASE_POSY = -2;
 
+
+/** 520 ~ 120
+ 
+
+
+ */
+
 /** 遍历细节数组，分发任务的间隔时间 */
 export const DISPATCH_INTERVAL = 320;
 
@@ -73,8 +80,10 @@ export enum ActionTypes {
     RandomDone,
     Random,
     Add,
+    AddDone,
     Delete,
     Search,
+    Move,
 }
 
 export interface IColorConfig {

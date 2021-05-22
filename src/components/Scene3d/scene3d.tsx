@@ -2,8 +2,9 @@ import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Environment, Html, OrbitControls, PerspectiveCamera, Reflector, TransformControls, useProgress } from "@react-three/drei";
-import './scene3d.scss'
 import { SceneLoader } from '../../configs/loading';
+
+import './scene3d.scss'
 
 
 interface IScene3dProps {
@@ -77,12 +78,6 @@ const Scene3d: React.FC<IScene3dProps> = (props) => {
                     ref={cameraRef}
                     makeDefault
                     position={[0, 0, 16]}
-                // position={cameraPos}
-                // lookAt={(v) => {
-                //     // v = cameraPos;
-                //     // console.log(v);
-                // }}
-
                 />
                 <ambientLight intensity={0.3} />
                 <directionalLight color="white" position={[1, 1, 1]} />

@@ -151,6 +151,7 @@ export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, 
     if (getRChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
 }
 
+/** 获取二叉树中序遍历的细节 */
 export function inOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
     if (getLChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
     sequence.push({ type: ActionTypes.Active, index: indexOfNode });
@@ -159,6 +160,7 @@ export function inOrderSeq(binaryTree: (number | null)[], indexOfNode: number, s
     if (getRChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
 }
 
+/** 获取二叉树后序遍历的细节 */
 export function postOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
     if (getLChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
     if (getRChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);

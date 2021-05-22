@@ -6,7 +6,7 @@ import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import Scene3d from '../../components/Scene3d/scene3d';
 import { randomArr, randomNum } from '../../utils/index'
-import { bubbleSortSeq, getStartXPos, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
+import { bubbleSortSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
 import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
 import {
     BarChartOutlined,
