@@ -114,25 +114,30 @@ function reducer(state: IState = initState, action: IAction): IState {
                     return { ...item };
                 })
 
-                const newOpeDetail = { type: OpeDetailTypes.Swap, payload: [index1, index2] }
-
-                return {
-                    ...state,
-                    cubes: newCubes,
-                    opeDetails: [...state.opeDetails, newOpeDetail]
-                }
-            }
-
-        case ActionTypes.SwapDone:
-            {
-                let index1 = (payload as number[])[0];
-                let index2 = (payload as number[])[1];
-
                 // 交换 values 的值
                 let newValues = [...state.values];
                 let temp = newValues[index1];
                 newValues[index1] = newValues[index2];
                 newValues[index2] = temp;
+
+                const newOpeDetail = {
+                    type: OpeDetailTypes.Swap,
+                    payload: {
+                        indexes: [index1, index2],
+                        curValues: [...newValues]
+                    }
+                }
+
+                return {
+                    ...state,
+                    cubes: newCubes,
+                    opeDetails: [...state.opeDetails, newOpeDetail],
+                    values: newValues
+                }
+            }
+
+        case ActionTypes.SwapDone:
+            {
 
                 // 交换完毕后，将对应的cube的sortIndex改为最新的sortIndex
                 const newCubes: ISortCube[] = state.cubes.map((item) => {
@@ -143,7 +148,6 @@ function reducer(state: IState = initState, action: IAction): IState {
 
                 return {
                     ...state,
-                    values: newValues,
                     cubes: newCubes,
                 }
             }
@@ -173,6 +177,9 @@ function reducer(state: IState = initState, action: IAction): IState {
 
 
                 let newValues: number[] = [...state.values];
+
+                let newOpeDetail;
+
                 // 判断是扩容还是缩容
                 if (targetIndexes[0] > oldIndexes[0]) {
                     // 扩容下标
@@ -180,12 +187,14 @@ function reducer(state: IState = initState, action: IAction): IState {
                 } else {
                     // 缩容下标
                     newValues.splice(oldIndexes[0], 1);
+                    newOpeDetail = { type: OpeDetailTypes.Delete, payload: { index: oldIndexes[0], value: state.values[oldIndexes[0]], curValues: [...newValues] } }
                 }
 
                 return {
                     ...state,
                     cubes: newCubes,
-                    values: newValues
+                    values: newValues,
+                    opeDetails: newOpeDetail ? [...state.opeDetails, newOpeDetail] : [...state.opeDetails]
                 }
             }
 
@@ -218,7 +227,7 @@ function reducer(state: IState = initState, action: IAction): IState {
                 newValues.splice(targetIndex, 0, newEle);
                 newValues.pop();
 
-                const newOpeDetail = { type: OpeDetailTypes.Swap, payload: { index: targetIndex, value: newEle } }
+                const newOpeDetail = { type: OpeDetailTypes.Add, payload: { index: targetIndex, value: newEle, curValues: [...newValues] } }
 
                 return {
                     ...state,
@@ -247,7 +256,7 @@ function reducer(state: IState = initState, action: IAction): IState {
                 newCubes.splice(payload, 1);
 
                 // 更新 cube 的 sortIndex 到最新
-                newCubes = state.cubes.map((item, i) => {
+                newCubes = state.cubes.map((item) => {
                     const curSortIndex = item.sortIndex;
                     const newSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
                     if (curSortIndex !== newSortIndex) {
@@ -462,24 +471,24 @@ const Sort = () => {
                                     case OpeDetailTypes.Swap:
                                         return (
                                             <Step
-                                                title={`交换元素: index1=${payload[0]}, index2=${payload[1]}`}
-                                                description={`当前数组: ${state.values.toString()}`}
+                                                title={`交换元素: i1=${payload.indexes[0]}, i2=${payload.indexes[1]}`}
+                                                description={`当前数组: [${payload.curValues.toString()}]`}
                                             />
                                         )
 
                                     case OpeDetailTypes.Add:
                                         return (
                                             <Step
-                                                title={`新增元素: index=${payload.index}, value=${payload.value}`}
-                                                description={`当前数组: ${state.values.toString()}`}
+                                                title={`新增元素: i=${payload.index}, v=${payload.value}`}
+                                                description={`当前数组: [${payload.curValues.toString()}]`}
                                             />
                                         )
 
                                     case OpeDetailTypes.Delete:
                                         return (
                                             <Step
-                                                title={`删除元素: index=${payload.index}, value=${payload.value}`}
-                                                description={`当前数组: ${state.values.toString()}`}
+                                                title={`删除元素: i=${payload.index}, v=${payload.value}`}
+                                                description={`当前数组: [${payload.curValues.toString()}]`}
                                             />
                                         )
                                     default:
