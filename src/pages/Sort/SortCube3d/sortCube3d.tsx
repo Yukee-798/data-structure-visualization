@@ -18,7 +18,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
         position,
         isActive,
         isLock,
-        isReset,
+        isSpRev,
         value,
         sortIndexes,
         sortIndex,
@@ -49,10 +49,10 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
     /** 配置扩缩动画效果 */
     const { scale } = useSpring({
-        reverse: disappear || isReset,
+        reverse: disappear || isSpRev,
         from: { scale: 0 },
         to: { scale: isClick ? 1.10 : 1 },
-        config: (disappear || isReset) ? config.default : config.wobbly
+        config: (disappear || isSpRev) ? config.default : config.wobbly
     })
 
     /** 配置颜色过渡效果 */

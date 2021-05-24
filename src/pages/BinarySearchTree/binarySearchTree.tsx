@@ -220,7 +220,7 @@ const BinarySearchTree = () => {
                                         value={sphere.value}
                                         isActive={sphere.isActive}
                                         isLock={sphere.isLock}
-                                        isReset={!state.randomDone}
+                                        isSpRev={!state.randomDone}
                                     />
                                     {curLChildValue ? <Line3d hidden={!state.randomDone} points={[cdnOfNodes[i], getLChildValue(cdnOfNodes, i)]} /> : <></>}
                                     {curRChildValue ? <Line3d hidden={!state.randomDone} points={[cdnOfNodes[i], getRChildValue(cdnOfNodes, i)]} /> : <></>}
@@ -231,7 +231,7 @@ const BinarySearchTree = () => {
                                     value={sphere.value}
                                     isActive={sphere.isActive}
                                     isLock={sphere.isLock}
-                                    isReset={!state.randomDone}
+                                    isSpRev={!state.randomDone}
                                 />);
                         } else {
                             currentNodeJSX = <Fragment key={i + '('}></Fragment>

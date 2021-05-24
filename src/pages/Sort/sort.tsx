@@ -1,6 +1,6 @@
 import { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, InputNumber, PageHeader, Steps } from 'antd';
+import { Button, InputNumber, PageHeader, Steps, message } from 'antd';
 import { Map, List } from 'immutable'
 import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
@@ -46,7 +46,7 @@ interface IAction {
 }
 
 const initState: IState = {
-    values: [],
+    values: randomArr(randomNum(4, 10)),
     cubes: [],
     sortDone: true,
     randomDone: true,
@@ -281,7 +281,8 @@ function reducer(state: IState = initState, action: IAction): IState {
                     cubes: initCubes(newValues),
                     values: newValues,
                     randomDone: true,
-                    startPosX: newStartPosX
+                    startPosX: newStartPosX,
+                    opeDetails: [{ type: OpeDetailTypes.Default, payload: newValues }]
                 }
             }
 
@@ -289,7 +290,6 @@ function reducer(state: IState = initState, action: IAction): IState {
             return {
                 ...state,
                 randomDone: false,
-                opeDetails: []
             };
 
         default:
@@ -301,13 +301,11 @@ const Sort = () => {
     const history = useHistory();
 
     const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
-        let initValues = randomArr(randomNum(4, 10));
-        let startPosX = getStartPosX(initValues.length);
         return {
             ...state,
-            values: initValues,
-            cubes: initCubes(initValues),
-            startPosX
+            cubes: initCubes(state.values),
+            startPosX: getStartPosX(state.values.length),
+            opeDetails: [{ type: OpeDetailTypes.Default, payload: initState.values }]
         }
     })
 
@@ -323,7 +321,7 @@ const Sort = () => {
         setIsSceneLoaded(true);
     }
 
-    /** 随机生成数据 */
+    /** 随机生成数组 */
     const handleRandom = () => {
         dispatch({ type: ActionTypes.Random });
         setTimeout(() => {
@@ -364,22 +362,40 @@ const Sort = () => {
 
     /** 处理添加元素 */
     const handleAddEle = () => {
-        const sequence = addEleSeq(state.values, value, index);
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.payload })
-            }, i * DISPATCH_INTERVAL)
-        })
+        if (state.values.length < 10) {
+            if (index > state.values.length - 1) {
+                message.warning('输入的序号不合法')
+            } else {
+                const sequence = addEleSeq(state.values, value, index);
+                sequence.forEach((event, i) => {
+                    setTimeout(() => {
+                        dispatch({ type: event.type, payload: event.payload })
+                    }, i * DISPATCH_INTERVAL)
+                })
+            }
+
+        } else {
+            message.warning('添加失败，数组最大容量为10')
+        }
+
     }
 
     /** 处理删除元素 */
     const handleDeleteEle = () => {
-        const sequence = deleteEleSeq(state.values, index);
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.payload })
-            }, i * DISPATCH_INTERVAL)
-        })
+        if (state.values.length > 0) {
+            if (index > state.values.length) {
+                message.warning('输入的序号不合法')
+            } else {
+                const sequence = deleteEleSeq(state.values, index);
+                sequence.forEach((event, i) => {
+                    setTimeout(() => {
+                        dispatch({ type: event.type, payload: event.payload })
+                    }, i * DISPATCH_INTERVAL)
+                })
+            }
+        } else {
+            message.warning('删除失败，当前数组为空')
+        }
     }
 
     /** 处理动画速度改变 */
@@ -411,7 +427,7 @@ const Sort = () => {
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
                                 position={[state.startPosX + (item.sortIndex * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
-                                isReset={!state.randomDone}
+                                isSpRev={!state.randomDone}
                                 disappear={item.disappear}
                             />
                         ))
@@ -451,11 +467,11 @@ const Sort = () => {
                             <div className='input-group'>
                                 <label>
                                     <span className='lable-name'>数值:</span>
-                                    <InputNumber onChange={(value) => setValue(value as number)} />
+                                    <InputNumber min={3} max={90} onChange={(value) => setValue(value as number)} />
                                 </label>
                                 <label>
                                     <span className='lable-name'>序号:</span>
-                                    <InputNumber onChange={(index) => setIndex(index as number)} />
+                                    <InputNumber min={0} max={state.values.length} onChange={(index) => setIndex(index as number)} />
                                 </label>
                                 <Button type='primary' onClick={handleAddEle}>添加</Button>
                                 <Button onClick={handleDeleteEle}>删除</Button>
@@ -492,7 +508,11 @@ const Sort = () => {
                                             />
                                         )
                                     default:
-                                        return <></>
+                                        return (
+                                            <Step
+                                                title={`当前数组: [${payload.toString()}]`}
+                                            />
+                                        )
                                 }
                             })}
 

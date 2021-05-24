@@ -14,7 +14,7 @@ const Sphere3d: React.FC<ISphere3dProps> = (props) => {
         value,
         isActive,
         isLock,
-        isReset,
+        isSpRev,
         colorConfig,
     } = props;
 
@@ -33,11 +33,11 @@ const Sphere3d: React.FC<ISphere3dProps> = (props) => {
 
     /** 配置扩缩动画效果 */
     const { scale } = useSpring({
-        reset: isReset,
-        reverse: isReset,
+        reset: isSpRev,
+        reverse: isSpRev,
         from: { scale: 0 },
         to: { scale: isClick ? 1.20 : 1 },
-        config: isReset ? config.default : config.wobbly
+        config: isSpRev ? config.default : config.wobbly
     })
 
     /** 扫描数组的时候，如果改变了 active 属性，则给它设置一个点击效果 */
