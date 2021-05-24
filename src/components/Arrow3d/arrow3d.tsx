@@ -1,10 +1,12 @@
 import { Line } from '@react-three/drei'
+import { useEffect } from 'react';
 import { Points } from '../../types';
 
 interface IArrow3d {
     points: Points;
     hidden?: boolean;
     lineWidth?: number;
+    ref?: any;
 }
 
 const Arrow3d: React.FC<IArrow3d> = (props) => {
@@ -12,21 +14,24 @@ const Arrow3d: React.FC<IArrow3d> = (props) => {
     const {
         points,
         hidden,
-        lineWidth
+        lineWidth,
+        ref
     } = props;
 
     const point2 = points[1];
 
+
     return (
         <>
-            <Line 
+            {/* <Line 
                 lineWidth={(lineWidth as number) * 1.5}
                 points={[[point2[0] - 0.2, point2[1] + 0.2, 0], point2]}
                 color={'gray'}
                 opacity={hidden ? 0 : 1}
                 transparent={true}
-            />
+            /> */}
             <Line
+                ref={ref}
                 lineWidth={lineWidth}
                 points={points}
                 color={'gray'}
@@ -34,13 +39,13 @@ const Arrow3d: React.FC<IArrow3d> = (props) => {
                 transparent={true}
             />
 
-            <Line 
+            {/* <Line 
                 lineWidth={(lineWidth as number) * 1.5}
                 points={[[point2[0] - 0.2, point2[1] - 0.2, 0], point2]}
                 color={'gray'}
                 opacity={hidden ? 0 : 1}
                 transparent={true}
-            />
+            /> */}
         </>
 
     )
