@@ -1,20 +1,25 @@
 import { IHomeItemProps } from "../../components/HomeItem/homeItem";
 import { DataStrucTypes } from "../../types";
 import Pic from '../../assets/homeItemCovers/84993086_p0.jpg'
+import SortPic from '../../assets/homeItemCovers/Sort.jpg';
+import StackPic from '../../assets/homeItemCovers/Stack.jpg';
+import LinkedListPic from '../../assets/homeItemCovers/LinkedList.jpg';
+import QueuePic from '../../assets/homeItemCovers/Queue.jpg';
+import BinarySearchTree from '../../assets/homeItemCovers/BinarySearchTree.jpg';
 import Tags from "../../components/Tags/tags";
 
 /** home 的 item 数据配置 */
-export  const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
+export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
     // 第一排
     [
         {
-            src: Pic,
+            src: SortPic,
             tag: (
                 <>
                     <Tags type={DataStrucTypes.Array} />
                     <Tags type={DataStrucTypes.BubbleSort} />
                     <Tags type={DataStrucTypes.SelectSort} />
-                    <Tags type={DataStrucTypes.InsertSort} />
+                    {/* <Tags type={DataStrucTypes.InsertSort} /> */}
                     <Tags type={DataStrucTypes.QuickSort} />
                 </>
             ),
@@ -22,20 +27,32 @@ export  const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             type: DataStrucTypes.Sort
         },
         {
-            src: Pic,
+            src: LinkedListPic,
             tag: <Tags type={DataStrucTypes.LinkedList} />,
             title: '链表',
             type: DataStrucTypes.LinkedList
         },
         {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.Stack} />,
+            src: StackPic,
+            tag: (
+                <>
+                    <Tags type={DataStrucTypes.Stack} />
+                    <Tags type={DataStrucTypes.Push} />
+                    <Tags type={DataStrucTypes.Pop} />
+                </>
+            ),
             title: '栈',
             type: DataStrucTypes.Stack
         },
         {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.Queue} />,
+            src: QueuePic,
+            tag: (
+                <>
+                    <Tags type={DataStrucTypes.Queue} />
+                    <Tags type={DataStrucTypes.Enqueue} />
+                    <Tags type={DataStrucTypes.Dequeue} />
+                </>
+            ),
             title: '队列',
             type: DataStrucTypes.Queue
         },
@@ -49,8 +66,10 @@ export  const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             type: DataStrucTypes.HashTable
         },
         {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.BinarySearchTree} />,
+            src: BinarySearchTree,
+            tag: (
+                <Tags type={DataStrucTypes.BinarySearchTree} />
+            ),
             title: '二叉搜索树',
             type: DataStrucTypes.BinarySearchTree
         },
