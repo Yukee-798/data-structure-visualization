@@ -2,14 +2,9 @@ import * as THREE from 'three'
 import React, { useEffect, useRef, useState } from 'react'
 import { animated, useSpring, config } from 'react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
-import { useFrame } from '@react-three/fiber'
-import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../../types';
-import { quickSortSeq } from '../../../utils/sort';
-
+import { IGeometryProps } from '../../../types';
 
 interface IStackCube3dProps extends IGeometryProps {
-    startPosY: any;
-    isPop?: boolean
 }
 
 const StackCube3d: React.FC<IStackCube3dProps> = (props) => {
@@ -18,16 +13,15 @@ const StackCube3d: React.FC<IStackCube3dProps> = (props) => {
         position,
         isActive,
         isLock,
-        isReset,
-        isPop,
+        isSpRev,
         value,
         colorConfig,
+        disappear
     } = props;
 
     const [isHover, setIsHover] = useState(false)
     const [isClick, setIsClick] = useState(false)
     const meshRef = useRef<THREE.Mesh>(null!)
-
 
     /** 扫描数组的时候，如果改变了 active 属性，则给它设置一个点击效果 */
     useEffect(() => {
@@ -36,11 +30,10 @@ const StackCube3d: React.FC<IStackCube3dProps> = (props) => {
 
     /** 配置扩缩动画效果 */
     const { scale } = useSpring({
-        reset: isReset,
-        reverse: isReset,
+        reverse: disappear || isSpRev,
         from: { scale: 0 },
-        to: { scale:  isClick ? 1.10 : 1 },
-        config: isReset ? config.default : config.wobbly
+        to: { scale: isClick ? 1.10 : 1 },
+        config: (disappear || isSpRev) ? config.default : config.wobbly
     })
 
     /** 配置颜色过渡效果 */
