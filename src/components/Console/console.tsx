@@ -13,10 +13,12 @@ interface IConsoleProps extends IBaseProps {
     operation?: React.ReactNode;
     /** 控制台右边的显示器 */
     displayer?: React.ReactNode;
-    /** slider变化时的回调 */
-    onSliderChange?: (value: number) => void;
     /** drawer的高度 */
     drawerHeight?: number;
+    /** 是否有silider */
+    showSilider?: boolean;
+    /** slider变化时的回调 */
+    onSliderChange?: (value: number) => void;
 }
 
 const Console: React.FC<IConsoleProps> = (props) => {
@@ -27,6 +29,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
         operation,
         displayer,
         drawerHeight,
+        showSilider,
         onSliderChange
     } = props;
 
@@ -80,14 +83,17 @@ const Console: React.FC<IConsoleProps> = (props) => {
             >
 
                 <div className='operation'>
-                    <div className='slider-warp'>
-                        动画速度：
-                        <Slider
-                            className='slider'
-                            defaultValue={32}
-                            onChange={(value: number) => onSliderChange?.(value)}
-                        />
-                    </div>
+                    {showSilider &&
+                        <div className='slider-warp'>
+                            动画速度：
+                            <Slider
+                                className='slider'
+                                defaultValue={32}
+                                onChange={(value: number) => onSliderChange?.(value)}
+                            />
+                        </div>
+                    }
+
                     {operation}
                 </div>
 
@@ -99,6 +105,10 @@ const Console: React.FC<IConsoleProps> = (props) => {
             </Drawer>
         </animated.div>
     )
+}
+
+Console.defaultProps = {
+    showSilider: true
 }
 
 export { Item, SubMenu };
