@@ -2,13 +2,9 @@ import * as THREE from 'three'
 import React, { useEffect, useRef, useState } from 'react'
 import { animated, useSpring, config } from 'react-spring/three'
 import { RoundedBox, Text } from "@react-three/drei";
-import { useFrame } from '@react-three/fiber'
-import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps } from '../../../types';
-import { quickSortSeq } from '../../../utils/sort';
-
+import { IGeometryProps } from '../../../types';
 
 interface IQueueCube3dProps extends IGeometryProps {
-    startPosX: any;
 }
 
 const QueueCube3d: React.FC<IQueueCube3dProps> = (props) => {
@@ -17,10 +13,10 @@ const QueueCube3d: React.FC<IQueueCube3dProps> = (props) => {
         position,
         isActive,
         isLock,
-        isReset,
+        isSpRev,
         value,
-        startPosX,
         colorConfig,
+        disappear
     } = props;
 
     const [isHover, setIsHover] = useState(false)
@@ -35,11 +31,10 @@ const QueueCube3d: React.FC<IQueueCube3dProps> = (props) => {
 
     /** 配置扩缩动画效果 */
     const { scale } = useSpring({
-        reset: isReset,
-        reverse: isReset,
+        reverse: disappear || isSpRev,
         from: { scale: 0 },
         to: { scale: isClick ? 1.10 : 1 },
-        config: isReset ? config.default : config.wobbly
+        config: (disappear || isSpRev) ? config.default : config.wobbly
     })
 
     /** 配置颜色过渡效果 */
