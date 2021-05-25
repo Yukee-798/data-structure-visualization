@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/data-structure-visualization/static/css/main.b843f646.chunk.css",
-    "main.js": "/data-structure-visualization/static/js/main.c10ce0a2.chunk.js",
-    "main.js.map": "/data-structure-visualization/static/js/main.c10ce0a2.chunk.js.map",
+    "main.js": "/data-structure-visualization/static/js/main.78fa7a1d.chunk.js",
+    "main.js.map": "/data-structure-visualization/static/js/main.78fa7a1d.chunk.js.map",
     "runtime-main.js": "/data-structure-visualization/static/js/runtime-main.2dbef204.js",
     "runtime-main.js.map": "/data-structure-visualization/static/js/runtime-main.2dbef204.js.map",
     "static/css/2.35e2f71b.chunk.css": "/data-structure-visualization/static/css/2.35e2f71b.chunk.css",
-    "static/js/2.f3b756f2.chunk.js": "/data-structure-visualization/static/js/2.f3b756f2.chunk.js",
-    "static/js/2.f3b756f2.chunk.js.map": "/data-structure-visualization/static/js/2.f3b756f2.chunk.js.map",
+    "static/js/2.05b71868.chunk.js": "/data-structure-visualization/static/js/2.05b71868.chunk.js",
+    "static/js/2.05b71868.chunk.js.map": "/data-structure-visualization/static/js/2.05b71868.chunk.js.map",
     "index.html": "/data-structure-visualization/index.html",
     "static/css/2.35e2f71b.chunk.css.map": "/data-structure-visualization/static/css/2.35e2f71b.chunk.css.map",
     "static/css/main.b843f646.chunk.css.map": "/data-structure-visualization/static/css/main.b843f646.chunk.css.map",
-    "static/js/2.f3b756f2.chunk.js.LICENSE.txt": "/data-structure-visualization/static/js/2.f3b756f2.chunk.js.LICENSE.txt",
+    "static/js/2.05b71868.chunk.js.LICENSE.txt": "/data-structure-visualization/static/js/2.05b71868.chunk.js.LICENSE.txt",
     "static/media/BinarySearchTree.0ea5af15.jpg": "/data-structure-visualization/static/media/BinarySearchTree.0ea5af15.jpg",
     "static/media/Queue.5d3f80d2.jpg": "/data-structure-visualization/static/media/Queue.5d3f80d2.jpg",
     "static/media/Sort.af83f2f6.jpg": "/data-structure-visualization/static/media/Sort.af83f2f6.jpg",
@@ -20,8 +20,8 @@
   "entrypoints": [
     "static/js/runtime-main.2dbef204.js",
     "static/css/2.35e2f71b.chunk.css",
-    "static/js/2.f3b756f2.chunk.js",
+    "static/js/2.05b71868.chunk.js",
     "static/css/main.b843f646.chunk.css",
-    "static/js/main.c10ce0a2.chunk.js"
+    "static/js/main.78fa7a1d.chunk.js"
   ]
 }
