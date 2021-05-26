@@ -5,6 +5,7 @@ interface ILine3dProps {
     points: Points;
     hidden: boolean;
     lineWidth?: number;
+    isActive?: boolean;
 }
 
 const Line3d:React.FC<ILine3dProps> = (props) => {
@@ -12,14 +13,15 @@ const Line3d:React.FC<ILine3dProps> = (props) => {
     const {
         points,
         hidden,
-        lineWidth
+        lineWidth,
+        isActive
     } = props;
 
     return (
         <Line
             lineWidth={lineWidth}
             points={points}
-            color={'gray'}
+            color={isActive ? 'orange' : 'gray'}
             opacity={hidden ? 0 : 1}
             transparent={true}
         />
