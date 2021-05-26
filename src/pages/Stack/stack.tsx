@@ -159,9 +159,6 @@ const Stack = () => {
         }
     });
 
-    /** 控制台的添加删除元素的value和index */
-    const [value, setValue] = useState(0);
-
     /** stackCube的起始坐标 */
     const startPosY = getStartYPos(state.cubes.length);
 
@@ -189,7 +186,7 @@ const Stack = () => {
     }
 
     /** 处理压栈 */
-    const handlePush = () => {
+    const handlePush = (value: number) => {
         if (state.values.length < 10) {
             const sequence = pushSeq(value);
             sequence.forEach((event, i) => {
@@ -215,7 +212,7 @@ const Stack = () => {
         <div className='stack-warp'>
             <PageHeader
                 onBack={() => {
-                    history.goBack();
+                    history.replace('/data-structure-visualization/')
                     window.location.reload();
                 }}
                 title='栈'
@@ -226,7 +223,7 @@ const Stack = () => {
                         <React.Fragment key={i + '!'}>
                             <StackCube3d
                                 value={item.value}
-                                position={[0, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE), 0]}
+                                position={[0, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE) + 2, 0]}
                                 isSpRev={!state.randomDone}
                                 isActive={item.isActive}
                                 disappear={item.disappear}
@@ -236,7 +233,7 @@ const Stack = () => {
                                 <Text
                                     fontSize={0.5}
                                     color='black'
-                                    position={[-2.5, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE), 0]}
+                                    position={[-2.5, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE) + 2, 0]}
                                 >
                                     {'Top ——>'}
                                 </Text> : <></>}
@@ -246,23 +243,18 @@ const Stack = () => {
                 <Console
                     style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
                     showSilider={false}
+                    onAdd={handlePush}
+                    onDelete={handlePop}
+                    valueRange={[0, 90]}
+                    addText='压栈'
+                    deleteText='弹栈'
+                    isIndex={false}
                     operation={
-                        <>
-                            <div className='btn-group'>
-                                <div className='row'>
-                                    <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
-                                </div>
+                        <div className='btn-group'>
+                            <div className='row'>
+                                <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
                             </div>
-
-                            <div className='input-group'>
-                                <label>
-                                    <span className='lable-name'>数值:</span>
-                                    <InputNumber min={0} max={90} onChange={(value) => setValue(value as number)} />
-                                </label>
-                                <Button type='primary' onClick={handlePush}>压栈</Button>
-                                <Button onClick={handlePop}>弹栈</Button>
-                            </div>
-                        </>
+                        </div>
                     }
 
                     displayer={

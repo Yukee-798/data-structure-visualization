@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Input, Menu, InputNumber, Button, Drawer, Slider, InputNumberProps } from "antd";
+import { Menu, InputNumber, Button, Drawer, Slider, Radio } from "antd";
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useHover } from "../../utils";
 import { IBaseProps } from "../../types";
@@ -17,8 +17,32 @@ interface IConsoleProps extends IBaseProps {
     drawerHeight?: number;
     /** 是否有silider */
     showSilider?: boolean;
+    /** 是否可以添加、删除元素 */
+    isUpdate?: boolean;
+    /** 是否显示序号输入框 */
+    isIndex?: boolean;
+    /** 设置value范围 */
+    valueRange?: [number, number];
+    /** 设置index范围 */
+    indexRange?: [number, number];
+    /** 设置value默认值 */
+    defaultValue?: number;
+    /** 设置index默认值 */
+    defaultIndex?: number;
+    /** 添加按钮的文字 */
+    addText?: string;
+    /** 删除按钮的文字 */
+    deleteText?: string;
     /** slider变化时的回调 */
     onSliderChange?: (value: number) => void;
+    /** value改变时的回调 */
+    onValueChange?: (value: number) => void;
+    /** index改变时的回调 */
+    onIndexChange?: (index: number) => void;
+    /** 点击添加时的回调 */
+    onAdd?: (value: number, index: number) => void;
+    /** 点击删除时的回调 */
+    onDelete?: (index: number) => void;
 }
 
 const Console: React.FC<IConsoleProps> = (props) => {
@@ -30,13 +54,31 @@ const Console: React.FC<IConsoleProps> = (props) => {
         displayer,
         drawerHeight,
         showSilider,
-        onSliderChange
+        addText,
+        defaultIndex,
+        valueRange,
+        indexRange,
+        defaultValue,
+        deleteText,
+        isUpdate,
+        isIndex,
+        onSliderChange,
+        onAdd,
+        onDelete,
+        onIndexChange,
+        onValueChange
     } = props;
 
     const [hoverRef, isHover] = useHover();
     const [isUnfold, setIsUnfold] = useState(false);
-    const displayConRef = useRef<HTMLDivElement>();
+    /** 控制台的添加删除元素的value和index */
+    const [value, setValue] = useState(defaultValue || 0);
+    const [index, setIndex] = useState(defaultIndex || 0);
 
+    // 被激活的 radio
+    const [radioActived, setRadioActived] = useState(1);
+
+    const displayConRef = useRef<HTMLDivElement>();
     const { opacity } = useSpring({
         opacity: isHover ? 0.7 : 0.2,
         config: config.gentle
@@ -94,7 +136,60 @@ const Console: React.FC<IConsoleProps> = (props) => {
                         </div>
                     }
 
+                    {/* 显示操作按钮 */}
                     {operation}
+
+                    {/* 显示添加、删除 */}
+                    {
+                        isUpdate &&
+                        <div className='input-group'>
+                            <Radio.Group
+                                className='radio-group'
+                                defaultValue={1}
+                                onChange={(e) => {
+                                    setRadioActived(e.target.value);
+                                }}
+                            >
+                                <Radio value={1}>{addText}</Radio>
+                                <Radio value={2}>{deleteText}</Radio>
+                            </Radio.Group>
+
+                            <div className='label-group'>
+                                {
+                                    radioActived === 1 &&
+                                    <label>
+                                        <span className='label-name'>数值:</span>
+                                        <InputNumber
+                                            min={valueRange?.[0]}
+                                            max={valueRange?.[1]}
+                                            defaultValue={defaultValue}
+                                            onChange={(value) => {
+                                                setValue(value as number)
+                                                onValueChange?.(value);
+                                            }}
+                                        />
+                                    </label>
+                                }
+                                {
+                                    isIndex &&
+                                    <label>
+                                        <span className='label-name'>序号:</span>
+                                        <InputNumber
+                                            min={indexRange?.[0]}
+                                            max={valueRange?.[1]}
+                                            defaultValue={defaultIndex}
+                                            onChange={(index) => {
+                                                setIndex(index as number)
+                                            }}
+                                        />
+                                    </label>
+                                }
+
+                                {radioActived === 1 && <Button type='primary' onClick={() => onAdd?.(value, index)}>{addText}</Button>}
+                                {radioActived === 2 && <Button type='primary' onClick={() => onDelete?.(index)}>{deleteText}</Button>}
+                            </div>
+                        </div>
+                    }
                 </div>
 
                 <div className='displayer'>
@@ -108,7 +203,15 @@ const Console: React.FC<IConsoleProps> = (props) => {
 }
 
 Console.defaultProps = {
-    showSilider: true
+    showSilider: true,
+    addText: '添加',
+    deleteText: '删除',
+    defaultIndex: 2,
+    defaultValue: 3,
+    valueRange: [3, 90],
+    indexRange: [0, 10],
+    isUpdate: true,
+    isIndex: true
 }
 
 export { Item, SubMenu };
