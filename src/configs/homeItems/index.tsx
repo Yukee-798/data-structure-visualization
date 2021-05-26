@@ -26,12 +26,12 @@ export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             title: '排序',
             type: DataStrucTypes.Sort
         },
-        {
-            src: LinkedListPic,
-            tag: <Tags type={DataStrucTypes.LinkedList} />,
-            title: '链表',
-            type: DataStrucTypes.LinkedList
-        },
+        // {
+        //     src: LinkedListPic,
+        //     tag: <Tags type={DataStrucTypes.LinkedList} />,
+        //     title: '链表',
+        //     type: DataStrucTypes.LinkedList
+        // },
         {
             src: StackPic,
             tag: (
@@ -56,62 +56,73 @@ export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             title: '队列',
             type: DataStrucTypes.Queue
         },
-    ],
-    // 第二排
-    [
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.HashTable} />,
-            title: '哈希表',
-            type: DataStrucTypes.HashTable
-        },
         {
             src: BinarySearchTree,
             tag: (
-                <Tags type={DataStrucTypes.BinarySearchTree} />
+                <>
+                    <Tags type={DataStrucTypes.BinarySearchTree} />
+                    <Tags type={DataStrucTypes.Traverse} />
+                </>
             ),
             title: '二叉搜索树',
             type: DataStrucTypes.BinarySearchTree
         },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.BinaryHeap} />,
-            title: '二叉堆',
-            type: DataStrucTypes.BinaryHeap
-        },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.AVLTree} />,
-            title: 'AVL树',
-            type: DataStrucTypes.AVLTree
-        },
     ],
-    // 第三排
-    [
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.RedBlackTree} />,
-            title: '红黑树',
-            type: DataStrucTypes.RedBlackTree
-        },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.BTree} />,
-            title: 'B树',
-            type: DataStrucTypes.BTree
-        },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.BPlusTree} />,
-            title: 'B+树',
-            type: DataStrucTypes.BPlusTree
-        },
-        {
-            src: Pic,
-            tag: <Tags type={DataStrucTypes.Graph} />,
-            title: '图结构',
-            type: DataStrucTypes.Graph
-        },
+    // 第二排
+    // [
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.HashTable} />,
+    //         title: '哈希表',
+    //         type: DataStrucTypes.HashTable
+    //     },
+    //     {
+    //         src: BinarySearchTree,
+    //         tag: (
+    //             <Tags type={DataStrucTypes.BinarySearchTree} />
+    //         ),
+    //         title: '二叉搜索树',
+    //         type: DataStrucTypes.BinarySearchTree
+    //     },
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.BinaryHeap} />,
+    //         title: '二叉堆',
+    //         type: DataStrucTypes.BinaryHeap
+    //     },
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.AVLTree} />,
+    //         title: 'AVL树',
+    //         type: DataStrucTypes.AVLTree
+    //     },
+    // ],
+    // // 第三排
+    // [
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.RedBlackTree} />,
+    //         title: '红黑树',
+    //         type: DataStrucTypes.RedBlackTree
+    //     },
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.BTree} />,
+    //         title: 'B树',
+    //         type: DataStrucTypes.BTree
+    //     },
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.BPlusTree} />,
+    //         title: 'B+树',
+    //         type: DataStrucTypes.BPlusTree
+    //     },
+    //     {
+    //         src: Pic,
+    //         tag: <Tags type={DataStrucTypes.Graph} />,
+    //         title: '图结构',
+    //         type: DataStrucTypes.Graph
+    //     },
 
-    ],
+    // ],
 ];
