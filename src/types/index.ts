@@ -89,7 +89,18 @@ export enum OpeDetailTypes {
     Push = '压栈',
     Enqueue = '入队',
     Dequeue = '出队',
+    PreOrderDetails = '前序遍历',
+    InOrderDetails = '中序遍历',
+    PostOrderDetails = '后序遍历',
     Default = '数据源'
+}
+
+
+export type IReducer<T> = (state: T, action: IAction) => T;
+
+export interface IAction {
+    type: ActionTypes;
+    payload?: any;
 }
 
 export enum ActionTypes {
@@ -98,6 +109,8 @@ export enum ActionTypes {
     Push,
     PushDone,
     Active,
+    ActiveLeft,
+    ActiveRight,
     Deactive,
     Swap,
     SwapDone,
@@ -120,7 +133,10 @@ export enum ActionTypes {
     TailInsert,
     ShowArrow,
     MoveDown,
-    MoveTop
+    MoveTop,
+    StartPreorder,
+    StartInOrder,
+    StartPostOrder
 }
 
 export interface IColorConfig {
