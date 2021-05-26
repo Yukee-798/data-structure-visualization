@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IQueueCube } from "../pages/Queue/queue";
+import { IQueueCube } from "../pages/Queue/store";
 import { ActionTypes, QUEUE_CUBE_INTERVAL_DISTANCE } from "../types";
 
 /** 根据数组长度，计算出第一个 cube 的 position 的 x 坐标 */

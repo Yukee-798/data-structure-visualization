@@ -11,7 +11,7 @@ const RouterView = () => {
   return (
 
     <Router>
-      <Redirect to="/home" />
+      <Redirect to="/data-structure-visualization/home" />
       <Switch>
         {routerMap.map((item, index) => (
           <Route key={index} path={item.path} component={item.page} />

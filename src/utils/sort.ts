@@ -1,4 +1,4 @@
-import { ISortCube } from "../pages/Sort/sort";
+import { ISortCube } from "../pages/Sort/store";
 import { ActionTypes, SORT_CUBE_INTERVAL_DISTANCE } from "../types";
 
 /** 初始化 cubes */

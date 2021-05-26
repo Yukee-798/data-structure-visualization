@@ -14,56 +14,56 @@ import BinarySearchTree from '../../pages/BinarySearchTree/binarySearchTree'
 
 const routerView = [
     {
-        path: "/home",
+        path: "/data-structure-visualization/home/",
         page: Home
     },
     {
-        path: "/sort",
+        path: "/data-structure-visualization/sort",
         page: Sort
     },
     {
-        path: "/linkedList",
+        path: "/data-structure-visualization/linkedList",
         page: LinkedList
     },
     {
-        path: "/queue",
+        path: "/data-structure-visualization/queue",
         page: Queue
     },
     {
-        path: "/stack",
+        path: "/data-structure-visualization/stack",
         page: Stack
     },
     {
-        path: "/binarySearchTree",
+        path: "/data-structure-visualization/binarySearchTree",
         page: BinarySearchTree
     },
     {
-        path: "/binaryHeap",
+        path: "/data-structure-visualization/binaryHeap",
         page: BinaryHeap
     },
     {
-        path: "/hashTable",
+        path: "/data-structure-visualization/hashTable",
         page: HashTable
     },
     {
-        path: "/avlTree",
+        path: "/data-structure-visualization/avlTree",
         page: AVLTree
     },
     {
-        path: "/redBlackTree",
+        path: "/data-structure-visualization/redBlackTree",
         page: RedBlackTree
     },
     {
-        path: "/bTree",
+        path: "/data-structure-visualization/bTree",
         page: BTree
     },
 
     {
-        path: "/bPlusTree",
+        path: "/data-structure-visualization/bPlusTree",
         page: BPlusTree
     },
     {
-        path: "/graph",
+        path: "/data-structure-visualization/graph",
         page: Graph
     },
 ];

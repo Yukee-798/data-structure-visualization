@@ -7,6 +7,8 @@ import { DataStrucTypes } from '../../types';
 import { homeItemsConfig } from '../../configs/homeItems';
 import './home.scss'
 
+const root = '/data-structure-visualization'
+
 const Home = () => {
     const history = useHistory();
     const [open, setOpen] = useState(false)
@@ -37,32 +39,33 @@ const Home = () => {
     //     open ? 0.1 : 0.6,
     // ])
 
+
     const handleClick = (type: DataStrucTypes) => {
         switch (type) {
             case DataStrucTypes.Sort:
-                return history.replace('/sort');
+                return history.push(root + '/sort');
             case DataStrucTypes.LinkedList:
-                return history.replace('/linkedList')
+                return history.push(root + '/linkedList')
             case DataStrucTypes.Stack:
-                return history.replace('/stack')
+                return history.push(root + '/stack')
             case DataStrucTypes.Queue:
-                return history.replace('/queue')
+                return history.push(root + '/queue')
             case DataStrucTypes.HashTable:
-                return history.replace('/hashTable')
+                return history.push(root + '/hashTable')
             case DataStrucTypes.BinarySearchTree:
-                return history.replace('/binarySearchTree')
+                return history.push(root + '/binarySearchTree')
             case DataStrucTypes.BinaryHeap:
-                return history.replace('/binaryHeap')
+                return history.push(root + '/binaryHeap')
             case DataStrucTypes.AVLTree:
-                return history.replace('/avlTree')
+                return history.push(root + '/avlTree')
             case DataStrucTypes.RedBlackTree:
-                return history.replace('/redBlackTree')
+                return history.push(root + '/redBlackTree')
             case DataStrucTypes.BTree:
-                return history.replace('/bTree')
+                return history.push(root + '/bTree')
             case DataStrucTypes.BPlusTree:
-                return history.replace('/bPlusTree')
+                return history.push(root + '/bPlusTree')
             case DataStrucTypes.Graph:
-                return history.replace('/graph')
+                return history.push(root + '/graph')
         }
     }
     const { size, opacity } = useSpring({
@@ -82,9 +85,9 @@ const Home = () => {
                 <Row gutter={{ xs: 8, sm: 16, md: 24 }} key={i + '&'}>
                     {row.map((col, j) => (
                         <Col xs={12} sm={12} md={6} lg={6} xl={6} key={i + '&' + j}>
-                            <animated.div 
+                            <animated.div
                                 className='homeItem-warp'
-                                style={{ width: size, height: size, opacity }} 
+                                style={{ width: size, height: size, opacity }}
                                 onClick={() => { setOpen(true) }}
                             >
                                 <HomeItem

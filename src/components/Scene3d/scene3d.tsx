@@ -120,10 +120,10 @@ const Scene3d: React.FC<IScene3dProps> = (props) => {
                         maxDistance={30}
                     />
                     <Environment
-                        // preset='warehouse'  
+                        // preset='night'  
                         background
                         files={['ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg']}
-                        path='/envFiles/'
+                        path='./'
                     />
                 </Suspense>
             </Canvas>

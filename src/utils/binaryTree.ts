@@ -1,5 +1,5 @@
 import { randomArr, randomNum } from '.';
-import { ISphere } from '../pages/BinarySearchTree/binarySearchTree';
+import { IBSTCube3d } from '../pages/BinarySearchTree/store';
 import { ActionTypes } from '../types';
 import { log } from './math';
 
@@ -133,7 +133,7 @@ export function randomBST() {
 }
 
 /** 初始化二叉树sphere */
-export function initSpheres(values: (number | null)[]): ISphere[] {
+export function initSpheres(values: (number | null)[]): IBSTCube3d[] {
     return values.map((value, index) => ({
         sortIndex: index,
         value,
@@ -145,8 +145,9 @@ export function initSpheres(values: (number | null)[]): ISphere[] {
 /** 获取二叉树前序遍历的细节 */
 export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
     sequence.push({ type: ActionTypes.Active, index: indexOfNode });
+    // sequence.push({ type: ActionTypes.ActiveLeft, index: indexOfNode })
     sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
-    sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
+    sequence.push({ type: ActionTypes.Lock, index: indexOfNode });
     if (getLChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
     if (getRChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
 }
@@ -155,6 +156,7 @@ export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, 
 export function inOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
     if (getLChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
     sequence.push({ type: ActionTypes.Active, index: indexOfNode });
+    // sequence.push({ type: ActionTypes.ActiveRight, index: indexOfNode })
     sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
     sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
     if (getRChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
@@ -165,6 +167,7 @@ export function postOrderSeq(binaryTree: (number | null)[], indexOfNode: number,
     if (getLChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
     if (getRChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
     sequence.push({ type: ActionTypes.Active, index: indexOfNode });
+    sequence.push({ type: ActionTypes.ActiveLeft, index: indexOfNode })
     sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
     sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
 }
