@@ -3,22 +3,23 @@ import { Card } from 'antd'
 import { DataStrucTypes, IBaseProps } from '../../types'
 import { useHover } from '../../utils'
 import './homeItem.scss'
+import Tag, { TagType } from '../Tag/tag'
 
 export interface IHomeItemProps extends IBaseProps {
-    /** 卡片标题 */
-    title: string;
     /** 数据结构类型 */
     type: DataStrucTypes;
+    /** 卡片标题 */
+    title?: string;
     /** 图片资源 */
-    src: string;
+    src?: string;
     /** 标签 */
-    tag: React.ReactNode;
+    tags?: TagType[];
     /** 点击事件 */
-    onClick: (type: DataStrucTypes) => void;
+    onClick?: (type: DataStrucTypes) => void;
 }
 
 const HomeItem: React.FC<IHomeItemProps> = (props) => {
-    const { title, src, tag, type, onClick } = props;
+    const { title, src, tags, type, onClick } = props;
     const [hoverRef, isHover] = useHover();
 
     const { scale } = useSpring({
@@ -37,11 +38,15 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
             <Card
                 hoverable
                 cover={<img src={src} alt='pic' />}
-                onClick={() => { setTimeout(() => { onClick(type) }, 250) }}
+                onClick={() => { setTimeout(() => { onClick?.(type) }, 250) }}
             >
                 <Card.Meta
                     title={title}
-                    description={tag}
+                    description={tags?.map((tagName: TagType) => (
+                        <Tag
+                            type={tagName}
+                        />
+                    ))}
                 />
             </Card>
         </animated.div>

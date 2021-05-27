@@ -4,7 +4,7 @@ import { useHistory } from 'react-router';
 import { useSpring, animated, config, useSpringRef, useTransition, useChain } from 'react-spring/web'
 import HomeItem from '../../components/HomeItem/homeItem';
 import { DataStrucTypes } from '../../types';
-import { homeItemsConfig } from '../../configs/homeItems';
+import { homeItemsConfig } from './config';
 import './home.scss'
 
 const root = '/data-structure-visualization'
@@ -92,7 +92,7 @@ const Home = () => {
                             >
                                 <HomeItem
                                     src={col.src}
-                                    tag={col.tag}
+                                    tags={col.tags}
                                     title={col.title}
                                     type={col.type}
                                     onClick={handleClick}
