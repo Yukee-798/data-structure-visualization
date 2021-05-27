@@ -143,7 +143,7 @@ const BinarySearchTree = () => {
                                 activeLeft={sphere.activeLeft}
                                 activeRight={sphere.activeRight}
                                 isLock={sphere.isLock}
-                                isSpRev={!state.randomDone}
+                                disappear={!state.randomDone}
                                 lChildPos={hasLChild && lChildPos}
                                 rChildPos={hasRChild && rChildPos}
 

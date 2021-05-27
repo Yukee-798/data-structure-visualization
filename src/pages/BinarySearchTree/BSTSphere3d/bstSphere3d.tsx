@@ -20,15 +20,14 @@ const BSTCube3d: React.FC<IBSTSphere3dProps> = (props) => {
     const {
         lChildPos,
         rChildPos,
-        isSpRev,
         position,
         activeLeft,
-        activeRight
+        activeRight,
+        disappear
         // position,
         // value,
         // isActive,
         // isLock,
-        // isSpRev,
         // colorConfig,
         // lChildPos,
         // rChildPos,
@@ -44,7 +43,7 @@ const BSTCube3d: React.FC<IBSTSphere3dProps> = (props) => {
             {
                 lChildPos &&
                 <Line3d
-                    hidden={isSpRev as boolean}
+                    hidden={disappear as boolean}
                     points={[position, lChildPos]}
                     isActive={activeLeft}
                 />
@@ -52,7 +51,7 @@ const BSTCube3d: React.FC<IBSTSphere3dProps> = (props) => {
             {
                 rChildPos &&
                 <Line3d
-                    hidden={isSpRev as boolean}
+                    hidden={disappear as boolean}
                     points={[position, rChildPos]}
                     isActive={activeRight}
                 />
