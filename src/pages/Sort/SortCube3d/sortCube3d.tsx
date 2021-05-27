@@ -1,12 +1,10 @@
 import * as THREE from 'three'
-import React, { useEffect, useRef, useState } from 'react'
-import { animated, useSpring, config } from 'react-spring/three'
-import { RoundedBox, Text } from "@react-three/drei";
+import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, IGeometryProps, DISPATCH_INTERVAL } from '../../../types';
-import { quickSortSeq } from '../../../utils/sort';
+import { SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL } from '../../../types';
+import Cube3d, { ICube3dProps } from '../../../components/Cube3d/cube3d';
 
-interface ISortCube3dProps extends IGeometryProps {
+interface ISortCube3dProps extends ICube3dProps {
     sortIndexes: number[];
     sortIndex: number;
     startPosX: any;
@@ -15,20 +13,13 @@ interface ISortCube3dProps extends IGeometryProps {
 const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
     const {
-        position,
-        isActive,
-        isLock,
-        isSpRev,
-        value,
         sortIndexes,
         sortIndex,
         startPosX,
-        colorConfig,
-        disappear
+        value,
+        ...restProps
     } = props;
 
-    const [isHover, setIsHover] = useState(false)
-    const [isClick, setIsClick] = useState(false)
     const meshRef = useRef<THREE.Mesh>(null!)
 
     /** 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
@@ -46,28 +37,6 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
     const oldPosX = getOrginPosX();
     const targetPosX = getTargetPosX();
-
-    /** 配置扩缩动画效果 */
-    const { scale } = useSpring({
-        reverse: disappear || isSpRev,
-        from: { scale: 0 },
-        to: { scale: isClick ? 1.10 : 1 },
-        config: (disappear || isSpRev) ? config.default : config.wobbly
-    })
-
-    /** 配置颜色过渡效果 */
-    const { color } = useSpring({
-        color: (
-            isClick ? colorConfig?.activeColor :
-                isHover ? colorConfig?.hoverColor :
-                    isLock ? colorConfig?.lockColor : colorConfig?.defaultColor
-        )
-    })
-
-    /** 扫描数组的时候，如果改变了 active 属性，则给它设置一个点击效果 */
-    useEffect(() => {
-        isActive ? setIsClick(true) : setIsClick(false);
-    }, [isActive])
 
 
     useFrame(() => {
@@ -96,36 +65,12 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
     })
 
     return (
-        <animated.mesh
-            scale={scale}
-            ref={meshRef}
-            position={position}
-        >
-            <Text
-                fontSize={0.5}
-                color='black'
-            >
-                {value}
-            </Text>
-            <RoundedBox
-                args={[1, value ? value * 0.2 : 0, 1]}
-                onClick={() => setIsClick(!isClick)}
-                onPointerOver={() => setIsHover(true)}
-                onPointerOut={() => setIsHover(false)}
-            >
-                <animated.meshPhongMaterial
-                    color={color}
-                    opacity={0.5}
-                    transparent={true}
-                // vertexColors={true}
-                // color={[0xffff00, 0xff00ff, 0x00ffff]}
-                // specular={new THREE.Color(0x4488ee)}
-                // shininess={12}
-                // wireframeLinewidth={3}
-                // wireframe={true}
-                />
-            </RoundedBox>
-        </animated.mesh>
+        <Cube3d
+            args={[1, value ? value * 0.2 : 0, 1]}
+            value={value}
+            mRef={meshRef}
+            {...restProps}
+        />
     )
 }
 

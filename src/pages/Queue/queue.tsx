@@ -91,9 +91,8 @@ const Queue = () => {
                             <QueueCube3d
                                 value={item.value}
                                 position={[startPosX + (i * QUEUE_CUBE_INTERVAL_DISTANCE), 2, 0]}
-                                isSpRev={!state.randomDone}
                                 isActive={item.isActive}
-                                disappear={item.disappear}
+                                disappear={!state.randomDone || item.disappear}
                             />
                             {i === 0 || i === arr.length - 1 ?
                                 <Text

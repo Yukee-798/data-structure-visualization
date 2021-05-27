@@ -139,8 +139,7 @@ const Sort = () => {
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
                                 position={[state.startPosX + (item.sortIndex * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
-                                isSpRev={!state.randomDone}
-                                disappear={item.disappear}
+                                disappear={!state.randomDone || item.disappear}
                             />
                         ))
                     }

@@ -224,9 +224,8 @@ const Stack = () => {
                             <StackCube3d
                                 value={item.value}
                                 position={[0, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE) + 2, 0]}
-                                isSpRev={!state.randomDone}
                                 isActive={item.isActive}
-                                disappear={item.disappear}
+                                disappear={item.disappear || !state.randomDone}
 
                             />
                             {(i === state.cubes.length - 1 && state.randomDone) ?
