@@ -1,20 +1,38 @@
 import * as THREE from 'three'
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Spin } from 'antd';
+import { Canvas } from '@react-three/fiber';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Environment, Html, OrbitControls, PerspectiveCamera, Reflector, TransformControls, useProgress } from "@react-three/drei";
-import { SceneLoader } from '../../configs/loading';
-
 import './scene3d.scss'
 
+function SceneLoader(props: any) {
+    const { progress } = useProgress();
+    const { onLoaded } = props;
+    useEffect(() => {
+        if (progress === 100) {
+            onLoaded?.();
+        }
+    }, [progress])
+
+    return (
+        <Html center style={{ marginTop: '200px' }}>
+            <Spin size='large' />
+            {/* {progress} % loaded */}
+        </Html>
+    );
+}
 
 interface IScene3dProps {
     /** 场景加载完毕后的回调 */
     onLoaded?: () => void;
+    /** 设置相机的z坐标 */
+    cameraPosZ?: number;
 }
 
 const Scene3d: React.FC<IScene3dProps> = (props) => {
     const {
         children,
+        cameraPosZ,
         onLoaded
     } = props;
 
@@ -77,7 +95,7 @@ const Scene3d: React.FC<IScene3dProps> = (props) => {
                 <PerspectiveCamera
                     ref={cameraRef}
                     makeDefault
-                    position={[0, 0, 16]}
+                    position={[0, 0, cameraPosZ as number]}
                 />
                 <ambientLight intensity={0.3} />
                 <directionalLight color="white" position={[1, 1, 1]} />
@@ -130,6 +148,10 @@ const Scene3d: React.FC<IScene3dProps> = (props) => {
         </div>
 
     )
+}
+
+Scene3d.defaultProps = {
+    cameraPosZ: 16
 }
 
 export default Scene3d;
