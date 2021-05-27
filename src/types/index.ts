@@ -31,51 +31,39 @@ export interface IBaseProps {
     className?: string;
 }
 
-/** 数据结构类型枚举同时也是tag的类型 */
+/** 主页的item类型 */
 export enum DataStrucTypes {
     Sort,
-    Array,
-    BubbleSort,
-    SelectSort,
-    InsertSort,
-    QuickSort,
-    MergeSort,
-
     LinkedList,
-    HeadInsert,
-    TailInsert,
     Queue,
-    Enqueue,
-    Dequeue,
     Stack,
-    Push,
-    Pop,
-
-    Search,
     HashTable,
-    BinarySearch,
-
-    Tree,
     BinarySearchTree,
     BinaryHeap,
     AVLTree,
     BTree,
     BPlusTree,
     RedBlackTree,
-
-    Graph,
-    Traverse,
+    Graph
 }
 
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
+    mRef?: any;
+    /** 构造参数 */
+    args?: any;
+    /** 取值 */
     value: number | null;
+    /** 是否消失 */
     disappear?: boolean;
+    /** 颜色配置 */
     colorConfig?: IColorConfig
+    /** 位置 */
     position?: any;
+    /** 是否激活 */
     isActive?: boolean;
+    /** 是否锁定 */
     isLock?: boolean;
-    isSpRev?: boolean;
 }
 
 /** 控制台操作细节类型 */
