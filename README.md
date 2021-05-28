@@ -1,6 +1,4 @@
-## 前言
-由于这个月时间有点紧迫，而且实现的3d技术是从零开始学的，目前实现的数据结构只有四个，但是经历这段时间的学习和实践，已经能够比较熟练的实现大部分数据结构的动画效果了，希望老师能够给个通过初赛的机会，在决赛开始前的时间，肯定能够完善更多的更复杂数据结构，比如红黑树、B树、B+树、图等。
-
+## 预览
 * 在线预览：https://yukee-798.github.io/data-structure-visualization/
 * github仓库：https://github.com/Yukee-798/data-structure-visualization/tree/master
 
