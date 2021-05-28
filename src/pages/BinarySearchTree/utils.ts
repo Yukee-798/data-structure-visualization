@@ -1,7 +1,17 @@
-import { randomArr, randomNum } from '.';
-import { IBSTCube3d } from '../pages/BinarySearchTree/store';
-import { ActionTypes } from '../types';
-import { log } from './math';
+import { randomArr, randomNum } from '../../utils';
+import { IBSTCube3d } from './store';
+import { ActionTypes, Range } from '../../types';
+import { log } from '../../utils/math';
+
+/** 初始化二叉树sphere */
+export function initSpheres(values: (number | null)[]): IBSTCube3d[] {
+    return values.map((value, index) => ({
+        sortIndex: index,
+        value,
+        isActive: false,
+        isLock: false,
+    }))
+}
 
 /** 获取传入结点的父结点数据值 */
 export function getFatherValue<T>(binaryTree: T[], indexOfNode: number) {
@@ -37,37 +47,43 @@ export function getDeepthByNodeIndex(indexOfNode: number) {
     return Math.floor(log(2, indexOfNode + 1));
 }
 
+/** 获取二叉树最大层数 */
+export function getMaxDeepth(binaryTree: (number | null)[]) {
+    return getDeepthByNodeIndex(binaryTree.length - 1);
+}
+
+
 /** 随机生成结点数为n的二叉树 */
-function binaryTreeGenerator(n: number, binaryTree: (number | null)[], indexOfRoot: number) {
+function binaryTreeGenerator(n: number, binaryTree: (number | null)[], nodeValueRange: Range, indexOfRoot: number,) {
     if (n === 0) return;
 
     // 左孩子的值
-    const lChildV = randomNum(1, 80);
+    const lChildV = randomNum(nodeValueRange);
     // 右孩子的值
-    const rChildV = randomNum(1, 80);
+    const rChildV = randomNum(nodeValueRange);
 
     // 根结点的左子树的结点个数
-    const leftN = randomNum(0, n - 1);
+    const leftN = randomNum([0, n - 1]);
     const rightN = n - leftN - 1;
 
     // 递归建立每棵子树
     setLChild(binaryTree, indexOfRoot, leftN > 0 ? lChildV : null);
-    binaryTreeGenerator(leftN, binaryTree, indexOfRoot * 2 + 1)
+    binaryTreeGenerator(leftN, binaryTree, nodeValueRange, indexOfRoot * 2 + 1)
 
     setRChild(binaryTree, indexOfRoot, rightN > 0 ? rChildV : null);
-    binaryTreeGenerator(rightN, binaryTree, indexOfRoot * 2 + 2)
+    binaryTreeGenerator(rightN, binaryTree, nodeValueRange, indexOfRoot * 2 + 2)
 }
 
 /** 生成层数小于3且结点数在 5 ～ 15 的二叉树 */
-export function randomBinaryTree(): (number | null)[] {
+export function randomBinaryTree(nodeNumsRange: Range, nodeValueRange: Range, maxDeepth: number): (number | null)[] {
 
     let cache = new Array(500);
 
     // 如果生成的二叉树的层数大于了3则重新生成
     while (getDeepthByNodeIndex(cache.length - 1) > 3) {
         cache.fill(null);
-        cache[0] = randomNum(1, 80);
-        binaryTreeGenerator(randomNum(5, 15), cache, 0);
+        cache[0] = randomNum(nodeValueRange);
+        binaryTreeGenerator(randomNum(nodeNumsRange), cache, nodeValueRange, 0,);
 
         // 找到 cache 中最后一个不为 null 的元素的下标
         for (let i = 500; i >= 0; i--) {
@@ -81,7 +97,7 @@ export function randomBinaryTree(): (number | null)[] {
 }
 
 /** 为二叉搜索树添加结点 */
-export function addToBST(bts: any[], indexOfRoot: number ,nodeV: number) {
+export function addToBST(bts: any[], indexOfRoot: number, nodeV: number) {
     // 传入的 bts 必须有一个根结点
     if (bts.length === 0) throw 'the length of bts is 0';
 
@@ -105,16 +121,20 @@ export function addToBST(bts: any[], indexOfRoot: number ,nodeV: number) {
     }
 }
 
-/** 生成二叉搜索树结点数在 5 ~ 15，且层数小于3的二叉搜索树 */
-export function randomBST() {
+/**
+ * @param nodeNumsRange 结点数量范围
+ * @param maxDeepth 二叉树的最大层数(从0开始计数)
+ * @returns 返回二叉搜索数的顺序存储结构
+ */
+export function randomBST(nodeNumsRange: Range, nodeValueRange: Range, maxDeepth: number) {
     // 初始化 cache
     let cache = new Array(500);
 
     // 如果生成的二叉搜索树的层数大于了3则重新生成
-    while (getDeepthByNodeIndex(cache.length - 1) > 3) {
-        const arr = randomArr(randomNum(5, 15));
+    while (getDeepthByNodeIndex(cache.length - 1) > maxDeepth) {
+        const arr = randomArr(randomNum(nodeNumsRange), nodeValueRange);
         cache.fill(null);
-        cache[0] = randomNum(20, 80);
+        cache[0] = randomNum(nodeValueRange);
 
         // 用 arr 向 cache 中添加结点
         arr.forEach((value) => {
@@ -132,15 +152,16 @@ export function randomBST() {
     return cache;
 }
 
-/** 初始化二叉树sphere */
-export function initSpheres(values: (number | null)[]): IBSTCube3d[] {
-    return values.map((value, index) => ({
-        sortIndex: index,
-        value,
-        isActive: false,
-        isLock: false,
-    }))
+/** 获取向二叉搜索树添加结点的细节 */
+export function addNodeSeq(bts: any[], indexOfRoot: number, nodeV: number, seq: any[]) {
+    seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
 }
+
+/** 获取向二叉树删除结点的细节 */
+export function deleteNodeSeq() {
+
+}
+
 
 /** 获取二叉树前序遍历的细节 */
 export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {

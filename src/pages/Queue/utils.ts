@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IQueueCube } from "../pages/Queue/store";
-import { ActionTypes, QUEUE_CUBE_INTERVAL_DISTANCE } from "../types";
+import { IQueueCube } from "./store";
+import { ActionTypes } from "../../types";
+import config from './config'
 
 /** 根据数组长度，计算出第一个 cube 的 position 的 x 坐标 */
 export function getStartPosX(arrLen: number): number {
-    return -(arrLen - 1) * QUEUE_CUBE_INTERVAL_DISTANCE / 2;
+    return -(arrLen - 1) * config.geoBaseDistance / 2;
 }
 
 export function initCubes(values: number[]): IQueueCube[] {

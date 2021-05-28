@@ -1,5 +1,6 @@
-import { IStackCube } from "../pages/Stack/stack";
-import { ActionTypes, STACK_CUBE_INTERVAL_DISTANCE } from "../types";
+import { ActionTypes } from "../../types";
+import { IStackCube } from "./stack";
+import config from './config'
 
 export function initCubes(values: number[]): IStackCube[] {
     return values.map((value) => ({
@@ -27,5 +28,5 @@ export function popSeq() {
 
 /** 根据数组长度，计算出第一个 cube 的 position 的 y 坐标 */
 export function getStartYPos(arrLen: number): number {
-    return -(arrLen - 1) * STACK_CUBE_INTERVAL_DISTANCE / 2;
+    return -(arrLen - 1) * config.geoBaseDistance / 2;
 }

@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react"
+import { Range } from "../types";
 
 /** 随机生成一个 start ~ end 的整数 */
-export function randomNum(start: number, end: number): number {
-    return +(Math.random() * (end - start) + start).toFixed(0);
+export function randomNum(range: Range): number {
+    return +(Math.random() * (range[1] - range[0]) + range[0]).toFixed(0);
 }
 
 /** 随机生成指定长度的数组 */
-export function randomArr(length: number): number[] {
+export function randomArr(length: number, valueRange: Range): number[] {
     const arr = [];
     for (let i = 0; i < length; i++) {
-        arr.push(randomNum(3, 40));
+        arr.push(randomNum(valueRange));
     }
     return arr;
 }

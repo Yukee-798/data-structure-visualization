@@ -1,5 +1,6 @@
-import { ISortCube } from "../pages/Sort/store";
-import { ActionTypes, SORT_CUBE_INTERVAL_DISTANCE } from "../types";
+import { ISortCube } from "./store";
+import { ActionTypes } from "../../types";
+import config from './config'
 
 /** 初始化 cubes */
 export function initCubes(values: number[]): ISortCube[] {
@@ -15,7 +16,7 @@ export function initCubes(values: number[]): ISortCube[] {
 
 /** 根据数组长度，计算出第一个 cube 的 position 的 x 坐标 */
 export function getStartPosX(arrLen: number): number {
-    return -(arrLen - 1) * SORT_CUBE_INTERVAL_DISTANCE / 2;
+    return -(arrLen - 1) * config.geoBaseDistance / 2;
 }
 
 /** 传入一组序列，判断其是否有序 */
