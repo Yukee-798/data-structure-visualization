@@ -1,17 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, forwardRef } from "react";
 import { RoundedBox, Text } from "@react-three/drei";
 import { animated, config, useSpring } from "react-spring/three";
 import { IGeometryProps } from "../../types";
 import { defaultGeoColor } from "../../configs/page/defaultConfig";
 
 export interface ICube3dProps extends IGeometryProps {
-
+    ref?: any;
 }
 
-const Cube3d: React.FC<ICube3dProps> = (props) => {
+const Cube3d: React.FC<ICube3dProps> = forwardRef<any, ICube3dProps>((props, ref) => {
     const {
         args,
-        mRef,
         position,
         isActive,
         isLock,
@@ -51,7 +50,7 @@ const Cube3d: React.FC<ICube3dProps> = (props) => {
         <animated.mesh
             scale={scale}
             position={position}
-            ref={mRef}
+            ref={ref}
         >
             <Text
                 fontSize={0.5}
@@ -74,7 +73,7 @@ const Cube3d: React.FC<ICube3dProps> = (props) => {
             </RoundedBox>
         </animated.mesh>
     )
-}
+})
 
 Cube3d.defaultProps = {
     colorConfig: defaultGeoColor
