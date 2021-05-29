@@ -6,15 +6,20 @@ import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
 import Scene3d from '../../components/Scene3d/scene3d';
-import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from '../../utils/sort';
-import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, OpeDetailTypes, IReducer } from '../../types';
+import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from './utils';
+import { ActionTypes, OpeDetailTypes, IReducer } from '../../types';
 import { initState, IState, reducer } from './store';
+import config from './config'
+import { root } from '../../configs/router/config';
 import './sort.scss'
 
 const { Step } = Steps;
 
-const Sort = () => {
+
+
+const Sort = (props: any) => {
     const history = useHistory();
+    console.log(props?.match?.params);
 
     const [state, dispatch] = useReducer<IReducer<IState>, IState>(reducer, initState, (state): IState => {
         return {
@@ -38,7 +43,7 @@ const Sort = () => {
         dispatch({ type: ActionTypes.Random });
         setTimeout(() => {
             dispatch({ type: ActionTypes.RandomDone })
-        }, 400);
+        }, config.animationSpeed);
     }
 
     /** 处理冒泡排序 */
@@ -47,7 +52,7 @@ const Sort = () => {
         sequence.forEach((event, i) => {
             setTimeout(() => {
                 dispatch({ type: event.type, payload: event.indexes })
-            }, i * DISPATCH_INTERVAL);
+            }, i * config.animationSpeed);
         });
     }
 
@@ -57,7 +62,7 @@ const Sort = () => {
         sequence.forEach((event, i) => {
             setTimeout(() => {
                 dispatch({ type: event.type, payload: event.indexes })
-            }, i * DISPATCH_INTERVAL)
+            }, i * config.animationSpeed)
         })
     }
 
@@ -68,26 +73,26 @@ const Sort = () => {
         sequence.forEach((event, i) => {
             setTimeout(() => {
                 dispatch({ type: event.type, payload: event.indexes })
-            }, i * DISPATCH_INTERVAL)
+            }, i * config.animationSpeed)
         })
     }
 
     /** 处理添加元素 */
     const handleAddEle = (value: number, index: number) => {
-        if (state.values.length < 10) {
-            if (index > state.values.length) {
+        if (state.values.length < config.geoNumRange[1] + 3) {
+            if (index > state.values.length - 1 || index < 0) {
                 message.warning('输入的序号不合法')
             } else {
                 const sequence = addEleSeq(state.values, value, index);
                 sequence.forEach((event, i) => {
                     setTimeout(() => {
                         dispatch({ type: event.type, payload: event.payload })
-                    }, i * DISPATCH_INTERVAL)
+                    }, i * config.animationSpeed)
                 })
             }
 
         } else {
-            message.warning('添加失败，数组最大容量为10')
+            message.warning(`添加失败，数组最大容量为${config.geoNumRange[1] + 3}`)
         }
 
     }
@@ -95,14 +100,14 @@ const Sort = () => {
     /** 处理删除元素 */
     const handleDeleteEle = (index: number) => {
         if (state.values.length > 0) {
-            if (index > state.values.length) {
+            if (index > state.values.length - 1 || index < 0) {
                 message.warning('输入的序号不合法')
             } else {
                 const sequence = deleteEleSeq(state.values, index);
                 sequence.forEach((event, i) => {
                     setTimeout(() => {
                         dispatch({ type: event.type, payload: event.payload })
-                    }, i * DISPATCH_INTERVAL)
+                    }, i * config.animationSpeed)
                 })
             }
         } else {
@@ -120,13 +125,16 @@ const Sort = () => {
         <div className='sort-warp'>
             <PageHeader
                 onBack={() => {
-                    history.replace('/data-structure-visualization/')
+                    history.replace(root)
                     window.location.reload();
                 }}
                 title='排序'
             />
             <div className='main'>
-                <Scene3d onLoaded={handleSceneLoaded}>
+                <Scene3d
+                    onLoaded={handleSceneLoaded}
+                    cameraPosZ={config.cameraPosZ}
+                >
                     {
                         state.cubes.map((item, index) => (
                             <SortCube3d
@@ -138,7 +146,7 @@ const Sort = () => {
                                 isActive={item.isActive}
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
-                                position={[state.startPosX + (item.sortIndex * SORT_CUBE_INTERVAL_DISTANCE), ((item.value as number) * 0.2) / 2 + BASE_POSY, 0]}
+                                position={[state.startPosX + (item.sortIndex * config.geoBaseDistance), ((item.value as number) * 0.2) / 2 + config.geoBasePosY, 0]}
                                 disappear={!state.randomDone || item.disappear}
                             />
                         ))
@@ -150,7 +158,7 @@ const Sort = () => {
                                 fillOpacity={state.randomDone ? 1 : 0}
                                 color='black'
                                 fontSize={0.5}
-                                position={[state.startPosX + (index * SORT_CUBE_INTERVAL_DISTANCE), -1 + BASE_POSY, 0]}
+                                position={[state.startPosX + (index * config.geoBaseDistance), -1 + config.geoBasePosY, 0]}
                             >
                                 {index}
                             </Text>
@@ -162,6 +170,8 @@ const Sort = () => {
                     onSliderChange={handleSliderChange}
                     onAdd={handleAddEle}
                     onDelete={handleDeleteEle}
+                    indexRange={[0, 10]}
+                    valueRange={[3, 35]}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

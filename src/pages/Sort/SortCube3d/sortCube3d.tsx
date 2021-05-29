@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL } from '../../../types';
 import Cube3d, { ICube3dProps } from '../../../components/Cube3d/cube3d';
+import config from '../config'
 
 interface ISortCube3dProps extends ICube3dProps {
     sortIndexes: number[];
@@ -23,7 +23,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
     const meshRef = useRef<THREE.Mesh>(null!)
 
     /** 根据传入的排序下标，获取到 cube 所在的 X 坐标 */
-    const getPosX = (sortIndex: number) => startPosX + (sortIndex * SORT_CUBE_INTERVAL_DISTANCE);
+    const getPosX = (sortIndex: number) => startPosX + (sortIndex * config.geoBaseDistance);
 
     /** 移动元素时，获取其起始位置 */
     const getOrginPosX = () => {
@@ -41,7 +41,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
 
     useFrame(() => {
 
-        const delta = Math.abs(oldPosX - targetPosX) / (DISPATCH_INTERVAL / 20);
+        const delta = Math.abs(oldPosX - targetPosX) / (config.animationSpeed / 20);
 
         // 如果当前 sortIndex 需要改变
         if (delta) {
@@ -68,7 +68,7 @@ const SortCube3d: React.FC<ISortCube3dProps> = (props) => {
         <Cube3d
             args={[1, value ? value * 0.2 : 0, 1]}
             value={value}
-            mRef={meshRef}
+            ref={meshRef}
             {...restProps}
         />
     )

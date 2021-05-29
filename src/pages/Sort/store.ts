@@ -1,6 +1,7 @@
 import { ActionTypes, IGeometryProps, IReducer, OpeDetailTypes } from "../../types";
 import { randomArr, randomNum } from "../../utils";
-import { getStartPosX, initCubes } from "../../utils/sort";
+import { getStartPosX, initCubes } from "./utils";
+import config from './config'
 
 export interface ISortCube extends IGeometryProps {
     // 记录 cube 将要经历或者已经历过的下标
@@ -25,7 +26,7 @@ export interface IState {
 }
 
 export const initState: IState = {
-    values: randomArr(randomNum(4, 10)),
+    values: randomArr(randomNum(config.geoNumRange), config.geoValueRange),
     cubes: [],
     sortDone: true,
     randomDone: true,
@@ -253,7 +254,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
 
         case ActionTypes.RandomDone:
             {
-                let newValues = randomArr(randomNum(4, 8));
+                let newValues = randomArr(randomNum(config.geoNumRange), config.geoValueRange);
                 let newStartPosX = getStartPosX(newValues.length);
                 return {
                     ...state,
