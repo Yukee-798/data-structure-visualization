@@ -42,10 +42,8 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
             >
                 <Card.Meta
                     title={title}
-                    description={tags?.map((tagName: TagType) => (
-                        <Tag
-                            type={tagName}
-                        />
+                    description={tags?.map((tagName: TagType, i) => (
+                        <Tag key={i} type={tagName} />
                     ))}
                 />
             </Card>

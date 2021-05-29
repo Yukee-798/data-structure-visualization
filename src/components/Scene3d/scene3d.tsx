@@ -139,6 +139,7 @@ const Scene3d: React.FC<IScene3dProps> = (props) => {
                     />
                     <Environment
                         // preset='night'  
+
                         background
                         files={['ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg', 'ev.jpg']}
                         path='./'

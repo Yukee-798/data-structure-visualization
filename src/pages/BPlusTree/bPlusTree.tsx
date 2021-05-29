@@ -6,7 +6,7 @@ import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import Scene3d from '../../components/Scene3d/scene3d';
 import { randomArr, randomNum } from '../../utils/index'
-import { ActionTypes, BASE_POSY, SORT_CUBE_INTERVAL_DISTANCE, DISPATCH_INTERVAL, IGeometryProps } from '../../types';
+import { ActionTypes, IGeometryProps } from '../../types';
 import {
     BarChartOutlined,
     DotChartOutlined,
