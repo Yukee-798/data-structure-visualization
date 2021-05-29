@@ -5,9 +5,10 @@ import { useSpring, animated, config, useSpringRef, useTransition, useChain } fr
 import HomeItem from '../../components/HomeItem/homeItem';
 import { DataStrucTypes } from '../../types';
 import { homeItemsConfig } from './config';
+import { root } from '../../configs/router/config'
 import './home.scss'
+import { Link } from 'react-router-dom';
 
-const root = '/data-structure-visualization'
 
 const Home = () => {
     const history = useHistory();
@@ -85,23 +86,27 @@ const Home = () => {
                 <Row gutter={{ xs: 8, sm: 16, md: 24 }} key={i + '&'}>
                     {row.map((col, j) => (
                         <Col xs={12} sm={12} md={6} lg={6} xl={6} key={i + '&' + j}>
-                            <animated.div
-                                className='homeItem-warp'
-                                style={{ width: size, height: size, opacity }}
-                                onClick={() => { setOpen(true) }}
-                            >
-                                <HomeItem
-                                    src={col.src}
-                                    tags={col.tags}
-                                    title={col.title}
-                                    type={col.type}
-                                    onClick={handleClick}
-                                />
-                            </animated.div>
+                            {/* <Link to={root + '/sort/023012423'}> */}
+                                <animated.div
+                                    className='homeItem-warp'
+                                    style={{ width: size, height: size, opacity }}
+                                    onClick={() => { setOpen(true) }}
+                                >
+
+                                    <HomeItem
+                                        src={col.src}
+                                        tags={col.tags}
+                                        title={col.title}
+                                        type={col.type}
+                                        onClick={handleClick}
+                                    />
+                                </animated.div>
+                            {/* </Link> */}
                         </Col>
                     ))}
                 </Row>
-            ))}
+            ))
+            }
         </div >
     )
 }
