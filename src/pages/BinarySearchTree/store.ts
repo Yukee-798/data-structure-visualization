@@ -1,9 +1,9 @@
 import { ActionTypes, IReducer, OpeDetailTypes } from "../../types";
-import { initSpheres, randomBST } from "./utils";
+import { formatBinaryTree, formatSpheres, initSpheres, randomBST } from "./utils";
 import { IBSTSphere3dProps } from "./BSTSphere3d/bstSphere3d";
 import config from "./config";
 
-export interface IBSTCube3d extends IBSTSphere3dProps {
+export interface IBSTSphere3d extends IBSTSphere3dProps {
 
 }
 
@@ -11,7 +11,7 @@ export interface IState {
     // 表示二叉树当前真实的结构
     binaryTree: (number | null)[];
     // 用来表示每个 sphere 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
-    spheres: IBSTCube3d[];
+    spheres: IBSTSphere3d[];
     randomDone: boolean;
     opeDetails: any[];
 }
@@ -21,13 +21,44 @@ export const initState: IState = {
     spheres: [],
     opeDetails: [],
     randomDone: true,
-
 }
 
 export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
     switch (type) {
 
+        case ActionTypes.Add: {
+            const { value, index } = payload;
+            let newSpheres = [...state.spheres];
+            // 新结点
+            const newNode: IBSTSphere3d = {
+                value,
+                sortIndex: index
+            };
+            // 添加新结点
+            newSpheres[index] = newNode;
+            // 格式化
+            newSpheres = formatSpheres(newSpheres);
+
+            let newBt = [...state.binaryTree];
+            // 添加新值
+            newBt[index] = value
+            // 格式化
+            newBt = formatBinaryTree(newBt);
+
+            return {
+                ...state,
+                binaryTree: newBt,
+                spheres: newSpheres,
+                opeDetails: [...state.opeDetails, {
+                    type: OpeDetailTypes.Add, payload: {
+                        index: payload.index,
+                        value: payload.value,
+                        cur: newBt
+                    }
+                }]
+            }
+        }
 
         case ActionTypes.StartPreorder:
             return {

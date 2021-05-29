@@ -1,16 +1,35 @@
 import { randomArr, randomNum } from '../../utils';
-import { IBSTCube3d } from './store';
+import { IBSTSphere3d } from './store';
 import { ActionTypes, Range } from '../../types';
 import { log } from '../../utils/math';
+import { IBSTSphere3dProps } from './BSTSphere3d/bstSphere3d';
+
+/** 格式化二叉树：将spheres中的空元素设置为value为空的sphere */
+export function formatSpheres<T extends IBSTSphere3dProps>(spheres: T[]) {
+    return spheres.map<T>((sphere, i, arr) => {
+        if (!sphere) return { ...arr[0], value: null, sortIndex: i }
+        return sphere
+    })
+}
+
+/** 格式化二叉树：将数组内的空数组全部设置为null */
+export function formatBinaryTree(binaryTree: (number | null)[]) {
+    for (let i = 0; i < binaryTree.length; i++) {
+        if (!binaryTree[i]) {
+            binaryTree[i] = null;
+        }
+    }
+    return [...binaryTree]
+}
+
+/** 将传入的二叉树数组转为字符串 */
+export function treeToString(binaryTree: (number | null)[]) {
+    return '[' + binaryTree.map((value) => !value ? 'null' : value).toString() + ']'
+}
 
 /** 初始化二叉树sphere */
-export function initSpheres(values: (number | null)[]): IBSTCube3d[] {
-    return values.map((value, index) => ({
-        sortIndex: index,
-        value,
-        isActive: false,
-        isLock: false,
-    }))
+export function initSpheres(values: (number | null)[]): IBSTSphere3d[] {
+    return values.map((value, index) => ({ sortIndex: index, value }))
 }
 
 /** 获取传入结点的父结点数据值 */
@@ -143,7 +162,7 @@ export function randomBST(nodeNumsRange: Range, nodeValueRange: Range, maxDeepth
 
         // 找到 cache 中最后一个不为 null 的元素的下标
         for (let i = 500; i >= 0; i--) {
-            if (cache[i] !== null) {
+            if (cache[i]) {
                 cache.length = i + 1;
                 break;
             }
@@ -154,7 +173,36 @@ export function randomBST(nodeNumsRange: Range, nodeValueRange: Range, maxDeepth
 
 /** 获取向二叉搜索树添加结点的细节 */
 export function addNodeSeq(bst: any[], indexOfRoot: number, nodeV: number, seq: any[]) {
+    // 传入的 bst 必须有一个根结点
+    if (bst.length === 0) throw 'the length of bst is 0';
+
+    if (!bst[indexOfRoot]) return;
+
     seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+    seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+
+    // 判断传入结点的值和当前子树根结点的值的关系
+    if (nodeV > bst[indexOfRoot]) {
+        // 当前结点的右孩子不存在，则直接挂上去
+        if (!getRChildValue(bst, indexOfRoot)) {
+            seq.push({
+                type: ActionTypes.Add,
+                payload: { value: nodeV, index: indexOfRoot * 2 + 2 }
+            })
+        } else {
+            addNodeSeq(bst, indexOfRoot * 2 + 2, nodeV, seq);
+        }
+    } else {
+        // 当前结点的左孩子不存在，则直接挂上去
+        if (!getLChildValue(bst, indexOfRoot)) {
+            seq.push({
+                type: ActionTypes.Add,
+                payload: { value: nodeV, index: indexOfRoot * 2 + 1 }
+            })
+        } else {
+            addNodeSeq(bst, indexOfRoot * 2 + 1, nodeV, seq);
+        }
+    }
 }
 
 /** 获取向二叉树删除结点的细节 */
@@ -170,18 +218,18 @@ export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: a
     // 如果结点不存在则直接返回
     if (!bst[indexOfRoot]) return;
 
+    seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+    seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+
     // 判断传入结点的值和当前子树根结点的值的关系
     if (nodeV > bst[indexOfRoot]) {
         // 如果传入的值大于当前子树根结点的值
-        seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-        seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
-
         // 则看其右子树
         if (getRChildValue(bst, indexOfRoot) === nodeV) {
             // 如果右结点等于nodeV则锁定
-            seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Lock, payload: indexOfRoot })
-            // seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 })
+            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 })
+            seq.push({ type: ActionTypes.Lock, payload: indexOfRoot * 2 + 2 })
         } else {
             // 否则递归搜索其右子树
             searchSeq(bst, nodeV, indexOfRoot * 2 + 2, seq);
@@ -189,15 +237,12 @@ export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: a
 
     } else if (nodeV < bst[indexOfRoot]) {
         // 如果传入的值小于当前子树根结点的值
-        seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-        seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
-
         // 则看其左子树
-        if (getRChildValue(bst, indexOfRoot) === nodeV) {
+        if (getLChildValue(bst, indexOfRoot) === nodeV) {
             // 如果左结点等于nodeV则锁定
-            seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Lock, payload: indexOfRoot })
-            // seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 })
+            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 })
+            seq.push({ type: ActionTypes.Lock, payload: indexOfRoot * 2 + 1 })
         } else {
             // 否则递归搜索其右子树
             searchSeq(bst, nodeV, indexOfRoot * 2 + 1, seq);
@@ -205,6 +250,7 @@ export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: a
     } else {
         // 如果当前结点等于nodeV则锁定
         seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+        seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
         seq.push({ type: ActionTypes.Lock, payload: indexOfRoot })
     }
 }

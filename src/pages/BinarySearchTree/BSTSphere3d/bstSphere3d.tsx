@@ -4,7 +4,7 @@ import Sphere3d, { ISphere3dProps } from "../../../components/Sphere3d/sphere3d"
 
 export interface IBSTSphere3dProps extends ISphere3dProps {
     /** 结点的实际顺序 */
-    sortIndex?: number;
+    sortIndex: number;
     /** 左线条位置 */
     lChildPos?: any;
     /** 右线条位置 */

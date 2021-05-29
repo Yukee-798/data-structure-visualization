@@ -33,6 +33,8 @@ interface IConsoleProps extends IBaseProps {
     defaultValue?: number;
     /** 设置index默认值 */
     defaultIndex?: number;
+    /** 设置searchValue默认值 */
+    defaultSearchValue?: number;
     /** 添加按钮的文字 */
     addText?: string;
     /** 删除按钮的文字 */
@@ -43,6 +45,8 @@ interface IConsoleProps extends IBaseProps {
     onValueChange?: (value: number) => void;
     /** index改变时的回调 */
     onIndexChange?: (index: number) => void;
+    /** searchValue改变时的回调 */
+    onSearchValueChange?: (value: number) => void;
     /** 点击添加时的回调 */
     onAdd?: (value: number, index: number) => void;
     /** 点击删除时的回调 */
@@ -62,6 +66,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
         showSilider,
         addText,
         defaultIndex,
+        defaultSearchValue,
         valueRange,
         indexRange,
         defaultValue,
@@ -73,16 +78,18 @@ const Console: React.FC<IConsoleProps> = (props) => {
         onSliderChange,
         onAdd,
         onDelete,
+        onSearch,
         onIndexChange,
         onValueChange,
-        onSearch
+        onSearchValueChange,
     } = props;
 
     const [hoverRef, isHover] = useHover();
     const [isUnfold, setIsUnfold] = useState(false);
     /** 控制台的添加删除元素的value和index */
-    const [value, setValue] = useState(defaultValue || 0);
+    const [value, setValue] = useState(defaultValue || 8);
     const [index, setIndex] = useState(defaultIndex || 0);
+    const [searchValue, setSearchValue] = useState(defaultSearchValue || 32)
 
     // 被激活的 radio
     const [radioActived, setRadioActived] = useState(1);
@@ -155,9 +162,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                             <Radio.Group
                                 className='radio-group'
                                 defaultValue={1}
-                                onChange={(e) => {
-                                    setRadioActived(e.target.value);
-                                }}
+                                onChange={(e) => setRadioActived(e.target.value)}
                             >
                                 <Radio value={1}>{addText}</Radio>
                                 <Radio value={2}>{deleteText}</Radio>
@@ -171,6 +176,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                             <>
                                                 {
                                                     isAddIndex &&
+                                                    // 序号input
                                                     (<label>
                                                         <span className='label-name'>序号:</span>
                                                         <InputNumber
@@ -179,10 +185,12 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                                             defaultValue={defaultIndex}
                                                             onChange={(index) => {
                                                                 setIndex(index as number)
+                                                                onIndexChange?.(index)
                                                             }}
                                                         />
                                                     </label>)
                                                 }
+                                                {/* 数值input */}
                                                 <label>
                                                     <span className='label-name'>数值:</span>
                                                     <InputNumber
@@ -191,7 +199,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                                         defaultValue={defaultValue}
                                                         onChange={(value) => {
                                                             setValue(value as number)
-                                                            onValueChange?.(value);
+                                                            onValueChange?.(value)
                                                         }}
                                                     />
                                                 </label>
@@ -199,6 +207,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                         ) : radioActived === 2 ?
                                             (
                                                 isDeleteIndex &&
+                                                // 序号input
                                                 (<label>
                                                     <span className='label-name'>序号:</span>
                                                     <InputNumber
@@ -207,19 +216,22 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                                         defaultValue={defaultIndex}
                                                         onChange={(index) => {
                                                             setIndex(index as number)
+                                                            onIndexChange?.(index)
                                                         }}
                                                     />
                                                 </label>)
-                                            ) : isSearch && 
+                                            ) : isSearch &&
                                             (
+                                                // 搜索input
                                                 (<label>
                                                     <span className='label-name'>数值:</span>
                                                     <InputNumber
                                                         // min={(valueRange as unknown as number[])?.[0]}
                                                         // max={(valueRange as unknown as number[])?.[0]}
-                                                        defaultValue={defaultIndex}
-                                                        onChange={(index) => {
-                                                            setIndex(index as number)
+                                                        defaultValue={defaultSearchValue}
+                                                        onChange={(value) => {
+                                                            setSearchValue(value as number)
+                                                            onSearchValueChange?.(value)
                                                         }}
                                                     />
                                                 </label>)
@@ -228,7 +240,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
 
                                 {radioActived === 1 && <Button type='primary' onClick={() => onAdd?.(value, index)}>{addText}</Button>}
                                 {radioActived === 2 && <Button type='primary' onClick={() => onDelete?.(index)}>{deleteText}</Button>}
-                                {radioActived === 3 && <Button type='primary' onClick={() => onSearch?.(index)}>查找</Button>}
+                                {radioActived === 3 && <Button type='primary' onClick={() => onSearch?.(searchValue)}>查找</Button>}
 
                             </div>
                         </div>
@@ -251,6 +263,7 @@ Console.defaultProps = {
     deleteText: '删除',
     defaultIndex: 2,
     defaultValue: 3,
+    defaultSearchValue: 27,
     valueRange: [3, 90] as Range,
     indexRange: [0, 10] as Range,
     isUpdate: true,
