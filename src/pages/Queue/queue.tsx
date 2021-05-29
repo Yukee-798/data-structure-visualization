@@ -1,18 +1,20 @@
 import React, { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, InputNumber, PageHeader, Steps, message } from 'antd';
+import { Button, PageHeader, Steps, message } from 'antd';
 import { Text } from '@react-three/drei';
 import Console, { Item } from '../../components/Console/console';
 import Scene3d from '../../components/Scene3d/scene3d';
 import QueueCube3d from './QueueCube3d/queueCube3d'
-import { ActionTypes, DISPATCH_INTERVAL, IReducer, OpeDetailTypes, QUEUE_CUBE_INTERVAL_DISTANCE } from '../../types';
+import { ActionTypes, IReducer, OpeDetailTypes } from '../../types';
 import {
     BarChartOutlined,
     DotChartOutlined
 } from '@ant-design/icons';
-import './queue.scss'
-import { dequeueSeq, enqueueSeq, getStartPosX, initCubes } from '../../utils/queue';
+import { dequeueSeq, enqueueSeq, getStartPosX, initCubes } from './utils';
 import { initState, IState, reducer } from './store';
+import config from './config'
+import './queue.scss'
+import { root } from '../../configs/router/config';
 
 const { Step } = Steps;
 
@@ -48,15 +50,15 @@ const Queue = () => {
 
     /** 处理入队 */
     const handleEnqueue = (value: number) => {
-        if (state.values.length < 10) {
+        if (state.values.length < config.geoNumRange[1]) {
             const sequence = enqueueSeq(value, state.values.length);
             sequence.forEach((event, i) => {
                 setTimeout(() => {
                     dispatch(event)
-                }, i * DISPATCH_INTERVAL)
+                }, i * config.animationSpeed)
             })
         } else {
-            message.warning('入队失败，队列最大容量为10')
+            message.warning(`入队失败，队列最大容量为${config.geoNumRange[1]}`)
         }
     }
 
@@ -67,7 +69,7 @@ const Queue = () => {
             sequence.forEach((event, i) => {
                 setTimeout(() => {
                     dispatch(event)
-                }, i * DISPATCH_INTERVAL)
+                }, i * config.animationSpeed)
             })
         } else {
             message.warning('出队失败，当前队列为空')
@@ -78,19 +80,22 @@ const Queue = () => {
         <div className='queue-warp'>
             <PageHeader
                 onBack={() => {
-                    history.replace('/data-structure-visualization/')
+                    history.replace(root)
                     window.location.reload();
                 }}
                 title='队列'
             />
 
             <div className='main'>
-                <Scene3d onLoaded={handleSceneLoaded}>
+                <Scene3d 
+                    onLoaded={handleSceneLoaded}
+                    cameraPosZ={config.cameraPosZ}
+                >
                     {state.cubes.map((item, i, arr) => (
                         <React.Fragment key={item.key}>
                             <QueueCube3d
                                 value={item.value}
-                                position={[startPosX + (i * QUEUE_CUBE_INTERVAL_DISTANCE), 2, 0]}
+                                position={[startPosX + (i * config.geoBaseDistance), config.geoBasePosY, 0]}
                                 isActive={item.isActive}
                                 disappear={!state.randomDone || item.disappear}
                             />
@@ -99,7 +104,7 @@ const Queue = () => {
                                     fillOpacity={state.randomDone ? 1 : 0}
                                     color='black'
                                     fontSize={0.5}
-                                    position={[startPosX + (i * QUEUE_CUBE_INTERVAL_DISTANCE), 1, 0]}
+                                    position={[startPosX + (i * config.geoBaseDistance), config.geoBasePosY - 1, 0]}
                                 >
                                     {i === 0 ? 'head' : 'tail'}
                                 </Text> : <></>
@@ -114,7 +119,8 @@ const Queue = () => {
                     onDelete={handleDequeue}
                     addText='入队'
                     deleteText='出队'
-                    isIndex={false}
+                    isAddIndex={false}
+                    isDeleteIndex={false}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ActionTypes, IGeometryProps, IReducer, OpeDetailTypes } from "../../types";
 import { randomArr, randomNum } from "../../utils";
-import { initCubes } from '../../utils/queue';
+import { initCubes } from './utils';
+import config from './config';
 
 export interface IQueueCube extends IGeometryProps {
     key: any;
@@ -18,7 +19,7 @@ export interface IState {
 
 export const initState: IState = {
     randomDone: true,
-    values: randomArr(randomNum(3, 6)),
+    values: randomArr(randomNum(config.geoNumRange), config.geoValueRange),
     cubes: [],
     opeDetails: []
 }
@@ -114,7 +115,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
 
         case ActionTypes.RandomDone:
             {
-                let newValues = randomArr(randomNum(3, 6));
+                let newValues = randomArr(randomNum(config.geoNumRange), config.geoValueRange);
                 return {
                     ...state,
                     cubes: initCubes(newValues),
