@@ -4,19 +4,21 @@ import { Button, PageHeader, Steps } from 'antd'
 import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons'
 import Console, { Item, SubMenu } from '../../components/Console/console'
 import Scene3d from '../../components/Scene3d/scene3d'
-import { ActionTypes, DISPATCH_INTERVAL, IReducer, OpeDetailTypes } from '../../types'
-import { randomBST, getDeepthByNodeIndex, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq } from '../../utils/binaryTree'
+import { ActionTypes, IReducer, OpeDetailTypes } from '../../types'
+import { randomBST, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq, searchSeq } from './utils'
 import { cdnOfNodes } from './config'
 import { initState, IState, reducer } from './store'
-import './binarySearchTree.scss'
 import BSTCube3d from './BSTSphere3d/bstSphere3d'
+import config from './config'
+import './binarySearchTree.scss'
+import { root } from '../../configs/router/config'
 
 const { Step } = Steps;
 
 const BinarySearchTree = () => {
     const history = useHistory();
     const [state, dispatch] = useReducer<IReducer<IState>, IState>(reducer, initState, (state): IState => {
-        const initBinaryTree = randomBST();
+        const initBinaryTree = randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth);
         const treeToString = initBinaryTree.map((item) => {
             if (!item) return 'null'
             return item;
@@ -39,12 +41,13 @@ const BinarySearchTree = () => {
         setIsSceneLoaded(true);
     }
 
-    /** 获取二叉树的最大层数 */
-    const maxDeepth = getDeepthByNodeIndex(state.binaryTree.length - 1);
-
     /** 添加元素 */
-    const handleAddEle = () => {
+    const handleAddEle = (value: number, _: unknown) => {
         // console.log(value, index);
+        // console.log(value);
+        // let sequence: any[] = [];
+        // searchSeq(state.binaryTree, value, 0, sequence);
+        // console.log(sequence);
     }
 
     /** 删除元素 */
@@ -52,12 +55,21 @@ const BinarySearchTree = () => {
 
     }
 
+    /** 搜索元素 */
+    const handleSearch = (value: number, _: unknown) => {
+        // console.log(value, index);
+        // console.log(value);
+        let sequence: any[] = [];
+        searchSeq(state.binaryTree, value, 0, sequence);
+        console.log(sequence);
+    }
+
     /** 随机生成数据 */
     const handleRandom = () => {
         dispatch({ type: ActionTypes.Random });
         setTimeout(() => {
             dispatch({ type: ActionTypes.RandomDone })
-        }, 400);
+        }, config.animationSpeed);
     }
 
     /** 前序遍历 */
@@ -72,7 +84,7 @@ const BinarySearchTree = () => {
         sequence.forEach((event, i) => {
             setTimeout(() => {
                 dispatch({ type: event.type, payload: event.index })
-            }, i * DISPATCH_INTERVAL)
+            }, i * config.animationSpeed)
         })
 
     }
@@ -89,7 +101,7 @@ const BinarySearchTree = () => {
         sequence.forEach((event, i) => {
             setTimeout(() => {
                 dispatch({ type: event.type, payload: event.index })
-            }, i * DISPATCH_INTERVAL)
+            }, i * config.animationSpeed)
         })
     }
 
@@ -105,7 +117,7 @@ const BinarySearchTree = () => {
         sequence.forEach((event, i) => {
             setTimeout(() => {
                 dispatch({ type: event.type, payload: event.index })
-            }, i * DISPATCH_INTERVAL)
+            }, i * config.animationSpeed)
         })
     }
 
@@ -113,13 +125,16 @@ const BinarySearchTree = () => {
         <div className='binarySearchTree-warp'>
             <PageHeader
                 onBack={() => {
-                    history.replace('/data-structure-visualization/')
+                    history.replace(root)
                     window.location.reload();
                 }}
                 title='二叉搜索树'
             />
             <div className='main'>
-                <Scene3d onLoaded={handleSceneLoaded}>
+                <Scene3d
+                    onLoaded={handleSceneLoaded}
+                    cameraPosZ={config.cameraPosZ}
+                >
                     {state.spheres.map((sphere, i) => {
                         // 判断当前结点是否有左孩子
                         const hasLChild = getLChildValue(state.spheres, i)?.value;
@@ -146,7 +161,6 @@ const BinarySearchTree = () => {
                                 disappear={!state.randomDone}
                                 lChildPos={hasLChild && lChildPos}
                                 rChildPos={hasRChild && rChildPos}
-
                             />
                         )
                     })}
@@ -154,6 +168,10 @@ const BinarySearchTree = () => {
                 <Console
                     style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
                     // onSliderChange={handleSliderChange}
+                    isAddIndex={false}
+                    isSearch={true}
+                    onAdd={handleAddEle}
+                    onDelete={handleDeleteEle}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

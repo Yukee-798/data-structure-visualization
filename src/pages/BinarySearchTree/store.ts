@@ -1,6 +1,7 @@
 import { ActionTypes, IReducer, OpeDetailTypes } from "../../types";
-import { initSpheres, randomBST } from "../../utils/binaryTree";
+import { initSpheres, randomBST } from "./utils";
 import { IBSTSphere3dProps } from "./BSTSphere3d/bstSphere3d";
+import config from "./config";
 
 export interface IBSTCube3d extends IBSTSphere3dProps {
 
@@ -121,7 +122,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
 
         case ActionTypes.RandomDone:
             {
-                let newBinaryTree = randomBST();
+                let newBinaryTree = randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth);
 
                 const treeToString = newBinaryTree.map((item) => {
                     if (!item) return 'null'
