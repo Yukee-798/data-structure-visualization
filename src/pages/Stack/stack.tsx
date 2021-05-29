@@ -1,157 +1,24 @@
+import React, { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, InputNumber, PageHeader, Steps, message } from 'antd';
+import { Button, PageHeader, Steps, message } from 'antd';
+import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons';
 import Scene3d from '../../components/Scene3d/scene3d'
 import StackCube3d from './StackCube3d/stackCube3d';
-import React, { useReducer, useState } from 'react';
 import { Text } from '@react-three/drei';
-import { ActionTypes, DISPATCH_INTERVAL, IGeometryProps, OpeDetailTypes, STACK_CUBE_INTERVAL_DISTANCE } from '../../types';
-import { getStartYPos, initCubes, popSeq, pushSeq } from '../../utils/stack';
-import { randomArr, randomNum } from '../../utils';
+import { ActionTypes, IReducer, OpeDetailTypes } from '../../types';
+import { getStartYPos, initCubes, popSeq, pushSeq } from './utils';
 import Console, { Item } from '../../components/Console/console';
-import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons';
+import { IState, initState, reducer } from './store'
+import config from './config'
 import './stack.scss'
+import { root } from '../../configs/router/config';
 
 const { Step } = Steps;
 
-export interface IStackCube extends IGeometryProps {
-
-}
-
-interface IState {
-    cubes: IStackCube[];
-    randomDone: boolean;
-    opeDetails: { type: OpeDetailTypes, payload?: any }[]
-    values: number[]
-}
-
-const initState: IState = {
-    cubes: [],
-    randomDone: true,
-    opeDetails: [],
-    values: randomArr(randomNum(4, 10))
-}
-
-interface IAction {
-    type: ActionTypes;
-    payload?: any;
-}
-
-type IReducer = (state: IState, action: IAction) => IState;
-
-function reducer(state: IState = initState, action: IAction): IState {
-    const { type, payload } = action;
-
-    switch (type) {
-        case ActionTypes.Active:
-            {
-                const newCubes: IStackCube[] = state.cubes.map((item, i, arr) => ({
-                    ...item,
-                    isActive: i === arr.length - 1
-                }))
-
-                return {
-                    ...state,
-                    cubes: newCubes
-                }
-            }
-        case ActionTypes.Deactive:
-            {
-                const newCubes: IStackCube[] = state.cubes.map((item, i, arr) => ({
-                    ...item,
-                    isActive: (i === arr.length - 1) ? false : item.isActive
-                }))
-
-                return {
-                    ...state,
-                    cubes: newCubes
-                }
-            }
-
-        case ActionTypes.Pop:
-            {
-                const newCubes: IStackCube[] = state.cubes.map((item, i, arr) => ({
-                    ...item,
-                    disappear: i === arr.length - 1
-                }));
-
-                const newValues = [...state.values];
-                const popValue = newValues.pop();
-
-                return {
-                    ...state,
-                    cubes: newCubes,
-                    opeDetails: [...state.opeDetails, {
-                        type: OpeDetailTypes.Pop,
-                        payload: {
-                            popValue,
-                            curValues: newValues
-                        }
-                    }],
-                    values: newValues
-                }
-            }
-
-        case ActionTypes.PopDone:
-            {
-                const newCubes: IStackCube[] = [...state.cubes];
-                newCubes.pop();
-                return {
-                    ...state,
-                    cubes: newCubes
-                }
-            }
-
-        case ActionTypes.Push:
-            {
-                const newCubes = [...state.cubes]
-                const newCube: IStackCube = {
-                    value: payload,
-                    isActive: true
-                };
-                const newValues = [...state.values]
-                newCubes.push(newCube);
-                newValues.push(payload);
-
-                return {
-                    ...state,
-                    cubes: newCubes,
-                    values: newValues,
-                    opeDetails: [...state.opeDetails, {
-                        type: OpeDetailTypes.Push,
-                        payload: {
-                            pushValue: payload,
-                            curValues: newValues
-                        }
-                    }]
-                }
-            }
-
-        case ActionTypes.Random:
-            return {
-                ...state,
-                randomDone: false
-            }
-
-        case ActionTypes.RandomDone:
-            {
-                let newValues = randomArr(randomNum(4, 8));
-                return {
-                    ...state,
-                    cubes: initCubes(newValues),
-                    randomDone: true,
-                    values: newValues,
-                    opeDetails: [{ type: OpeDetailTypes.Default, payload: newValues }]
-                }
-            }
-
-        default:
-            return state;
-    }
-}
 
 const Stack = () => {
     const history = useHistory();
-    const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
+    const [state, dispatch] = useReducer<IReducer<IState>, IState>(reducer, initState, (state): IState => {
         return {
             ...state,
             cubes: initCubes(state.values),
@@ -177,7 +44,7 @@ const Stack = () => {
             sequence.forEach((event, i) => {
                 setTimeout(() => {
                     dispatch(event)
-                }, i * DISPATCH_INTERVAL)
+                }, i * config.animationSpeed)
             })
         } else {
             message.warning('弹栈失败，当前栈为空')
@@ -187,15 +54,15 @@ const Stack = () => {
 
     /** 处理压栈 */
     const handlePush = (value: number) => {
-        if (state.values.length < 10) {
+        if (state.values.length < config.geoNumRange[1]) {
             const sequence = pushSeq(value);
             sequence.forEach((event, i) => {
                 setTimeout(() => {
                     dispatch(event)
-                }, i * DISPATCH_INTERVAL)
+                }, i * config.animationSpeed)
             })
         } else {
-            message.warning('压栈失败，栈最大容量为10')
+            message.warning(`压栈失败，栈最大容量为${config.geoNumRange[1]}`)
         }
 
     }
@@ -205,25 +72,28 @@ const Stack = () => {
         dispatch({ type: ActionTypes.Random });
         setTimeout(() => {
             dispatch({ type: ActionTypes.RandomDone })
-        }, 400)
+        }, config.animationSpeed)
     }
 
     return (
         <div className='stack-warp'>
             <PageHeader
                 onBack={() => {
-                    history.replace('/data-structure-visualization/')
+                    history.replace(root)
                     window.location.reload();
                 }}
                 title='栈'
             />
             <div className='main'>
-                <Scene3d onLoaded={handleSceneLoaded}>
+                <Scene3d
+                    onLoaded={handleSceneLoaded}
+                    cameraPosZ={config.cameraPosZ}
+                >
                     {state.cubes.map((item, i) => (
                         <React.Fragment key={i + '!'}>
                             <StackCube3d
                                 value={item.value}
-                                position={[0, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE) + 2, 0]}
+                                position={[0, startPosY + (i * config.geoBaseDistance) + config.geoBasePosY, 0]}
                                 isActive={item.isActive}
                                 disappear={item.disappear || !state.randomDone}
 
@@ -232,7 +102,7 @@ const Stack = () => {
                                 <Text
                                     fontSize={0.5}
                                     color='black'
-                                    position={[-2.5, startPosY + (i * STACK_CUBE_INTERVAL_DISTANCE) + 2, 0]}
+                                    position={[-2.5, startPosY + (i * config.geoBaseDistance) + config.geoBasePosY, 0]}
                                 >
                                     {'Top ——>'}
                                 </Text> : <></>}
@@ -247,7 +117,8 @@ const Stack = () => {
                     valueRange={[0, 90]}
                     addText='压栈'
                     deleteText='弹栈'
-                    isIndex={false}
+                    isAddIndex={false}
+                    isDeleteIndex={false}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

@@ -1,5 +1,5 @@
 import { ActionTypes } from "../../types";
-import { IStackCube } from "./stack";
+import { IStackCube } from "./store";
 import config from './config'
 
 export function initCubes(values: number[]): IStackCube[] {
