@@ -1,19 +1,19 @@
 import React from "react";
 
-/** 设置 SortCube 之间的间距 */
-export const SORT_CUBE_INTERVAL_DISTANCE = 2;
+// /** 设置 SortCube 之间的间距 */
+// export const SORT_CUBE_INTERVAL_DISTANCE = 2;
 
-/** 设置 StackCube 之间的间距 */
-export const STACK_CUBE_INTERVAL_DISTANCE = 0.8;
+// /** 设置 StackCube 之间的间距 */
+// export const STACK_CUBE_INTERVAL_DISTANCE = 0.8;
 
-/** 设置 QueueCube 之间的间距 */
-export const QUEUE_CUBE_INTERVAL_DISTANCE = 2.2;
+// /** 设置 QueueCube 之间的间距 */
+// export const QUEUE_CUBE_INTERVAL_DISTANCE = 2.2;
 
-/** 设置 LinkCube 之间的间距 */
-export const LINK_CUBE_INTERVAL_DISTANCE = 3.5;
+// /** 设置 LinkCube 之间的间距 */
+// export const LINK_CUBE_INTERVAL_DISTANCE = 3.5;
 
-/** 设置 3d 物品在 scene 中的基准 y 轴坐标 */
-export const BASE_POSY = -2;
+// /** 设置 3d 物品在 scene 中的基准 y 轴坐标 */
+// export const BASE_POSY = -2;
 
 
 /** 520 ~ 120
@@ -23,7 +23,7 @@ export const BASE_POSY = -2;
  */
 
 /** 遍历细节数组，分发任务的间隔时间 */
-export const DISPATCH_INTERVAL = 320;
+// export const DISPATCH_INTERVAL = 320;
 
 
 export interface IBaseProps {
@@ -47,9 +47,31 @@ export enum DataStrucTypes {
     Graph
 }
 
+/** 每个立方体页面的配置 */
+export interface IPageConfig {
+    /** 设置几何体之间的水平距离 */
+    geoBaseDistance: number;
+    /** 设置几何体出现的数量范围 */
+    geoNumRange: Range;
+    /** 设置几何体取值范围 */
+    geoValueRange: Range;
+    /** 设置动画的播放速度 */
+    animationSpeed: number;
+    /** 设置页面几何体的基础y坐标 */
+    geoBasePosY: number;
+    /** 设置摄像机的z坐标 */
+    cameraPosZ?: number;
+    /** 设置几何体的颜色 */
+    colorConfig?: IColorConfig;
+}
+
+export interface ISpherePageConfig extends IPageConfig {
+    /** 设置树的最大层数 */
+    maxDeepth: number;
+}
+
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
-    mRef?: any;
     /** 构造参数 */
     args?: any;
     /** 取值 */
@@ -140,3 +162,4 @@ export interface IColorConfig {
 
 
 export type Points = [number, number, number][];
+export type Range = [number, number];
