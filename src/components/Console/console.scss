@@ -97,11 +97,15 @@
 
             .content {
                 border-radius: 3px;
-                padding: 10px 20px;
+                padding: 10px 0 0 12px;
                 height: 100%;
                 border: rgb(211, 208, 208) 1px solid;
                 overflow: auto;
                 font-family: Monaco, Menlo, Ubuntu Mono, Consolas, source-code-pro, monospace;
+                // .ant-steps-item-title {
+                //     font-weight: 500;
+                //     font-size: 17px;
+                // }
             }
         }
     }
