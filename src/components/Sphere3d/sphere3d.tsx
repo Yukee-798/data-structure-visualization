@@ -4,7 +4,18 @@ import { Icosahedron, Text } from '@react-three/drei'
 import { defaultGeoColor } from '../../configs/page/defaultConfig';
 import { IGeometryProps } from '../../types';
 
-export interface ISphere3dProps extends IGeometryProps { }
+export interface ISphere3dProps extends IGeometryProps {
+    /** 结点的实际顺序 */
+    sortIndex: number;
+    /** 左线条位置 */
+    lChildPos?: any;
+    /** 右线条位置 */
+    rChildPos?: any;
+    /** 激活左线条 */
+    activeLeft?: boolean;
+    /** 激活右线条 */
+    activeRight?: boolean;
+}
 
 const Sphere3d: React.FC<ISphere3dProps> = (props) => {
 

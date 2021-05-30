@@ -6,10 +6,10 @@ import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons'
 import Console, { Item, SubMenu } from '../../components/Console/console'
 import Scene3d from '../../components/Scene3d/scene3d'
 import { ActionTypes, IReducer, OpeDetailTypes } from '../../types'
-import { randomBST, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq, searchSeq, addNodeSeq, treeToString } from './utils'
+import { randomBST, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq, searchSeq, addNodeSeq, treeToString, getDeepthByNodeIndex, deleteNodeSeq } from './utils'
 import { cdnOfNodes } from './config'
 import { initState, IState, reducer } from './store'
-import BSTCube3d from './BSTSphere3d/bstSphere3d'
+import BSTSphere3d from './BSTSphere3d/bstSphere3d'
 import config from './config'
 import './binarySearchTree.scss'
 import { root } from '../../configs/router/config'
@@ -38,23 +38,49 @@ const BinarySearchTree = () => {
 
     /** 添加元素 */
     const handleAddEle = (value: number, _: unknown) => {
-        console.log(value);
+        dispatch({ type: ActionTypes.UnLock })
         let sequence: any[] = [];
         addNodeSeq(state.binaryTree, 0, value, sequence);
         sequence.forEach((event, i) => {
             setTimeout(() => {
-                dispatch(event)
+                if (event.type !== ActionTypes.Add) {
+                    dispatch(event)
+                } else {
+                    // 判断一下最后要添加的元素的下标对应的层数是不是小于等于配置项的最大层数
+                    if (getDeepthByNodeIndex(event.payload.index) <= config.maxDeepth) {
+                        dispatch(event)
+                    } else {
+                        message.warning(`添加失败，二叉树最大层数为${config.maxDeepth + 1}`)
+                    }
+                }
             }, i * config.animationSpeed)
         })
     }
 
     /** 删除元素 */
-    const handleDeleteEle = () => {
+    const handleDeleteEle = (index: number) => {
+        dispatch({ type: ActionTypes.UnLock })
+
+        // 验证一下输入的序号
+        if (!state.binaryTree[index]) {
+            return message.warning('删除失败，输入的结点序号不存在')
+        }
+
+        let sequence: any[] = [];
+        deleteNodeSeq(state.binaryTree, index, 0, sequence);
+        console.log(sequence);
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                dispatch(event)
+            }, i * config.animationSpeed)
+        })
 
     }
 
     /** 搜索元素 */
     const handleSearch = (value: number) => {
+        dispatch({ type: ActionTypes.UnLock })
+
         let sequence: any[] = [];
         searchSeq(state.binaryTree, value, 0, sequence);
         sequence.forEach((event, i) => {
@@ -81,6 +107,7 @@ const BinarySearchTree = () => {
 
     /** 前序遍历 */
     const handlePreorder = () => {
+
         let sequence: any[] = [];
         preOrderSeq(state.binaryTree, 0, sequence);
 
@@ -152,11 +179,11 @@ const BinarySearchTree = () => {
                         // 判断当前结点是否有左孩子
                         const hasLChild = getLChildValue(state.spheres, sphere.sortIndex)?.value;
 
-                        // 获取左结点的位置
-                        const lChildPos = getLChildValue(cdnOfNodes, sphere.sortIndex);
+                        // 获取左结点的位置(加上前面的这个判断是为了在删除元素时，会设置与之连接的父结点的那条线为null)
+                        const lChildPos = sphere.lChildPos !== null && getLChildValue(cdnOfNodes, sphere.sortIndex);
 
                         // 判断当前结点是否有右孩子
-                        const hasRChild = getRChildValue(state.spheres, sphere.sortIndex)?.value;
+                        const hasRChild = sphere.rChildPos !== null && getRChildValue(state.spheres, sphere.sortIndex)?.value;
 
                         // 获取右结点的位置
                         const rChildPos = getRChildValue(cdnOfNodes, sphere.sortIndex);
@@ -164,7 +191,7 @@ const BinarySearchTree = () => {
                         return (
                             sphere.value && (
                                 <React.Fragment key={'sphere' + i}>
-                                    <BSTCube3d
+                                    <BSTSphere3d
                                         value={sphere.value}
                                         sortIndex={sphere.sortIndex}
                                         position={cdnOfNodes[sphere.sortIndex]}
@@ -172,7 +199,7 @@ const BinarySearchTree = () => {
                                         activeLeft={sphere.activeLeft}
                                         activeRight={sphere.activeRight}
                                         isLock={sphere.isLock}
-                                        disappear={!state.randomDone}
+                                        disappear={sphere.disappear || !state.randomDone}
                                         lChildPos={hasLChild && lChildPos}
                                         rChildPos={hasRChild && rChildPos}
 
@@ -180,7 +207,7 @@ const BinarySearchTree = () => {
                                     <Text
                                         position={[cdnOfNodes[i][0], cdnOfNodes[i][1] - 1.2, cdnOfNodes[i][2]]}
                                         fontSize={0.4}
-                                        fillOpacity={state.randomDone ? 1 : 0}
+                                        fillOpacity={!sphere.disappear && state.randomDone ? 1 : 0}
                                         color='black'
                                     >
                                         {i}
@@ -219,7 +246,7 @@ const BinarySearchTree = () => {
                                         return (
                                             <Step
                                                 key={'step' + i}
-                                                title={`中序遍历: ${payload}`}
+                                                title={`中序遍历: [${payload}]`}
                                             />
                                         )
 
@@ -227,7 +254,7 @@ const BinarySearchTree = () => {
                                         return (
                                             <Step
                                                 key={'step' + i}
-                                                title={`前序遍历: ${payload}`}
+                                                title={`前序遍历: [${payload}]`}
                                             />
                                         )
 
@@ -235,7 +262,7 @@ const BinarySearchTree = () => {
                                         return (
                                             <Step
                                                 key={'step' + i}
-                                                title={`后序遍历: ${payload}`}
+                                                title={`后序遍历: [${payload}]`}
                                             />
                                         )
 
@@ -250,6 +277,16 @@ const BinarySearchTree = () => {
                                         )
                                     }
 
+                                    case OpeDetailTypes.Delete: {
+                                        const { index, value, cur } = payload;
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`删除结点: i=${index}, v=${value}`}
+                                                description={`当前二叉树: ${treeToString(cur)}`}
+                                            />
+                                        )
+                                    }
 
                                     default:
                                         return (

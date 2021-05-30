@@ -2,20 +2,9 @@ import React from "react";
 import Line3d from "../../../components/Line3d/line3d";
 import Sphere3d, { ISphere3dProps } from "../../../components/Sphere3d/sphere3d";
 
-export interface IBSTSphere3dProps extends ISphere3dProps {
-    /** 结点的实际顺序 */
-    sortIndex: number;
-    /** 左线条位置 */
-    lChildPos?: any;
-    /** 右线条位置 */
-    rChildPos?: any;
-    /** 激活左线条 */
-    activeLeft?: boolean;
-    /** 激活右线条 */
-    activeRight?: boolean;
-}
+export interface IBSTSphere3dProps extends ISphere3dProps { }
 
-const BSTCube3d: React.FC<IBSTSphere3dProps> = (props) => {
+const BSTSphere3d: React.FC<IBSTSphere3dProps> = (props) => {
 
     const {
         lChildPos,
@@ -60,4 +49,4 @@ const BSTCube3d: React.FC<IBSTSphere3dProps> = (props) => {
     )
 }
 
-export default BSTCube3d;
+export default BSTSphere3d;

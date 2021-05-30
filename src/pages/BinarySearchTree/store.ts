@@ -1,11 +1,9 @@
 import { ActionTypes, IReducer, OpeDetailTypes } from "../../types";
-import { formatBinaryTree, formatSpheres, initSpheres, randomBST } from "./utils";
+import { formatBinaryTree, formatSpheres, getFatherIndex, initSpheres, randomBST, treeToString } from "./utils";
 import { IBSTSphere3dProps } from "./BSTSphere3d/bstSphere3d";
 import config from "./config";
 
-export interface IBSTSphere3d extends IBSTSphere3dProps {
-
-}
+export interface IBSTSphere3d extends IBSTSphere3dProps { }
 
 export interface IState {
     // 表示二叉树当前真实的结构
@@ -26,6 +24,57 @@ export const initState: IState = {
 export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
     switch (type) {
+        case ActionTypes.Disappear: {
+
+            let newSpheres = [...state.spheres];
+            // 让该结点消失
+            newSpheres = newSpheres.map((sphere) => (sphere.sortIndex === payload ? { ...sphere, disappear: true } : sphere));
+
+            // 让其父节点与之的连线也消失
+            let fatherIndex = getFatherIndex(payload);
+            // 判断是父结点左连线还是右连线(这里因为是二叉搜索树所以可以直接通过数值大小来判断)
+            let isLeft = (state.binaryTree[fatherIndex] as number) >= (state.binaryTree[payload] as number)
+            newSpheres = newSpheres.map((sphere) => {
+                let newSphere = { ...sphere };
+                if (sphere.sortIndex === fatherIndex) {
+                    if (isLeft) newSphere.lChildPos = null;
+                    else newSphere.rChildPos = null;
+                }
+                return newSphere;
+            })
+
+            let newBst = [...state.binaryTree];
+            newBst[payload] = null;
+            return {
+                ...state,
+                spheres: newSpheres,
+                opeDetails: [...state.opeDetails, {
+                    type: OpeDetailTypes.Delete, payload: {
+                        index: payload,
+                        value: state.binaryTree[payload],
+                        cur: formatBinaryTree(newBst)
+                    }
+                }]
+            }
+        }
+
+
+        case ActionTypes.Delete: {
+            let newSpheres = [...state.spheres];
+            newSpheres = newSpheres.map((sphere) => {
+                if (sphere.sortIndex === payload) return { ...sphere, value: null }
+                return sphere;
+            })
+
+            let newBst = [...state.binaryTree];
+            newBst[payload] = null;
+
+            return {
+                ...state,
+                spheres: newSpheres,
+                binaryTree: formatBinaryTree(newBst),
+            }
+        }
 
         case ActionTypes.Add: {
             const { value, index } = payload;
@@ -40,21 +89,21 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
             // 格式化
             newSpheres = formatSpheres(newSpheres);
 
-            let newBt = [...state.binaryTree];
+            let newBst = [...state.binaryTree];
             // 添加新值
-            newBt[index] = value
+            newBst[index] = value
             // 格式化
-            newBt = formatBinaryTree(newBt);
+            newBst = formatBinaryTree(newBst);
 
             return {
                 ...state,
-                binaryTree: newBt,
+                binaryTree: newBst,
                 spheres: newSpheres,
                 opeDetails: [...state.opeDetails, {
                     type: OpeDetailTypes.Add, payload: {
                         index: payload.index,
                         value: payload.value,
-                        cur: newBt
+                        cur: newBst
                     }
                 }]
             }
@@ -141,7 +190,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
             return {
                 ...state,
                 spheres: state.spheres.map(
-                    (item) => payload === item.sortIndex ? { ...item, isLock: false } : { ...item }
+                    (item) => !payload ? { ...item, isLock: false } : (payload === item.sortIndex) ? { ...item, isLock: false } : { ...item }
                 )
             }
 
@@ -151,27 +200,19 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
                 randomDone: false
             }
 
-        case ActionTypes.RandomDone:
-            {
-                let newBinaryTree = randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth);
+        case ActionTypes.RandomDone: {
+            let newBinaryTree = randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth);
 
-                const treeToString = newBinaryTree.map((item) => {
-                    if (!item) return 'null'
-                    return item;
-                }).toString();
-
-                return {
-                    ...state,
-                    binaryTree: newBinaryTree,
-                    spheres: initSpheres(newBinaryTree),
-                    randomDone: true,
-                    opeDetails: [{ type: OpeDetailTypes.Default, payload: treeToString }]
-                }
+            return {
+                ...state,
+                binaryTree: formatBinaryTree(newBinaryTree),
+                spheres: initSpheres(newBinaryTree),
+                randomDone: true,
+                opeDetails: [{ type: OpeDetailTypes.Default, payload: treeToString(newBinaryTree) }]
             }
+        }
 
         default:
-            return {
-                ...state
-            }
+            return state
     }
 }

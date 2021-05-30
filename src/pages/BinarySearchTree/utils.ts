@@ -19,6 +19,13 @@ export function formatBinaryTree(binaryTree: (number | null)[]) {
             binaryTree[i] = null;
         }
     }
+    // 将尾部所有的null去掉
+    for (let i = binaryTree.length - 1; i >= 0; i--) {
+        if (binaryTree[i] !== null) {
+            binaryTree.length = i + 1;
+            break;
+        }
+    }
     return [...binaryTree]
 }
 
@@ -37,6 +44,11 @@ export function getFatherValue<T>(binaryTree: T[], indexOfNode: number) {
     return binaryTree[Math.floor((indexOfNode - 1) / 2)];
 }
 
+/** 获取传入结点的父结点的下标 */
+export function getFatherIndex(indexOfNode: number) {
+    return Math.floor((indexOfNode - 1) / 2);
+}
+
 /** 获取传入结点的左孩子数据值 */
 export function getLChildValue<T>(binaryTree: T[], indexOfNode: number) {
     return binaryTree[indexOfNode * 2 + 1];
@@ -51,14 +63,14 @@ export function getRChildValue<T>(binaryTree: T[], indexOfNode: number) {
 export function setLChild<T>(binaryTree: T[], indexOfNode: number, lChild: T) {
     const root = binaryTree[indexOfNode];
     if (root) binaryTree[indexOfNode * 2 + 1] = lChild;
-    else throw 'node is null';
+    else throw new Error('node is null');
 }
 
 /** 为传入的结点设置右孩子 */
 export function setRChild<T>(binaryTree: T[], indexOfNode: number, rChild: T) {
     const root = binaryTree[indexOfNode];
     if (root) binaryTree[indexOfNode * 2 + 2] = rChild;
-    else throw 'node is null';
+    else throw new Error('node is null');
 }
 
 /** 根据传入的下标获取结点所在的二叉树层数 */
@@ -70,7 +82,6 @@ export function getDeepthByNodeIndex(indexOfNode: number) {
 export function getMaxDeepth(binaryTree: (number | null)[]) {
     return getDeepthByNodeIndex(binaryTree.length - 1);
 }
-
 
 /** 随机生成结点数为n的二叉树 */
 function binaryTreeGenerator(n: number, binaryTree: (number | null)[], nodeValueRange: Range, indexOfRoot: number,) {
@@ -118,7 +129,7 @@ export function randomBinaryTree(nodeNumsRange: Range, nodeValueRange: Range, ma
 /** 为二叉搜索树添加结点 */
 export function addToBST(bst: any[], indexOfRoot: number, nodeV: number) {
     // 传入的 bst 必须有一个根结点
-    if (bst.length === 0) throw 'the length of bst is 0';
+    if (bst.length === 0) throw new Error('the length of bst is 0');
 
     if (!bst[indexOfRoot]) return;
 
@@ -174,7 +185,7 @@ export function randomBST(nodeNumsRange: Range, nodeValueRange: Range, maxDeepth
 /** 获取向二叉搜索树添加结点的细节 */
 export function addNodeSeq(bst: any[], indexOfRoot: number, nodeV: number, seq: any[]) {
     // 传入的 bst 必须有一个根结点
-    if (bst.length === 0) throw 'the length of bst is 0';
+    if (bst.length === 0) throw new Error('the length of bst is 0');
 
     if (!bst[indexOfRoot]) return;
 
@@ -206,14 +217,76 @@ export function addNodeSeq(bst: any[], indexOfRoot: number, nodeV: number, seq: 
 }
 
 /** 获取向二叉树删除结点的细节 */
-export function deleteNodeSeq() {
+export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: number, seq: any[]) {
 
+    // 传入的 bst 必须有一个根结点
+    if (bst.length === 0) throw new Error('the length of bst is 0');
+
+    if (!bst[indexOfRoot]) return;
+
+    // seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+    // seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+
+
+    // 如果删除的结点是叶子结点
+    if (judgeNode(bst, targetIndex) === 0) {
+
+
+        seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+        seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+
+        // 判断传入结点的值和当前子树根结点的值的关系
+        if (bst[targetIndex] > bst[indexOfRoot]) {
+            // 如果传入的值大于当前子树根结点的值
+            // 则看其右子树
+            if (getRChildValue(bst, indexOfRoot) === bst[targetIndex]) {
+                // 如果右结点等于nodeV则删除
+                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 })
+                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 });
+                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 })
+                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 })
+            } else {
+                // 否则递归搜索其右子树
+                deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 2, seq);
+            }
+
+        } else if (bst[targetIndex] < bst[indexOfRoot]) {
+            // 如果传入的值小于当前子树根结点的值
+            // 则看其左子树
+            if (getLChildValue(bst, indexOfRoot) === bst[targetIndex]) {
+                // 如果左结点等于nodeV则删除
+                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 })
+                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 })
+                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 })
+                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 })
+            } else {
+                // 否则递归搜索其右子树
+                deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 1, seq);
+            }
+        } else {
+            // 如果当前结点等于nodeV则删除
+            seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Delete, payload: indexOfRoot })
+        }
+    }
+}
+
+
+
+/** 判断二叉树的某个结点有几个子结点 */
+export function judgeNode(binaryTree: (number | null)[], indexOfNode: number) {
+    let childNum = 0;
+    if (getLChildValue(binaryTree, indexOfNode)) childNum++;
+    if (getRChildValue(binaryTree, indexOfNode)) childNum++;
+    return childNum;
 }
 
 /** 获取查找细节 */
 export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: any[]) {
     // 传入的 bst 必须有一个根结点
-    if (bst.length === 0) throw 'the length of bst is 0';
+    if (bst.length === 0) throw new Error('the length of bst is 0');
 
     // 如果结点不存在则直接返回
     if (!bst[indexOfRoot]) return;
