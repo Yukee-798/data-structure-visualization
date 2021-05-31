@@ -36,7 +36,7 @@ export function treeToString(binaryTree: (number | null)[]) {
 
 /** 初始化二叉树sphere */
 export function initSpheres(values: (number | null)[]): IBSTSphere3d[] {
-    return values.map((value, index) => ({ sortIndex: index, value }))
+    return values.map((value, index) => ({ sortIndex: index, sortIndexes: [index], value }))
 }
 
 /** 获取传入结点的父结点数据值 */
@@ -47,6 +47,14 @@ export function getFatherValue<T>(binaryTree: T[], indexOfNode: number) {
 /** 获取传入结点的父结点的下标 */
 export function getFatherIndex(indexOfNode: number) {
     return Math.floor((indexOfNode - 1) / 2);
+}
+
+/** 获取传入结点子结点下标 */
+export function getChildrenIndexes(binaryTree: (number | null)[], indexOfNode: number) {
+    let indexes: any[] = [undefined, undefined];
+    if (getLChildValue(binaryTree, indexOfNode)) indexes[0] = indexOfNode * 2 + 1;
+    if (getRChildValue(binaryTree, indexOfNode)) indexes[1] = indexOfNode * 2 + 2;
+    return indexes;
 }
 
 /** 获取传入结点的左孩子数据值 */
@@ -224,17 +232,48 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
 
     if (!bst[indexOfRoot]) return;
 
-    // seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-    // seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+    seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+    seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
 
-
-    // 如果删除的结点是叶子结点
     if (judgeNode(bst, targetIndex) === 0) {
+        // 如果删除的结点是叶子结点
+        // 判断传入结点的值和当前子树根结点的值的关系
+        if (bst[targetIndex] > bst[indexOfRoot]) {
+            // 如果传入的值大于当前子树根结点的值
+            // 则看其右子树
+            if (getRChildValue(bst, indexOfRoot) === bst[targetIndex]) {
+                // 如果右结点等于nodeV则删除
+                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 })
+                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 });
+                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 })
+                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 })
+            } else {
+                // 否则递归搜索其右子树
+                deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 2, seq);
+            }
 
-
-        seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-        seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
-
+        } else if (bst[targetIndex] < bst[indexOfRoot]) {
+            // 如果传入的值小于当前子树根结点的值
+            // 则看其左子树
+            if (getLChildValue(bst, indexOfRoot) === bst[targetIndex]) {
+                // 如果左结点等于nodeV则删除
+                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 })
+                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 })
+                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 })
+                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 })
+            } else {
+                // 否则递归搜索其右子树
+                deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 1, seq);
+            }
+        } else {
+            // 如果当前结点等于nodeV则删除
+            seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot })
+            seq.push({ type: ActionTypes.Delete, payload: indexOfRoot })
+        }
+    } else if (judgeNode(bst, targetIndex) === 1) {
+        // 如果删除的结点有一个子结点
         // 判断传入结点的值和当前子树根结点的值的关系
         if (bst[targetIndex] > bst[indexOfRoot]) {
             // 如果传入的值大于当前子树根结点的值
@@ -272,8 +311,6 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
         }
     }
 }
-
-
 
 /** 判断二叉树的某个结点有几个子结点 */
 export function judgeNode(binaryTree: (number | null)[], indexOfNode: number) {

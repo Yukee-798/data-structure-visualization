@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { animated, config, useSpring } from 'react-spring/three';
 import { Icosahedron, Text } from '@react-three/drei'
 import { defaultGeoColor } from '../../configs/page/defaultConfig';
@@ -7,6 +7,8 @@ import { IGeometryProps } from '../../types';
 export interface ISphere3dProps extends IGeometryProps {
     /** 结点的实际顺序 */
     sortIndex: number;
+    /** 该sphere过去已存在或者未来将要到达的位置 */
+    sortIndexes: number[];
     /** 左线条位置 */
     lChildPos?: any;
     /** 右线条位置 */
@@ -17,7 +19,7 @@ export interface ISphere3dProps extends IGeometryProps {
     activeRight?: boolean;
 }
 
-const Sphere3d: React.FC<ISphere3dProps> = (props) => {
+const Sphere3d: React.FC<ISphere3dProps> = forwardRef<any, ISphere3dProps>((props, ref) => {
 
     const {
         position,
@@ -57,10 +59,11 @@ const Sphere3d: React.FC<ISphere3dProps> = (props) => {
     return (
         <animated.mesh
             position={position}
-            ref={meshRef}
+            ref={ref}
             scale={scale}
         >
             <Icosahedron
+                ref={meshRef}
                 args={[0.7, 10]}
                 onClick={() => setIsClick(!isClick)}
                 onPointerOver={() => setIsHover(true)}
@@ -81,7 +84,7 @@ const Sphere3d: React.FC<ISphere3dProps> = (props) => {
             </Icosahedron>
         </animated.mesh>
     )
-}
+})
 
 Sphere3d.defaultProps = {
     colorConfig: defaultGeoColor

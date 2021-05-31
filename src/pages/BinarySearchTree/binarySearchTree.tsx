@@ -194,6 +194,7 @@ const BinarySearchTree = () => {
                                     <BSTSphere3d
                                         value={sphere.value}
                                         sortIndex={sphere.sortIndex}
+                                        sortIndexes={sphere.sortIndexes}
                                         position={cdnOfNodes[sphere.sortIndex]}
                                         isActive={sphere.isActive}
                                         activeLeft={sphere.activeLeft}
@@ -202,7 +203,6 @@ const BinarySearchTree = () => {
                                         disappear={sphere.disappear || !state.randomDone}
                                         lChildPos={hasLChild && lChildPos}
                                         rChildPos={hasRChild && rChildPos}
-
                                     />
                                     <Text
                                         position={[cdnOfNodes[i][0], cdnOfNodes[i][1] - 1.2, cdnOfNodes[i][2]]}
@@ -219,7 +219,7 @@ const BinarySearchTree = () => {
                     })}
                 </Scene3d>
                 <Console
-                    style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    style={{ display: isSceneLoaded ? 'flex' : 'none' }}
                     // onSliderChange={handleSliderChange}
                     isAddIndex={false}
                     isSearch={true}

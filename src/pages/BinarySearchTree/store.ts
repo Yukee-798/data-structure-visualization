@@ -1,5 +1,5 @@
 import { ActionTypes, IReducer, OpeDetailTypes } from "../../types";
-import { formatBinaryTree, formatSpheres, getFatherIndex, initSpheres, randomBST, treeToString } from "./utils";
+import { formatBinaryTree, formatSpheres, getChildrenIndexes, getFatherIndex, initSpheres, judgeNode, randomBST, treeToString } from "./utils";
 import { IBSTSphere3dProps } from "./BSTSphere3d/bstSphere3d";
 import config from "./config";
 
@@ -26,53 +26,94 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
     switch (type) {
         case ActionTypes.Disappear: {
 
+            // 判断删除的结点类型
+            const deleteType = judgeNode(state.binaryTree, payload);
             let newSpheres = [...state.spheres];
-            // 让该结点消失
-            newSpheres = newSpheres.map((sphere) => (sphere.sortIndex === payload ? { ...sphere, disappear: true } : sphere));
-
-            // 让其父节点与之的连线也消失
-            let fatherIndex = getFatherIndex(payload);
-            // 判断是父结点左连线还是右连线(这里因为是二叉搜索树所以可以直接通过数值大小来判断)
-            let isLeft = (state.binaryTree[fatherIndex] as number) >= (state.binaryTree[payload] as number)
-            newSpheres = newSpheres.map((sphere) => {
-                let newSphere = { ...sphere };
-                if (sphere.sortIndex === fatherIndex) {
-                    if (isLeft) newSphere.lChildPos = null;
-                    else newSphere.rChildPos = null;
-                }
-                return newSphere;
-            })
-
             let newBst = [...state.binaryTree];
-            newBst[payload] = null;
-            return {
-                ...state,
-                spheres: newSpheres,
-                opeDetails: [...state.opeDetails, {
-                    type: OpeDetailTypes.Delete, payload: {
-                        index: payload,
-                        value: state.binaryTree[payload],
-                        cur: formatBinaryTree(newBst)
+
+            if (deleteType === 0) {
+                // 让该结点消失
+                newSpheres = newSpheres.map((sphere) => (sphere.sortIndex === payload ? { ...sphere, disappear: true } : sphere));
+                // 让其父节点与之的连线也消失
+                let fatherIndex = getFatherIndex(payload);
+                // 判断是父结点左连线还是右连线(这里因为是二叉搜索树所以可以直接通过数值大小来判断)
+                let isLeft = (state.binaryTree[fatherIndex] as number) >= (state.binaryTree[payload] as number)
+                newSpheres = newSpheres.map((sphere) => {
+                    let newSphere = { ...sphere };
+                    if (sphere.sortIndex === fatherIndex) {
+                        if (isLeft) newSphere.lChildPos = null;
+                        else newSphere.rChildPos = null;
                     }
-                }]
+                    return newSphere;
+                })
+                newBst[payload] = null;
+
+                return {
+                    ...state,
+                    spheres: newSpheres,
+                    opeDetails: [...state.opeDetails, {
+                        type: OpeDetailTypes.Delete, payload: {
+                            index: payload,
+                            value: state.binaryTree[payload],
+                            cur: formatBinaryTree(newBst)
+                        }
+                    }]
+                }
+
+            } else if (deleteType === 1) {
+                return {
+                    ...state
+                }
+
+            } else {
+                return {
+                    ...state
+                }
             }
+
+
+
         }
 
 
         case ActionTypes.Delete: {
             let newSpheres = [...state.spheres];
-            newSpheres = newSpheres.map((sphere) => {
-                if (sphere.sortIndex === payload) return { ...sphere, value: null }
-                return sphere;
-            })
-
             let newBst = [...state.binaryTree];
-            newBst[payload] = null;
+
+            // 判断删除的结点类型
+            const deleteType = judgeNode(state.binaryTree, payload);
+
+            if (deleteType === 0) { // 删除的结点为叶子结点
+                newSpheres = newSpheres.map((sphere) => {
+                    if (sphere.sortIndex === payload) return { ...sphere, value: null }
+                    return sphere;
+                })
+                newBst[payload] = null;
+            } else if (deleteType === 1) { // 删除的结点有一个子结点
+                // 获取其父结点的下标
+                let fatherIndex = getFatherIndex(payload);
+                // 获取其子结点的下标
+                let childrenIndexes = getChildrenIndexes(state.binaryTree, payload)[0];
+                let childIndex = childrenIndexes[0] ? childrenIndexes[0] : childrenIndexes[1];
+
+                newSpheres = newSpheres.map((sphere) => {
+                    // 将其子结点位移到该被删除结点的位置
+                    if (sphere.sortIndex === payload) return { ...sphere, value: null }
+                    return sphere;
+                })
+                newBst[payload] = null;
+            } else {
+
+            }
+
+
+            // console.log(newSpheres);
+            // console.log(formatBinaryTree(newBst));
 
             return {
                 ...state,
-                spheres: newSpheres,
-                binaryTree: formatBinaryTree(newBst),
+                spheres: newSpheres as any,
+                binaryTree: formatBinaryTree(newBst as any),
             }
         }
 
@@ -82,7 +123,8 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
             // 新结点
             const newNode: IBSTSphere3d = {
                 value,
-                sortIndex: index
+                sortIndex: index,
+                sortIndexes: [index]
             };
             // 添加新结点
             newSpheres[index] = newNode;

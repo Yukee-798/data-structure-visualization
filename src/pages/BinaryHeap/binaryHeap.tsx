@@ -1,108 +1,29 @@
 import { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, Drawer, Input, PageHeader } from 'antd';
+import { Button, PageHeader, Steps } from 'antd';
 import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import Scene3d from '../../components/Scene3d/scene3d';
-import { randomArr, randomNum } from '../../utils/index'
-import { ActionTypes, IGeometryProps } from '../../types';
-import {
-    BarChartOutlined,
-    DotChartOutlined,
-    MinusSquareOutlined,
-    PlusSquareOutlined,
-} from '@ant-design/icons';
+import { ActionTypes, IReducer, OpeDetailTypes } from '../../types';
+import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons';
+import { initState, IState, reducer } from './store';
+import { treeToString } from '../BinarySearchTree/utils';
+import config from './config';
 import './binaryHeap.scss'
 
-export interface IBinaryHeapCube extends IGeometryProps {
-
-}
-type IReducer = (state: IState, action: IAction) => IState;
-
-interface IState {
-    // 是否随机化完毕
-    randomDone: boolean;
-}
-
-interface IAction {
-    type: ActionTypes;
-    payload?: any;
-}
-
-const initState: IState = {
-    randomDone: true,
-}
-
-function reducer(state: IState = initState, action: IAction): IState {
-
-    const { type, payload } = action;
-
-
-    switch (type) {
-        case ActionTypes.Active:
-            return {
-                ...state,
-            }
-
-        case ActionTypes.Deactive:
-            return {
-                ...state,
-            }
-
-        case ActionTypes.Lock:
-            return {
-                ...state,
-            }
-
-        case ActionTypes.UnLock:
-            return {
-                ...state,
-            }
-
-
-        // case ActionTypes.Add:
-
-        // case ActionTypes.Delete:
-
-        case ActionTypes.RandomDone:
-            {
-                return {
-                    ...state,
-                    randomDone: true
-                }
-            }
-
-        case ActionTypes.Random:
-            return {
-                ...state,
-                randomDone: false
-            };
-
-        // case ActionTypes.Search:
-
-        default:
-            return state;
-    }
-}
+const { Step } = Steps;
 
 const BinaryHeap = () => {
 
     const history = useHistory();
-    const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
+    const [state, dispatch] = useReducer<IReducer<IState>, IState>(reducer, initState, (state): IState => {
         return {
             ...state,
         }
     })
 
-    /** 控制抽屉是否展开 */
-    const [isUnfold, setIsUnfold] = useState(false);
-
     /** 场景是否加载完毕 */
     const [isSceneLoaded, setIsSceneLoaded] = useState(false);
-
-    /** 传入数组长度，计算第一个元素的起始x坐标 */
-    // const startPosX = getStartXPos(state.cubes.length);
-
 
     /** 处理场景加载完毕回调 */
     const handleSceneLoaded = () => {
@@ -127,13 +48,97 @@ const BinaryHeap = () => {
             />
 
             <div className='main'>
-                <Scene3d onLoaded={handleSceneLoaded}>
+                <Scene3d
+                    onLoaded={handleSceneLoaded}
+                    cameraPosZ={config.cameraPosZ}
+                >
 
                 </Scene3d>
+
                 <Console
-                    style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    style={{ display: isSceneLoaded ? 'flex' : 'none' }}
+                    // onSliderChange={handleSliderChange}
+                    isAddIndex={false}
+                    isSearch={true}
+                    // onAdd={handleAddEle}
+                    // onDelete={handleDeleteEle}
+                    // onSearch={handleSearch}
+                    operation={
+                        <div className='btn-group'>
+                            <div className='row'>
+                                <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
+                                {/* <Button icon={<BarChartOutlined />} onClick={handlePreorder}>前序遍历</Button>
+                                <Button icon={<BarChartOutlined />} onClick={handleInorder}>中序遍历</Button>
+                                <Button icon={<BarChartOutlined />} onClick={handlePostorder}>后序遍历</Button> */}
+                            </div>
+                        </div>
+                    }
+
+                    displayer={
+                        <Steps direction="vertical" size="small" current={state.opeDetails.length - 1}>
+                            {state.opeDetails.map((item, i) => {
+                                const { type, payload } = item;
+                                switch (type) {
+                                    case OpeDetailTypes.InOrderDetails:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`中序遍历: [${payload}]`}
+                                            />
+                                        )
+
+                                    case OpeDetailTypes.PreOrderDetails:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`前序遍历: [${payload}]`}
+                                            />
+                                        )
+
+                                    case OpeDetailTypes.PostOrderDetails:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`后序遍历: [${payload}]`}
+                                            />
+                                        )
+
+                                    case OpeDetailTypes.Add: {
+                                        const { index, value, cur } = payload;
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`新增结点: i=${index}, v=${value}`}
+                                                description={`当前二叉树: ${treeToString(cur)}`}
+                                            />
+                                        )
+                                    }
+
+                                    case OpeDetailTypes.Delete: {
+                                        const { index, value, cur } = payload;
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`删除结点: i=${index}, v=${value}`}
+                                                description={`当前二叉树: ${treeToString(cur)}`}
+                                            />
+                                        )
+                                    }
+
+                                    default:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`当前二叉树: ${payload}`}
+                                            />
+                                        )
+                                }
+                            })}
+                        </Steps>
+                    }
                 >
                     <Item
+                        key='item1'
                         icon={<DotChartOutlined />}
                         onClick={handleRandom}
                     >
@@ -141,28 +146,14 @@ const BinaryHeap = () => {
                     </Item>
 
                     <SubMenu
-                        key='2'
+                        key='item2'
                         icon={<BarChartOutlined />}
-                        title='排序'
+                        title='遍历'
                     >
-                        <Item>冒泡排序</Item>
-                        <Item>选择排序</Item>
-                        <Item>插入排序</Item>
-                        <Item>快速排序</Item>
-                        <Item>归并排序</Item>
+                        {/* <Item onClick={handlePreorder}>前序遍历</Item>
+                        <Item onClick={handleInorder}>中序遍历</Item>
+                        <Item onClick={handlePostorder}>后序遍历</Item> */}
                     </SubMenu>
-
-                    <SubMenu
-                        icon={<PlusSquareOutlined />}
-                    >
-                        <Item>
-                            <Input />
-                            <Button>添加</Button>
-                        </Item>
-                    </SubMenu>
-
-                    <Item icon={<MinusSquareOutlined />}>删除</Item>
-
                 </Console>
             </div>
 
