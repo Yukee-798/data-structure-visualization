@@ -113,7 +113,7 @@ const Queue = () => {
                     ))}
                 </Scene3d>
                 <Console
-                    style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    style={{ display: isSceneLoaded ? 'flex' : 'none' }}
                     showSilider={false}
                     onAdd={handleEnqueue}
                     onDelete={handleDequeue}

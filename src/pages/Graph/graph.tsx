@@ -131,7 +131,7 @@ const Graph = () => {
 
                 </Scene3d>
                 <Console
-                    style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    style={{ display: isSceneLoaded ? 'flex' : 'none' }}
                 >
                     <Item
                         icon={<DotChartOutlined />}
