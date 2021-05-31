@@ -6,20 +6,18 @@ import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
 import Scene3d from '../../components/Scene3d/scene3d';
-import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, quickSortSeq, selectSortSeq } from './utils';
-import { ActionTypes, OpeDetailTypes, IReducer } from '../../types';
+import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, parseValue, quickSortSeq, initSeq, selectSortSeq } from './utils';
+import { OpeDetailTypes, IReducer } from '../../types';
 import { initState, IState, reducer } from './store';
 import config from './config'
 import { root } from '../../configs/router/config';
 import './sort.scss'
+import { randomArr, randomNum } from '../../utils';
 
 const { Step } = Steps;
 
-
-
-const Sort = (props: any) => {
+const Sort = () => {
     const history = useHistory();
-    console.log(props?.match?.params);
 
     const [state, dispatch] = useReducer<IReducer<IState>, IState>(reducer, initState, (state): IState => {
         return {
@@ -38,12 +36,35 @@ const Sort = (props: any) => {
         setIsSceneLoaded(true);
     }
 
+    /** 渲染器生成数组 */
+    const handleRender = (value: string) => {
+        const parseRes = parseValue(value);
+        if (parseRes) {
+            let sequence = initSeq(parseRes);
+            sequence.forEach((event, i) => {
+                setTimeout(() => {
+                    if (!Array.isArray(event)) dispatch(event)
+                    else {
+                        event.forEach((e) => { dispatch(e) })
+                    }
+                }, i * config.animationSpeed)
+            })
+        } else {
+            message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
+        }
+    }
+
     /** 随机生成数组 */
     const handleRandom = () => {
-        dispatch({ type: ActionTypes.Random });
-        setTimeout(() => {
-            dispatch({ type: ActionTypes.RandomDone })
-        }, config.animationSpeed);
+        let sequence = initSeq(randomArr(randomNum(config.geoNumRange), config.geoValueRange));
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                if (!Array.isArray(event)) dispatch(event)
+                else {
+                    event.forEach((e) => { dispatch(e) })
+                }
+            }, i * config.animationSpeed)
+        })
     }
 
     /** 处理冒泡排序 */
@@ -120,7 +141,6 @@ const Sort = (props: any) => {
         // console.log(value);
     }
 
-
     return (
         <div className='sort-warp'>
             <PageHeader
@@ -147,7 +167,7 @@ const Sort = (props: any) => {
                                 isLock={item.isLock}
                                 // 由于 cube 的重心决定其位置，那么高度变化会导致其底部覆盖掉下面的 text，所以要改变其重心位置
                                 position={[state.startPosX + (item.sortIndex * config.geoBaseDistance), ((item.value as number) * 0.2) / 2 + config.geoBasePosY, 0]}
-                                disappear={!state.randomDone || item.disappear}
+                                disappear={item.disappear}
                             />
                         ))
                     }
@@ -155,7 +175,7 @@ const Sort = (props: any) => {
                         state.values.map((_, index) => (
                             <Text
                                 key={index + '*'}
-                                fillOpacity={state.randomDone ? 1 : 0}
+                                fillOpacity={state.disappearAll ? 0 : 1}
                                 color='black'
                                 fontSize={0.5}
                                 position={[state.startPosX + (index * config.geoBaseDistance), -1 + config.geoBasePosY, 0]}
@@ -166,12 +186,14 @@ const Sort = (props: any) => {
                     }
                 </Scene3d>
                 <Console
-                    style={{ display: isSceneLoaded ? 'inline-block' : 'none' }}
+                    style={{ display: isSceneLoaded ? 'flex' : 'none' }}
                     onSliderChange={handleSliderChange}
                     onAdd={handleAddEle}
                     onDelete={handleDeleteEle}
                     indexRange={[0, 10]}
                     valueRange={[3, 35]}
+                    // spinning={true}
+                    onRender={handleRender}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

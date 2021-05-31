@@ -1,6 +1,7 @@
 import { ISortCube } from "./store";
 import { ActionTypes } from "../../types";
 import config from './config'
+import { randomArr, randomNum } from "../../utils";
 
 /** 初始化 cubes */
 export function initCubes(values: number[]): ISortCube[] {
@@ -19,16 +20,33 @@ export function getStartPosX(arrLen: number): number {
     return -(arrLen - 1) * config.geoBaseDistance / 2;
 }
 
+/** input输入的value解析为数组，如果输入的不合法则返回 undefined */
+export function parseValue(value: string) {
+    // 去掉前后括，然后按照逗号划分，再转换成数字数组
+    let parseRes = value.substring(1, value.length - 1).split(/[,，]/g).map(item => +item);
+    console.log(parseRes);
+
+    // 1. 格式不正确：不是类似 [x,xx,x] 这样的格式
+    // 2. 元素取值不能是小数 [1.2,3.2,3]
+    // 3. 元素不能为空 []
+
+    return undefined
+}
+
 /** 传入一组序列，判断其是否有序 */
 export function isSorted(values: number[]): boolean {
     return false;
 }
 
-/*
-    0 1 2 3 4 5 6 7 
-    0 1 2 3 x 4 5 6 7
-
-*/
+/** 返回初始化数组的细节 */
+export function initSeq(values: number[]) {
+    const seq = [];
+    seq.push({ type: ActionTypes.Disappear })
+    seq.push([
+        { type: ActionTypes.Generate, payload: values },
+        { type: ActionTypes.Appear }])
+    return seq;
+}
 
 /** 返回向数组插值时，数组位移的细节 */
 export function addEleSeq(arr: number[], newEle: number, targetIndex: number) {
