@@ -72,6 +72,7 @@ export interface ISpherePageConfig extends IPageConfig {
 
 /** 3d几何体通用配置 */
 export interface IGeometryProps {
+    ref?: any;
     /** 构造参数 */
     args?: any;
     /** 取值 */
@@ -139,6 +140,7 @@ export enum ActionTypes {
     Dequeue,
     DequeueDone,
     Disappear,
+    Appear,
     HeadInsert,
     TailInsert,
     ShowArrow,
@@ -146,7 +148,9 @@ export enum ActionTypes {
     MoveTop,
     StartPreorder,
     StartInOrder,
-    StartPostOrder
+    StartPostOrder,
+    Generate,
+    
 }
 
 export interface IColorConfig {

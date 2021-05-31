@@ -4,9 +4,7 @@ import { animated, config, useSpring } from "react-spring/three";
 import { IGeometryProps } from "../../types";
 import { defaultGeoColor } from "../../configs/page/defaultConfig";
 
-export interface ICube3dProps extends IGeometryProps {
-    ref?: any;
-}
+export interface ICube3dProps extends IGeometryProps { }
 
 const Cube3d: React.FC<ICube3dProps> = forwardRef<any, ICube3dProps>((props, ref) => {
     const {
