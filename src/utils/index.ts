@@ -6,11 +6,15 @@ export function randomNum(range: Range): number {
     return +(Math.random() * (range[1] - range[0]) + range[0]).toFixed(0);
 }
 
-/** 随机生成指定长度的数组 */
+/** 随机生成指定长度且无重复的数组 */
 export function randomArr(length: number, valueRange: Range): number[] {
-    const arr = [];
+    const arr: number[] = [];
     for (let i = 0; i < length; i++) {
-        arr.push(randomNum(valueRange));
+        let value = randomNum(valueRange);
+        while (arr.includes(value)) {
+            value = randomNum(valueRange);
+        }
+        arr.push(value);
     }
     return arr;
 }
