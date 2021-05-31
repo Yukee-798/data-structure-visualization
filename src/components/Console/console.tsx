@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { Menu, InputNumber, Button, Drawer, Slider, Radio } from "antd";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { Menu, InputNumber, Button, Drawer, Slider, Radio, Divider, Spin, Input } from "antd";
+import { LoadingOutlined } from '@ant-design/icons';
 import { MenuUnfoldOutlined } from "@ant-design/icons";
 import { useHover } from "../../utils";
 import { IBaseProps, Range } from "../../types";
@@ -39,6 +40,8 @@ interface IConsoleProps extends IBaseProps {
     addText?: string;
     /** 删除按钮的文字 */
     deleteText?: string;
+    /** 操作是否正在执行 */
+    spinning?: boolean;
     /** slider变化时的回调 */
     onSliderChange?: (value: number) => void;
     /** value改变时的回调 */
@@ -53,6 +56,10 @@ interface IConsoleProps extends IBaseProps {
     onDelete?: (index: number) => void;
     /** 点击搜索时的回调 */
     onSearch?: (value: number) => void;
+    /** 渲染器输入框变化时的回调 */
+    onRenderChange?: (value: string) => void;
+    /** 点击渲染按钮时的回调 */
+    onRender?: (value: string) => void;
 }
 
 const Console: React.FC<IConsoleProps> = (props) => {
@@ -75,6 +82,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
         isAddIndex,
         isDeleteIndex,
         isSearch,
+        spinning,
         onSliderChange,
         onAdd,
         onDelete,
@@ -82,21 +90,27 @@ const Console: React.FC<IConsoleProps> = (props) => {
         onIndexChange,
         onValueChange,
         onSearchValueChange,
+        onRenderChange,
+        onRender
     } = props;
 
-    const [hoverRef, isHover] = useHover();
+    const [hoverLeftRef, isLeftHover] = useHover();
+    const [hoverRenderRef, isRenderHover] = useHover();
+
     const [isUnfold, setIsUnfold] = useState(false);
     /** 控制台的添加删除元素的value和index */
     const [value, setValue] = useState(defaultValue || 8);
     const [index, setIndex] = useState(defaultIndex || 0);
-    const [searchValue, setSearchValue] = useState(defaultSearchValue || 32)
+    const [searchValue, setSearchValue] = useState(defaultSearchValue || 32);
+    const [renderValue, setRenderValue] = useState('');
 
     // 被激活的 radio
     const [radioActived, setRadioActived] = useState(1);
 
     const displayConRef = useRef<HTMLDivElement>();
-    const { opacity } = useSpring({
-        opacity: isHover ? 0.7 : 0.2,
+    const { leftOpacity, renderOpacity } = useSpring({
+        leftOpacity: isLeftHover ? 0.7 : 0.2,
+        renderOpacity: isRenderHover ? 0.7 : 0.2,
         config: config.gentle
     })
 
@@ -106,154 +120,189 @@ const Console: React.FC<IConsoleProps> = (props) => {
     }, [displayConRef.current?.scrollHeight])
 
     return (
-        <animated.div
-            className='console-warp'
-            ref={hoverRef as any}
-            style={{ ...style, opacity }}
-        >
-            <Menu
-                className='console'
-                mode="inline"
-                theme="dark"
-                inlineCollapsed={true}
-                selectable={false}
-                style={{ display: isUnfold ? 'none' : 'inline-block' }}
+        <>
+            <animated.div
+                className='console-left'
+                ref={hoverLeftRef as any}
+                style={{ ...style, opacity: leftOpacity }}
             >
-                <Item
-                    icon={<MenuUnfoldOutlined />}
-                    key='item0'
-                    onClick={() => {
-                        setIsUnfold(true);
-                    }}
+                {/* 右侧栏 */}
+                <Menu
+                    className='console'
+                    mode="inline"
+                    theme="dark"
+                    inlineCollapsed={true}
+                    selectable={false}
+                    style={{ display: isUnfold ? 'none' : 'inline-block' }}
                 >
-                    展开操作台
+                    <Item
+                        icon={<MenuUnfoldOutlined />}
+                        key='item0'
+                        onClick={() => {
+                            setIsUnfold(true);
+                        }}
+                    >
+                        展开操作台
                 </Item>
-                {children}
-            </Menu>
-            <Drawer
-                className='console-drawer'
-                title='操作台'
-                height={drawerHeight}
-                visible={isUnfold}
-                placement='bottom'
-                mask={false}
-                onClose={() => { setIsUnfold(false) }}
-            >
+                    {children}
+                </Menu>
+                {/*  */}
 
-                <div className='operation'>
-                    {showSilider &&
-                        <div className='slider-warp'>
-                            动画速度：
+                {/* 抽屉 */}
+                <Drawer
+                    className='console-drawer'
+                    title='操作台'
+                    height={drawerHeight}
+                    visible={isUnfold}
+                    placement='bottom'
+                    mask={false}
+                    onClose={() => { setIsUnfold(false) }}
+                >
+
+                    <div className='operation'>
+                        {showSilider &&
+                            <div className='slider-warp'>
+                                动画速度：
                             <Slider
-                                className='slider'
-                                defaultValue={32}
-                                onChange={(value: number) => onSliderChange?.(value)}
-                            />
-                        </div>
-                    }
-
-                    {/* 显示操作按钮 */}
-                    {operation}
-
-                    {/* 显示添加、删除 */}
-                    {
-                        isUpdate &&
-                        <div className='input-group'>
-                            <Radio.Group
-                                className='radio-group'
-                                defaultValue={1}
-                                onChange={(e) => setRadioActived(e.target.value)}
-                            >
-                                <Radio value={1}>{addText}</Radio>
-                                <Radio value={2}>{deleteText}</Radio>
-                                {isSearch && <Radio value={3}>查找</Radio>}
-                            </Radio.Group>
-
-                            <div className='label-group'>
-                                {
-                                    radioActived === 1 ?
-                                        (
-                                            <>
-                                                {
-                                                    isAddIndex &&
-                                                    // 序号input
-                                                    (<label>
-                                                        <span className='label-name'>序号:</span>
-                                                        <InputNumber
-                                                            // min={(indexRange as unknown as number[])?.[0]}
-                                                            // max={(indexRange as unknown as number[])?.[0]}
-                                                            defaultValue={defaultIndex}
-                                                            onChange={(index) => {
-                                                                setIndex(index as number)
-                                                                onIndexChange?.(index)
-                                                            }}
-                                                        />
-                                                    </label>)
-                                                }
-                                                {/* 数值input */}
-                                                <label>
-                                                    <span className='label-name'>数值:</span>
-                                                    <InputNumber
-                                                        // min={(valueRange as unknown as number[])?.[0]}
-                                                        // max={(valueRange as unknown as number[])?.[1]}
-                                                        defaultValue={defaultValue}
-                                                        onChange={(value) => {
-                                                            setValue(value as number)
-                                                            onValueChange?.(value)
-                                                        }}
-                                                    />
-                                                </label>
-                                            </>
-                                        ) : radioActived === 2 ?
-                                            (
-                                                isDeleteIndex &&
-                                                // 序号input
-                                                (<label>
-                                                    <span className='label-name'>序号:</span>
-                                                    <InputNumber
-                                                        // min={(indexRange as unknown as number[])?.[0]}
-                                                        // max={(indexRange as unknown as number[])?.[0]}
-                                                        defaultValue={defaultIndex}
-                                                        onChange={(index) => {
-                                                            setIndex(index as number)
-                                                            onIndexChange?.(index)
-                                                        }}
-                                                    />
-                                                </label>)
-                                            ) : isSearch &&
-                                            (
-                                                // 搜索input
-                                                (<label>
-                                                    <span className='label-name'>数值:</span>
-                                                    <InputNumber
-                                                        // min={(valueRange as unknown as number[])?.[0]}
-                                                        // max={(valueRange as unknown as number[])?.[0]}
-                                                        defaultValue={defaultSearchValue}
-                                                        onChange={(value) => {
-                                                            setSearchValue(value as number)
-                                                            onSearchValueChange?.(value)
-                                                        }}
-                                                    />
-                                                </label>)
-                                            )
-                                }
-
-                                {radioActived === 1 && <Button type='primary' onClick={() => onAdd?.(value, index)}>{addText}</Button>}
-                                {radioActived === 2 && <Button type='primary' onClick={() => onDelete?.(index)}>{deleteText}</Button>}
-                                {radioActived === 3 && <Button type='primary' onClick={() => onSearch?.(searchValue)}>查找</Button>}
-
+                                    className='slider'
+                                    defaultValue={32}
+                                    onChange={(value: number) => onSliderChange?.(value)}
+                                />
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
 
-                <div className='displayer'>
-                    <div className='content' ref={displayConRef as any}>
-                        {displayer}
+
+                        <Spin
+                            tip='操作执行中...'
+                            spinning={spinning}
+                            indicator={<LoadingOutlined style={{ fontSize: 40 }} spin />}
+                        >
+                            <div className='operation-main'>
+                                {/* 显示操作按钮 */}
+                                {operation}
+
+                                {/* 显示添加、删除 */}
+                                {
+                                    isUpdate &&
+                                    <div className='input-group'>
+                                        <Radio.Group
+                                            className='radio-group'
+                                            defaultValue={1}
+                                            onChange={(e) => setRadioActived(e.target.value)}
+                                        >
+                                            <Radio value={1}>{addText}</Radio>
+                                            <Radio value={2}>{deleteText}</Radio>
+                                            {isSearch && <Radio value={3}>查找</Radio>}
+                                        </Radio.Group>
+
+                                        <div className='label-group'>
+                                            {
+                                                radioActived === 1 ?
+                                                    (
+                                                        <>
+                                                            {
+                                                                isAddIndex &&
+                                                                // 序号input
+                                                                (<label>
+                                                                    <span className='label-name'>序号:</span>
+                                                                    <InputNumber
+                                                                        // min={(indexRange as unknown as number[])?.[0]}
+                                                                        // max={(indexRange as unknown as number[])?.[0]}
+                                                                        defaultValue={defaultIndex}
+                                                                        onChange={(index) => {
+                                                                            setIndex(index as number)
+                                                                            onIndexChange?.(index)
+                                                                        }}
+                                                                    />
+                                                                </label>)
+                                                            }
+                                                            {/* 数值input */}
+                                                            <label>
+                                                                <span className='label-name'>数值:</span>
+                                                                <InputNumber
+                                                                    // min={(valueRange as unknown as number[])?.[0]}
+                                                                    // max={(valueRange as unknown as number[])?.[1]}
+                                                                    defaultValue={defaultValue}
+                                                                    onChange={(value) => {
+                                                                        setValue(value as number)
+                                                                        onValueChange?.(value)
+                                                                    }}
+                                                                />
+                                                            </label>
+                                                        </>
+                                                    ) : radioActived === 2 ?
+                                                        (
+                                                            isDeleteIndex &&
+                                                            // 序号input
+                                                            (<label>
+                                                                <span className='label-name'>序号:</span>
+                                                                <InputNumber
+                                                                    // min={(indexRange as unknown as number[])?.[0]}
+                                                                    // max={(indexRange as unknown as number[])?.[0]}
+                                                                    defaultValue={defaultIndex}
+                                                                    onChange={(index) => {
+                                                                        setIndex(index as number)
+                                                                        onIndexChange?.(index)
+                                                                    }}
+                                                                />
+                                                            </label>)
+                                                        ) : isSearch &&
+                                                        (
+                                                            // 搜索input
+                                                            (<label>
+                                                                <span className='label-name'>数值:</span>
+                                                                <InputNumber
+                                                                    // min={(valueRange as unknown as number[])?.[0]}
+                                                                    // max={(valueRange as unknown as number[])?.[0]}
+                                                                    defaultValue={defaultSearchValue}
+                                                                    onChange={(value) => {
+                                                                        setSearchValue(value as number)
+                                                                        onSearchValueChange?.(value)
+                                                                    }}
+                                                                />
+                                                            </label>)
+                                                        )
+                                            }
+
+                                            {radioActived === 1 && <Button type='primary' onClick={() => onAdd?.(value, index)}>{addText}</Button>}
+                                            {radioActived === 2 && <Button type='primary' onClick={() => onDelete?.(index)}>{deleteText}</Button>}
+                                            {radioActived === 3 && <Button type='primary' onClick={() => onSearch?.(searchValue)}>查找</Button>}
+
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </Spin>
+
                     </div>
-                </div>
-            </Drawer>
-        </animated.div>
+
+                    <Divider
+                        className='divider'
+                        type='vertical'
+                    />
+
+                    <div className='displayer'>
+                        <div className='content' ref={displayConRef as any}>
+                            {displayer}
+                        </div>
+                    </div>
+                </Drawer>
+            </animated.div>
+            <animated.div
+                className='console-render'
+                ref={hoverRenderRef as any}
+                style={{ ...style ,opacity: renderOpacity }}
+            >
+                <Input
+                    bordered={false}
+                    onChange={(e) => {
+                        setRenderValue(e.target.value.trim());
+                        onRenderChange?.(e.target.value.trim());
+                    }}
+                />
+                <Button onClick={() => { onRender?.(renderValue) }}>渲染</Button>
+            </animated.div>
+        </>
     )
 }
 
@@ -270,6 +319,7 @@ Console.defaultProps = {
     isSearch: false,
     isAddIndex: true,
     isDeleteIndex: true,
+    spinning: false
 }
 
 export { Item, SubMenu };
