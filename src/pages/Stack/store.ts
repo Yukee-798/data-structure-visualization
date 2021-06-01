@@ -8,14 +8,14 @@ export interface IStackCube extends IGeometryProps { }
 
 export interface IState {
     cubes: IStackCube[];
-    randomDone: boolean;
+    disappearAll: boolean;
     opeDetails: { type: OpeDetailTypes, payload?: any }[]
     values: number[]
 }
 
 export const initState: IState = {
     cubes: [],
-    randomDone: true,
+    disappearAll: false,
     opeDetails: [],
     values: randomArr(randomNum(config.geoNumRange), config.geoValueRange)
 }
@@ -24,6 +24,45 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
 
     switch (type) {
+
+        case ActionTypes.Generate: {
+            return {
+                ...state,
+                values: payload,
+                cubes: initCubes(payload),
+                opeDetails: [{ type: OpeDetailTypes.Default, payload }]
+            }
+        }
+
+        case ActionTypes.Appear: {
+            if (!payload && payload !== 0) {
+                return {
+                    ...state,
+                    cubes: state.cubes.map((item) => ({ ...item, disappear: false })),
+                    disappearAll: false,
+                }
+            } else {
+                return {
+                    ...state
+                }
+            }
+        }
+
+        case ActionTypes.Disappear: {
+            if (!payload && payload !== 0) {
+                return {
+                    ...state,
+                    cubes: state.cubes.map((item) => ({ ...item, disappear: true })),
+                    disappearAll: true,
+                    opeDetails: []
+                }
+            } else {
+                return {
+                    ...state
+                }
+            }
+        }
+
         case ActionTypes.Active:
             {
                 const newCubes: IStackCube[] = state.cubes.map((item, i, arr) => ({
@@ -108,23 +147,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
                 }
             }
 
-        case ActionTypes.Random:
-            return {
-                ...state,
-                randomDone: false
-            }
 
-        case ActionTypes.RandomDone:
-            {
-                let newValues = randomArr(randomNum(config.geoNumRange), config.geoValueRange);
-                return {
-                    ...state,
-                    cubes: initCubes(newValues),
-                    randomDone: true,
-                    values: newValues,
-                    opeDetails: [{ type: OpeDetailTypes.Default, payload: newValues }]
-                }
-            }
 
         default:
             return state;

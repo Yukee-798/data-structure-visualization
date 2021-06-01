@@ -5,16 +5,16 @@ import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons';
 import Scene3d from '../../components/Scene3d/scene3d'
 import StackCube3d from './StackCube3d/stackCube3d';
 import { Text } from '@react-three/drei';
-import { ActionTypes, IReducer, OpeDetailTypes } from '../../types';
-import { getStartYPos, initCubes, popSeq, pushSeq } from './utils';
+import { IReducer, OpeDetailTypes } from '../../types';
+import { getStartYPos, initCubes, initSeq, parseValue, popSeq, pushSeq } from './utils';
 import Console, { Item } from '../../components/Console/console';
 import { IState, initState, reducer } from './store'
 import config from './config'
-import './stack.scss'
 import { root } from '../../configs/router/config';
+import { randomArr, randomNum } from '../../utils';
+
 
 const { Step } = Steps;
-
 
 const Stack = () => {
     const history = useHistory();
@@ -37,6 +37,24 @@ const Stack = () => {
         setIsSceneLoaded(true);
     }
 
+    /** 渲染器生成数组 */
+    const handleRender = (value: string) => {
+        const parseRes = parseValue(value);
+        if (parseRes) {
+            let sequence = initSeq(parseRes);
+            sequence.forEach((event, i) => {
+                setTimeout(() => {
+                    if (!Array.isArray(event)) dispatch(event)
+                    else {
+                        event.forEach((e) => { dispatch(e) })
+                    }
+                }, i * config.animationSpeed)
+            })
+        } else {
+            message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
+        }
+    }
+
     /** 处理弹栈 */
     const handlePop = () => {
         if (state.values.length > 0) {
@@ -54,7 +72,7 @@ const Stack = () => {
 
     /** 处理压栈 */
     const handlePush = (value: number) => {
-        if (state.values.length < config.geoNumRange[1]) {
+        if (state.values.length < config.geoNumRange[1] + 4) {
             const sequence = pushSeq(value);
             sequence.forEach((event, i) => {
                 setTimeout(() => {
@@ -62,17 +80,22 @@ const Stack = () => {
                 }, i * config.animationSpeed)
             })
         } else {
-            message.warning(`压栈失败，栈最大容量为${config.geoNumRange[1]}`)
+            message.warning(`压栈失败，栈最大容量为${config.geoNumRange[1] + 4}`)
         }
 
     }
 
     /** 处理随机元素 */
     const handleRandom = () => {
-        dispatch({ type: ActionTypes.Random });
-        setTimeout(() => {
-            dispatch({ type: ActionTypes.RandomDone })
-        }, config.animationSpeed)
+        let sequence = initSeq(randomArr(randomNum(config.geoNumRange), config.geoValueRange));
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                if (!Array.isArray(event)) dispatch(event)
+                else {
+                    event.forEach((e) => { dispatch(e) })
+                }
+            }, i * config.animationSpeed)
+        })
     }
 
     return (
@@ -95,10 +118,10 @@ const Stack = () => {
                                 value={item.value}
                                 position={[0, startPosY + (i * config.geoBaseDistance) + config.geoBasePosY, 0]}
                                 isActive={item.isActive}
-                                disappear={item.disappear || !state.randomDone}
+                                disappear={item.disappear}
 
                             />
-                            {(i === state.cubes.length - 1 && state.randomDone) ?
+                            {(i === state.cubes.length - 1 && !state.disappearAll) ?
                                 <Text
                                     fontSize={0.5}
                                     color='black'
@@ -115,6 +138,7 @@ const Stack = () => {
                     onAdd={handlePush}
                     onDelete={handlePop}
                     valueRange={[0, 90]}
+                    onRender={handleRender}
                     addText='压栈'
                     deleteText='弹栈'
                     isAddIndex={false}

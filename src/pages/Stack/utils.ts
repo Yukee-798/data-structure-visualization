@@ -10,6 +10,29 @@ export function initCubes(values: number[]): IStackCube[] {
     }))
 }
 
+/** 返回初始化数组的细节 */
+export function initSeq(values: number[]) {
+    const seq = [];
+    seq.push({ type: ActionTypes.Disappear })
+    seq.push([
+        { type: ActionTypes.Generate, payload: values },
+        { type: ActionTypes.Appear }])
+    return seq;
+}
+
+/** input输入的value解析为数组，如果输入的不合法则返回 undefined */
+export function parseValue(value: string) {
+    // 去掉前后括，然后按照逗号划分，再转换成数字数组
+    let parseRes = value.substring(1, value.length - 1).split(/[,，]/g).map(item => +item);
+    // console.log(parseRes);
+
+    // 1. 格式不正确：不是类似 [x,xx,x] 这样的格式
+    // 2. 元素取值不能是小数 [1.2,3.2,3]
+    // 3. 元素不能为空 []
+
+    return parseRes;
+}
+
 /** 返回压栈细节 */
 export function pushSeq(value: number) {
     let seq = [];
