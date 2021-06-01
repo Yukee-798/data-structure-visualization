@@ -2,7 +2,7 @@ import Home from '../../pages/Home/home'
 import Sort from '../../pages/Sort/sort'
 // import AVLTree from '../../pages/AVLTree/avlTree'
 // import Graph from '../../pages/Graph/graph'
-// import BinaryHeap from '../../pages/BinaryHeap/binaryHeap'
+import BinaryHeap from '../../pages/BinaryHeap/binaryHeap'
 // import BTree from '../../pages/BTree/bTree'
 import Queue from '../../pages/Queue/queue'
 import Stack from '../../pages/Stack/stack'
@@ -11,6 +11,8 @@ import Stack from '../../pages/Stack/stack'
 // import RedBlackTree from '../../pages/RedBlackTree/redBlackTree'
 // import BPlusTree from '../../pages/BPlusTree/bPlusTree'
 import BinarySearchTree from '../../pages/BinarySearchTree/binarySearchTree'
+import HashTable from '../../pages/HashTable/hashTable'
+import Graph from '../../pages/Graph/graph'
 
 
 export const root = '/data-structure-visualization';
@@ -24,10 +26,10 @@ const routers = [
         path: root + "/sort",
         page: Sort
     },
-    // {
-    //     path: root + "/linkedList",
-    //     page: LinkedList
-    // },
+    {
+        path: root + "/graph",
+        page: Graph
+    },
     {
         path: root + "/queue",
         page: Queue
@@ -40,14 +42,14 @@ const routers = [
         path: root + "/binarySearchTree",
         page: BinarySearchTree
     },
-    // {
-    //     path: root + "/binaryHeap",
-    //     page: BinaryHeap
-    // },
-    // {
-    //     path: root + "/hashTable",
-    //     page: HashTable
-    // },
+    {
+        path: root + "/binaryHeap",
+        page: BinaryHeap
+    },
+    {
+        path: root + "/hashTable",
+        page: HashTable
+    },
     // {
     //     path: root + "/avlTree",
     //     page: AVLTree
@@ -65,10 +67,7 @@ const routers = [
     //     path: root + "/bPlusTree",
     //     page: BPlusTree
     // },
-    // {
-    //     path: root + "/graph",
-    //     page: Graph
-    // },
+
 ];
 
 

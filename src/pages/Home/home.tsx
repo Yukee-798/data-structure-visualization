@@ -87,20 +87,20 @@ const Home = () => {
                     {row.map((col, j) => (
                         <Col xs={12} sm={12} md={6} lg={6} xl={6} key={i + '&' + j}>
                             {/* <Link to={root + '/sort/023012423'}> */}
-                                <animated.div
-                                    className='homeItem-warp'
-                                    style={{ width: size, height: size, opacity }}
-                                    onClick={() => { setOpen(true) }}
-                                >
+                            <animated.div
+                                className='homeItem-warp'
+                                style={{ width: size, height: size, opacity }}
+                                onClick={() => setOpen(true)}
+                            >
 
-                                    <HomeItem
-                                        src={col.src}
-                                        tags={col.tags}
-                                        title={col.title}
-                                        type={col.type}
-                                        onClick={handleClick}
-                                    />
-                                </animated.div>
+                                <HomeItem
+                                    src={col.src}
+                                    tags={col.tags}
+                                    title={col.title}
+                                    type={col.type}
+                                    onClick={handleClick}
+                                />
+                            </animated.div>
                             {/* </Link> */}
                         </Col>
                     ))}
