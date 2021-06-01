@@ -6,25 +6,24 @@ import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons'
 import Console, { Item, SubMenu } from '../../components/Console/console'
 import Scene3d from '../../components/Scene3d/scene3d'
 import { ActionTypes, IReducer, OpeDetailTypes } from '../../types'
-import { randomBST, getLChildValue, getRChildValue, initSpheres, inOrderSeq, postOrderSeq, preOrderSeq, searchSeq, addNodeSeq, treeToString, getDeepthByNodeIndex, deleteNodeSeq } from './utils'
 import { cdnOfNodes } from './config'
 import { initState, IState, reducer } from './store'
 import BSTSphere3d from './BSTSphere3d/bstSphere3d'
-import config from './config'
-import './binarySearchTree.scss'
 import { root } from '../../configs/router/config'
+import { addNodeSeq, deleteNodeSeq, randomBST, searchSeq } from './utils'
+import { getDeepthByNodeIndex, getLChildValue, getRChildValue, initSeq, initSpheres, inOrderSeq, parseValue, postOrderSeq, preOrderSeq, treeToString } from '../../utils/binaryTree'
+import config from './config'
+
 
 const { Step } = Steps;
 
 const BinarySearchTree = () => {
     const history = useHistory();
     const [state, dispatch] = useReducer<IReducer<IState>, IState>(reducer, initState, (state): IState => {
-        const initBinaryTree = randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth);
         return {
             ...state,
-            binaryTree: initBinaryTree,
-            spheres: initSpheres(initBinaryTree),
-            opeDetails: [{ type: OpeDetailTypes.Default, payload: treeToString(initBinaryTree) }]
+            spheres: initSpheres(initState.binaryTree),
+            opeDetails: [{ type: OpeDetailTypes.Default, payload: treeToString(initState.binaryTree) }]
         }
     });
 
@@ -36,6 +35,26 @@ const BinarySearchTree = () => {
         setIsSceneLoaded(true);
     }
 
+    /** 渲染input输入的数据 */
+    const handleRender = (value: string) => {
+        const parseRes = parseValue(value);
+        console.log(parseRes);
+        if (parseRes) {
+            let sequence = initSeq(parseRes);
+            sequence.forEach((event, i) => {
+                setTimeout(() => {
+                    if (!Array.isArray(event)) dispatch(event)
+                    else {
+                        event.forEach((e) => { dispatch(e) })
+                    }
+                }, i * config.animationSpeed)
+            })
+        } else {
+            message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
+        }
+    }
+
+    // [32,27,56,n,n,54,n,n,n,n,n,n,55]
     /** 添加元素 */
     const handleAddEle = (value: number, _: unknown) => {
         dispatch({ type: ActionTypes.UnLock })
@@ -97,12 +116,17 @@ const BinarySearchTree = () => {
         }
     }
 
-    /** 随机生成数据 */
+    /** 处理随机元素 */
     const handleRandom = () => {
-        dispatch({ type: ActionTypes.Random });
-        setTimeout(() => {
-            dispatch({ type: ActionTypes.RandomDone })
-        }, config.animationSpeed);
+        let sequence = initSeq(randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth));
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                if (!Array.isArray(event)) dispatch(event)
+                else {
+                    event.forEach((e) => { dispatch(e) })
+                }
+            }, i * config.animationSpeed)
+        })
     }
 
     /** 前序遍历 */
@@ -200,14 +224,14 @@ const BinarySearchTree = () => {
                                         activeLeft={sphere.activeLeft}
                                         activeRight={sphere.activeRight}
                                         isLock={sphere.isLock}
-                                        disappear={sphere.disappear || !state.randomDone}
+                                        disappear={sphere.disappear}
                                         lChildPos={hasLChild && lChildPos}
                                         rChildPos={hasRChild && rChildPos}
                                     />
                                     <Text
                                         position={[cdnOfNodes[i][0], cdnOfNodes[i][1] - 1.2, cdnOfNodes[i][2]]}
                                         fontSize={0.4}
-                                        fillOpacity={!sphere.disappear && state.randomDone ? 1 : 0}
+                                        fillOpacity={!sphere.disappear && !state.disappearAll ? 1 : 0}
                                         color='black'
                                     >
                                         {i}
@@ -226,6 +250,7 @@ const BinarySearchTree = () => {
                     onAdd={handleAddEle}
                     onDelete={handleDeleteEle}
                     onSearch={handleSearch}
+                    onRender={handleRender}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>
