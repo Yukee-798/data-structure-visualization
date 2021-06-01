@@ -51,7 +51,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
         }
 
         case ActionTypes.Appear: {
-            if (!payload) {
+            if (!payload && payload !== 0) {
                 return {
                     ...state,
                     cubes: state.cubes.map((item) => ({ ...item, disappear: false })),
@@ -65,12 +65,11 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
         }
 
         case ActionTypes.Disappear: {
-            if (!payload) {
+            if (!payload && payload !== 0) {
                 return {
                     ...state,
                     cubes: state.cubes.map((item) => ({ ...item, disappear: true })),
-                    disappearAll: true,
-                    opeDetails: []
+                    disappearAll: true
                 }
             } else {
                 return {

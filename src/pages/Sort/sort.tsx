@@ -11,7 +11,6 @@ import { OpeDetailTypes, IReducer } from '../../types';
 import { initState, IState, reducer } from './store';
 import config from './config'
 import { root } from '../../configs/router/config';
-import './sort.scss'
 import { randomArr, randomNum } from '../../utils';
 
 const { Step } = Steps;

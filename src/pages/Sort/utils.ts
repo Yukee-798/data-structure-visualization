@@ -1,7 +1,6 @@
 import { ISortCube } from "./store";
 import { ActionTypes } from "../../types";
 import config from './config'
-import { randomArr, randomNum } from "../../utils";
 
 /** 初始化 cubes */
 export function initCubes(values: number[]): ISortCube[] {
@@ -24,13 +23,13 @@ export function getStartPosX(arrLen: number): number {
 export function parseValue(value: string) {
     // 去掉前后括，然后按照逗号划分，再转换成数字数组
     let parseRes = value.substring(1, value.length - 1).split(/[,，]/g).map(item => +item);
-    console.log(parseRes);
+    // console.log(parseRes);
 
     // 1. 格式不正确：不是类似 [x,xx,x] 这样的格式
     // 2. 元素取值不能是小数 [1.2,3.2,3]
     // 3. 元素不能为空 []
 
-    return undefined
+    return parseRes;
 }
 
 /** 传入一组序列，判断其是否有序 */
