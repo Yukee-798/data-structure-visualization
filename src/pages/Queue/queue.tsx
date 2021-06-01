@@ -5,16 +5,16 @@ import { Text } from '@react-three/drei';
 import Console, { Item } from '../../components/Console/console';
 import Scene3d from '../../components/Scene3d/scene3d';
 import QueueCube3d from './QueueCube3d/queueCube3d'
-import { ActionTypes, IReducer, OpeDetailTypes } from '../../types';
+import { IReducer, OpeDetailTypes } from '../../types';
 import {
     BarChartOutlined,
     DotChartOutlined
 } from '@ant-design/icons';
-import { dequeueSeq, enqueueSeq, getStartPosX, initCubes } from './utils';
+import { dequeueSeq, enqueueSeq, getStartPosX, initCubes, initSeq } from './utils';
 import { initState, IState, reducer } from './store';
 import config from './config'
-import './queue.scss'
 import { root } from '../../configs/router/config';
+import { randomArr, randomNum } from '../../utils';
 
 const { Step } = Steps;
 
@@ -40,17 +40,22 @@ const Queue = () => {
         setIsSceneLoaded(true);
     }
 
-    /** 随机生成队列 */
+    /** 处理随机元素 */
     const handleRandom = () => {
-        dispatch({ type: ActionTypes.Random });
-        setTimeout(() => {
-            dispatch({ type: ActionTypes.RandomDone })
-        }, 400);
+        let sequence = initSeq(randomArr(randomNum(config.geoNumRange), config.geoValueRange));
+        sequence.forEach((event, i) => {
+            setTimeout(() => {
+                if (!Array.isArray(event)) dispatch(event)
+                else {
+                    event.forEach((e) => { dispatch(e) })
+                }
+            }, i * config.animationSpeed)
+        })
     }
 
     /** 处理入队 */
     const handleEnqueue = (value: number) => {
-        if (state.values.length < config.geoNumRange[1]) {
+        if (state.values.length < config.geoNumRange[1] + 5) {
             const sequence = enqueueSeq(value, state.values.length);
             sequence.forEach((event, i) => {
                 setTimeout(() => {
@@ -58,7 +63,7 @@ const Queue = () => {
                 }, i * config.animationSpeed)
             })
         } else {
-            message.warning(`入队失败，队列最大容量为${config.geoNumRange[1]}`)
+            message.warning(`入队失败，队列最大容量为${config.geoNumRange[1] + 5}`)
         }
     }
 
@@ -87,7 +92,7 @@ const Queue = () => {
             />
 
             <div className='main'>
-                <Scene3d 
+                <Scene3d
                     onLoaded={handleSceneLoaded}
                     cameraPosZ={config.cameraPosZ}
                 >
@@ -97,11 +102,11 @@ const Queue = () => {
                                 value={item.value}
                                 position={[startPosX + (i * config.geoBaseDistance), config.geoBasePosY, 0]}
                                 isActive={item.isActive}
-                                disappear={!state.randomDone || item.disappear}
+                                disappear={item.disappear}
                             />
                             {i === 0 || i === arr.length - 1 ?
                                 <Text
-                                    fillOpacity={state.randomDone ? 1 : 0}
+                                    fillOpacity={!state.disappearAll ? 1 : 0}
                                     color='black'
                                     fontSize={0.5}
                                     position={[startPosX + (i * config.geoBaseDistance), config.geoBasePosY - 1, 0]}

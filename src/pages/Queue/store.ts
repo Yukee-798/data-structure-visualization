@@ -11,15 +11,16 @@ export interface IQueueCube extends IGeometryProps {
 export interface IState {
     values: number[];
     cubes: IQueueCube[];
-    randomDone: boolean;
+    disappearAll: boolean;
     opeDetails: { type: OpeDetailTypes, payload?: any }[]
+
 }
 
 
 
 export const initState: IState = {
-    randomDone: true,
     values: randomArr(randomNum(config.geoNumRange), config.geoValueRange),
+    disappearAll: false,
     cubes: [],
     opeDetails: []
 }
@@ -28,33 +29,39 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
 
     switch (type) {
-        case ActionTypes.Active:
-            {
-                const newCubes: IQueueCube[] = state.cubes.map((item, i) => ({
-                    ...item,
-                    isActive: i === payload
-                }))
 
+        case ActionTypes.Generate: {
+            return {
+                ...state,
+                values: payload,
+                cubes: initCubes(payload),
+                opeDetails: [{ type: OpeDetailTypes.Default, payload }]
+            }
+        }
+
+        case ActionTypes.Appear: {
+            if (!payload && payload !== 0) {
                 return {
                     ...state,
-                    cubes: newCubes
+                    cubes: state.cubes.map((item) => ({ ...item, disappear: false })),
+                    disappearAll: false,
+                }
+            } else {
+                return {
+                    ...state
                 }
             }
-        case ActionTypes.Deactive:
-            {
-                const newCubes: IQueueCube[] = state.cubes.map((item, i) => ({
-                    ...item,
-                    isActive: i === payload ? false : item.isActive
-                }))
+        }
 
+        case ActionTypes.Disappear: {
+            if (!payload && payload !== 0) {
                 return {
                     ...state,
-                    cubes: newCubes
+                    cubes: state.cubes.map((item) => ({ ...item, disappear: true })),
+                    disappearAll: true,
+                    opeDetails: []
                 }
-            }
-
-        case ActionTypes.Disappear:
-            {
+            } else {
                 const newCubes: IQueueCube[] = state.cubes.map((item, i) => ({
                     ...item,
                     disappear: i === payload
@@ -65,71 +72,75 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
                     cubes: newCubes
                 }
             }
+        }
 
-        case ActionTypes.Enqueue:
-            {
-                const newCubes = [...state.cubes]
-                const newCube: IQueueCube = {
-                    value: payload,
-                    isActive: true,
-                    key: uuidv4()
-                };
-                const newValues = [...state.values]
-                newCubes.push(newCube);
-                newValues.push(payload);
+        case ActionTypes.Active: {
+            const newCubes: IQueueCube[] = state.cubes.map((item, i) => ({
+                ...item,
+                isActive: i === payload
+            }))
 
-                return {
-                    ...state,
-                    cubes: newCubes,
-                    values: newValues,
-                    opeDetails: [...state.opeDetails, {
-                        type: OpeDetailTypes.Enqueue,
-                        payload: {
-                            enqueueValue: payload,
-                            curValues: newValues
-                        }
-                    }]
-                }
-            }
-
-        case ActionTypes.Dequeue:
-            {
-                const newCubes: IQueueCube[] = [...state.cubes];
-                newCubes.shift();
-                const newValues = [...state.values];
-                const dequeueValue = newValues.shift();
-
-                return {
-                    ...state,
-                    opeDetails: [...state.opeDetails, {
-                        type: OpeDetailTypes.Dequeue,
-                        payload: {
-                            dequeueValue,
-                            curValues: newValues
-                        }
-                    }],
-                    values: newValues,
-                    cubes: newCubes
-                }
-            }
-
-        case ActionTypes.RandomDone:
-            {
-                let newValues = randomArr(randomNum(config.geoNumRange), config.geoValueRange);
-                return {
-                    ...state,
-                    cubes: initCubes(newValues),
-                    randomDone: true,
-                    values: newValues,
-                    opeDetails: [{ type: OpeDetailTypes.Default, payload: newValues }]
-                }
-            }
-
-        case ActionTypes.Random:
             return {
                 ...state,
-                randomDone: false
+                cubes: newCubes
+            }
+        }
+        case ActionTypes.Deactive: {
+            const newCubes: IQueueCube[] = state.cubes.map((item, i) => ({
+                ...item,
+                isActive: i === payload ? false : item.isActive
+            }))
+
+            return {
+                ...state,
+                cubes: newCubes
+            }
+        }
+
+        case ActionTypes.Enqueue: {
+            const newCubes = [...state.cubes]
+            const newCube: IQueueCube = {
+                value: payload,
+                isActive: true,
+                key: uuidv4()
             };
+            const newValues = [...state.values]
+            newCubes.push(newCube);
+            newValues.push(payload);
+
+            return {
+                ...state,
+                cubes: newCubes,
+                values: newValues,
+                opeDetails: [...state.opeDetails, {
+                    type: OpeDetailTypes.Enqueue,
+                    payload: {
+                        enqueueValue: payload,
+                        curValues: newValues
+                    }
+                }]
+            }
+        }
+
+        case ActionTypes.Dequeue: {
+            const newCubes: IQueueCube[] = [...state.cubes];
+            newCubes.shift();
+            const newValues = [...state.values];
+            const dequeueValue = newValues.shift();
+
+            return {
+                ...state,
+                opeDetails: [...state.opeDetails, {
+                    type: OpeDetailTypes.Dequeue,
+                    payload: {
+                        dequeueValue,
+                        curValues: newValues
+                    }
+                }],
+                values: newValues,
+                cubes: newCubes
+            }
+        }
 
         default:
             return state;

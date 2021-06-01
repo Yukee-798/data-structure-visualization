@@ -17,6 +17,16 @@ export function initCubes(values: number[]): IQueueCube[] {
     }))
 }
 
+/** 返回初始化数组的细节 */
+export function initSeq(values: number[]) {
+    const seq = [];
+    seq.push({ type: ActionTypes.Disappear })
+    seq.push([
+        { type: ActionTypes.Generate, payload: values },
+        { type: ActionTypes.Appear }])
+    return seq;
+}
+
 /** 返回入队细节 */
 export function enqueueSeq(value: number, arrLen: number) {
     let seq = [];
