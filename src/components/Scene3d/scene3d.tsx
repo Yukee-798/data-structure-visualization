@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import { Spin } from 'antd';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useEffect, useRef, useState } from 'react';
-import { Environment, Html, OrbitControls, PerspectiveCamera, Reflector, TransformControls, useProgress } from "@react-three/drei";
+import { Suspense, useEffect, useRef } from 'react';
+import { Environment, Html, OrbitControls, PerspectiveCamera, useProgress } from "@react-three/drei";
 import './scene3d.scss'
 
 function SceneLoader(props: any) {
@@ -17,7 +17,6 @@ function SceneLoader(props: any) {
     return (
         <Html center style={{ marginTop: '200px' }}>
             <Spin size='large' />
-            {/* {progress} % loaded */}
         </Html>
     );
 }
@@ -43,7 +42,7 @@ const Scene3d: React.FC<IScene3dProps> = (props) => {
     // })
 
 
-    const [cameraPos, setCameraPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 5));
+    // const [cameraPos, setCameraPos] = useState<THREE.Vector3>(new THREE.Vector3(0, 0, 5));
 
     // const upDate = () => {
     //     // console.log(123);

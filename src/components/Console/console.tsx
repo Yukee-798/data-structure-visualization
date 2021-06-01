@@ -300,7 +300,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                         onRenderChange?.(e.target.value.trim());
                     }}
                 />
-                <Button onClick={() => { onRender?.(renderValue) }}>渲染</Button>
+                <Button type='primary' onClick={() => { onRender?.(renderValue) }}>渲染</Button>
             </animated.div>
         </>
     )
