@@ -6,7 +6,7 @@ import config, { cdnOfNodes } from '../config'
 
 export interface IBinaryHeapSphere3dProps extends ISphere3dProps { }
 
-const BSTSphere3d: React.FC<IBinaryHeapSphere3dProps> = (props) => {
+const BinaryHeapSphere3d: React.FC<IBinaryHeapSphere3dProps> = (props) => {
 
     const {
         lChildPos,
@@ -107,4 +107,4 @@ const BSTSphere3d: React.FC<IBinaryHeapSphere3dProps> = (props) => {
     )
 }
 
-export default BSTSphere3d;
+export default BinaryHeapSphere3d;
