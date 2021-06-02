@@ -13,7 +13,7 @@ export function initCubes(values: number[]): IStackCube[] {
 /** 返回初始化数组的细节 */
 export function initSeq(values: number[]) {
     const seq = [];
-    seq.push({ type: ActionTypes.Disappear })
+    seq.push([{ type: ActionTypes.Disappear }])
     seq.push([
         { type: ActionTypes.Generate, payload: values },
         { type: ActionTypes.Appear }])
@@ -36,16 +36,16 @@ export function parseValue(value: string) {
 /** 返回压栈细节 */
 export function pushSeq(value: number) {
     let seq = [];
-    seq.push({ type: ActionTypes.Push, payload: value })
-    seq.push({ type: ActionTypes.Deactive });
+    seq.push([{ type: ActionTypes.Push, payload: value }])
+    seq.push([{ type: ActionTypes.Deactive }]);
     return seq;
 }
 /** 返回弹栈细节 */
 export function popSeq() {
     let seq = [];
-    seq.push({ type: ActionTypes.Active });
-    seq.push({ type: ActionTypes.Pop })
-    seq.push({ type: ActionTypes.PopDone })
+    seq.push([{ type: ActionTypes.Active }]);
+    seq.push([{ type: ActionTypes.Pop }])
+    seq.push([{ type: ActionTypes.PopDone }])
     return seq;
 }
 

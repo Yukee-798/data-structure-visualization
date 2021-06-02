@@ -5,7 +5,7 @@ import { Button, PageHeader, Steps, message } from 'antd'
 import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons'
 import Console, { Item, SubMenu } from '../../components/Console/console'
 import Scene3d from '../../components/Scene3d/scene3d'
-import { ActionTypes, IReducer, OpeDetailTypes } from '../../types'
+import { ActionTypes, IAction, IReducer, OpeDetailTypes, SeqType } from '../../types'
 import { cdnOfNodes } from './config'
 import { initState, IState, reducer } from './store'
 import BSTSphere3d from './BSTSphere3d/bstSphere3d'
@@ -13,7 +13,7 @@ import { root } from '../../configs/router/config'
 import { addNodeSeq, deleteNodeSeq, randomBST, searchSeq } from './utils'
 import { getDeepthByNodeIndex, getLChildValue, getRChildValue, initSeq, initSpheres, inOrderSeq, parseValue, postOrderSeq, preOrderSeq, treeToString } from '../../utils/binaryTree'
 import config from './config'
-
+import { excuteSeq } from '../../utils'
 
 const { Step } = Steps;
 
@@ -41,14 +41,7 @@ const BinarySearchTree = () => {
         console.log(parseRes);
         if (parseRes) {
             let sequence = initSeq(parseRes);
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    if (!Array.isArray(event)) dispatch(event)
-                    else {
-                        event.forEach((e) => { dispatch(e) })
-                    }
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
         } else {
             message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
         }
@@ -100,16 +93,12 @@ const BinarySearchTree = () => {
     const handleSearch = (value: number) => {
         dispatch({ type: ActionTypes.UnLock })
 
-        let sequence: any[] = [];
+        let sequence: SeqType = [];
         searchSeq(state.binaryTree, value, 0, sequence);
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch(event)
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
 
         // 如果最后一个操作的下标对应的值不等于value，则说明没有查找到目标元素
-        if (state.binaryTree[[...sequence].pop().payload] !== value) {
+        if (state.binaryTree[([...sequence].pop() as IAction[])[0].payload] !== value) {
             setTimeout(() => {
                 message.warning(`没有查找到取值为 ${value} 的元素`);
             }, (sequence.length) * config.animationSpeed)
@@ -119,70 +108,52 @@ const BinarySearchTree = () => {
     /** 处理随机元素 */
     const handleRandom = () => {
         let sequence = initSeq(randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth));
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                if (!Array.isArray(event)) dispatch(event)
-                else {
-                    event.forEach((e) => { dispatch(e) })
-                }
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     /** 前序遍历 */
     const handlePreorder = () => {
 
-        let sequence: any[] = [];
+        let sequence: SeqType = [];
         preOrderSeq(state.binaryTree, 0, sequence);
 
         // 获取遍历的结果
         const preOrderRes: number[] = [];
         sequence.forEach((event) => {
-            if (event.type === ActionTypes.Active) preOrderRes.push(state.binaryTree[event.index] as number)
+            if (event[0].type === ActionTypes.Active) preOrderRes.push(state.binaryTree[event[0].payload] as number)
         })
 
         dispatch({ type: ActionTypes.StartPreorder, payload: preOrderRes });
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.index })
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
 
     }
 
     /** 中序遍历 */
     const handleInorder = () => {
-        let sequence: any[] = [];
+        let sequence: SeqType = [];
         inOrderSeq(state.binaryTree, 0, sequence);
 
         // 获取遍历的结果
         const inOrderRes: number[] = [];
-        sequence.forEach((event) => {
-            if (event.type === ActionTypes.Active) inOrderRes.push(state.binaryTree[event.index] as number)
+        sequence.forEach((events) => {
+            if (events[0].type === ActionTypes.Active) inOrderRes.push(state.binaryTree[events[0].payload] as number)
         })
 
         dispatch({ type: ActionTypes.StartInOrder, payload: inOrderRes });
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.index })
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
+
     }
 
     /** 后序遍历 */
     const handlePostorder = () => {
-        let sequence: any[] = [];
+        let sequence: SeqType = [];
         postOrderSeq(state.binaryTree, 0, sequence);
         const postOrderRes: number[] = [];
-        sequence.forEach((event) => {
-            if (event.type === ActionTypes.Active) postOrderRes.push(state.binaryTree[event.index] as number)
+        sequence.forEach((events) => {
+            if (events[0].type === ActionTypes.Active) postOrderRes.push(state.binaryTree[events[0].payload] as number)
         })
         dispatch({ type: ActionTypes.StartPostOrder, payload: postOrderRes });
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.index })
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     return (
@@ -251,6 +222,7 @@ const BinarySearchTree = () => {
                     onDelete={handleDeleteEle}
                     onSearch={handleSearch}
                     onRender={handleRender}
+                    spinning={state.loading}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

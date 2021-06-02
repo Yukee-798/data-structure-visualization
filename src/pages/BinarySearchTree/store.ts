@@ -1,4 +1,4 @@
-import { ActionTypes, IReducer, OpeDetailTypes } from "../../types";
+import { ActionTypes, IBaseState, IReducer, OpeDetailTypes } from "../../types";
 import { formatBinaryTree, formatSpheres, getChildrenIndexes, getFatherIndex, initSpheres, judgeNode, treeToString } from "../../utils/binaryTree";
 import { IBSTSphere3dProps } from "./BSTSphere3d/bstSphere3d";
 import config, { cdnOfNodes } from "./config";
@@ -6,25 +6,35 @@ import { randomBST } from "./utils";
 
 export interface IBSTSphere3d extends IBSTSphere3dProps { }
 
-export interface IState {
+export interface IState extends IBaseState {
     // 表示二叉树当前真实的结构
     binaryTree: (number | null)[];
     // 用来表示每个 sphere 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
     spheres: IBSTSphere3d[];
-    disappearAll: boolean;
-    opeDetails: any[];
 }
 
 export const initState: IState = {
     binaryTree: randomBST(config.geoNumRange, config.geoValueRange, config.maxDeepth),
     spheres: [],
     opeDetails: [],
+    loading: false,
     disappearAll: false
 }
 
 export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
     switch (type) {
+        case ActionTypes.Loading:
+            return {
+                ...state,
+                loading: true
+            }
+
+        case ActionTypes.CancelLoading:
+            return {
+                ...state,
+                loading: false
+            }
 
         case ActionTypes.Generate: {
             return {

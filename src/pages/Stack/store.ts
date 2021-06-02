@@ -1,21 +1,21 @@
-import { ActionTypes, IGeometryProps, IReducer, OpeDetailTypes } from "../../types";
+import { ActionTypes, IBaseState, IReducer, OpeDetailTypes } from "../../types";
 import { randomArr, randomNum } from "../../utils";
 import { initCubes } from "./utils";
 import config from './config'
+import { ICube3dProps } from "../../components/Cube3d/cube3d";
 
-export interface IStackCube extends IGeometryProps { }
+export interface IStackCube extends ICube3dProps { }
 
 
-export interface IState {
+export interface IState extends IBaseState {
     cubes: IStackCube[];
-    disappearAll: boolean;
-    opeDetails: { type: OpeDetailTypes, payload?: any }[]
     values: number[]
 }
 
 export const initState: IState = {
     cubes: [],
     disappearAll: false,
+    loading: false,
     opeDetails: [],
     values: randomArr(randomNum(config.geoNumRange), config.geoValueRange)
 }
@@ -24,6 +24,18 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
 
     switch (type) {
+
+        case ActionTypes.Loading:
+            return {
+                ...state,
+                loading: true
+            }
+
+        case ActionTypes.CancelLoading:
+            return {
+                ...state,
+                loading: false
+            }
 
         case ActionTypes.Generate: {
             return {

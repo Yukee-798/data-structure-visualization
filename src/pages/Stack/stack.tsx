@@ -11,7 +11,7 @@ import Console, { Item } from '../../components/Console/console';
 import { IState, initState, reducer } from './store'
 import config from './config'
 import { root } from '../../configs/router/config';
-import { randomArr, randomNum } from '../../utils';
+import { excuteSeq, randomArr, randomNum } from '../../utils';
 
 
 const { Step } = Steps;
@@ -40,18 +40,11 @@ const Stack = () => {
     /** 渲染器生成数组 */
     const handleRender = (value: string) => {
         const parseRes = parseValue(value);
-        if (parseRes) {
+        if (Array.isArray(parseRes)) {
             let sequence = initSeq(parseRes);
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    if (!Array.isArray(event)) dispatch(event)
-                    else {
-                        event.forEach((e) => { dispatch(e) })
-                    }
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
         } else {
-            message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
+            message.warning(parseRes)
         }
     }
 
@@ -59,11 +52,7 @@ const Stack = () => {
     const handlePop = () => {
         if (state.values.length > 0) {
             const sequence = popSeq();
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    dispatch(event)
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
         } else {
             message.warning('弹栈失败，当前栈为空')
         }
@@ -74,11 +63,7 @@ const Stack = () => {
     const handlePush = (value: number) => {
         if (state.values.length < config.geoNumRange[1] + 4) {
             const sequence = pushSeq(value);
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    dispatch(event)
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
         } else {
             message.warning(`压栈失败，栈最大容量为${config.geoNumRange[1] + 4}`)
         }
@@ -88,14 +73,7 @@ const Stack = () => {
     /** 处理随机元素 */
     const handleRandom = () => {
         let sequence = initSeq(randomArr(randomNum(config.geoNumRange), config.geoValueRange));
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                if (!Array.isArray(event)) dispatch(event)
-                else {
-                    event.forEach((e) => { dispatch(e) })
-                }
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     return (
@@ -143,6 +121,7 @@ const Stack = () => {
                     deleteText='弹栈'
                     isAddIndex={false}
                     isDeleteIndex={false}
+                    spinning={state.loading}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

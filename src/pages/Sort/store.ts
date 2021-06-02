@@ -1,34 +1,29 @@
-import { ActionTypes, IGeometryProps, IReducer, OpeDetailTypes } from "../../types";
+import { ActionTypes, IBaseState, IReducer, OpeDetailTypes } from "../../types";
 import { randomArr, randomNum } from "../../utils";
 import { getStartPosX, initCubes } from "./utils";
 import config from './config'
+import { ICube3dProps } from "../../components/Cube3d/cube3d";
 
-export interface ISortCube extends IGeometryProps {
+export interface ISortCube extends ICube3dProps {
     // 记录 cube 将要经历或者已经历过的下标
     sortIndexes: number[];
     // 记录 cube 当前页面中正处于的下标
     sortIndex: number;
 }
 
-export interface IState {
+export interface IState extends IBaseState {
     // 用来表示数组中各值的实时位置
     values: number[];
     // 用来表示每个 cube 的属性，其元素位置无意义，其中 sortIndex 才是对应的 values 的下标
     cubes: ISortCube[];
-    // 是否排序完毕
-    sortDone: boolean;
-    // 全部消失
-    disappearAll: boolean;
     // 第一个cube的起始x坐标
     startPosX: number;
-    // 记录当前操作的细节
-    opeDetails: { type: OpeDetailTypes, payload?: any }[]
 }
 
 export const initState: IState = {
     values: randomArr(randomNum(config.geoNumRange), config.geoValueRange),
     cubes: [],
-    sortDone: true,
+    loading: false,
     disappearAll: false,
     startPosX: 0,
     opeDetails: []
@@ -39,6 +34,18 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
     const { type, payload } = action;
 
     switch (type) {
+
+        case ActionTypes.Loading:
+            return {
+                ...state,
+                loading: true
+            }
+
+        case ActionTypes.CancelLoading:
+            return {
+                ...state,
+                loading: false
+            }
 
         case ActionTypes.Generate: {
             return {
@@ -95,13 +102,22 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
                 )
             }
 
-        case ActionTypes.Lock:
-            return {
-                ...state,
-                cubes: state.cubes.map(
-                    (item) => payload?.includes(item.sortIndexes[item.sortIndexes.length - 1]) ? { ...item, isLock: true } : { ...item }
-                )
+        case ActionTypes.Lock: {
+            if (!payload && payload !== 0) {
+                return {
+                    ...state,
+                    cubes: state.cubes.map((item) => ({ ...item, isLock: true }))
+                }
+            } else {
+                return {
+                    ...state,
+                    cubes: state.cubes.map(
+                        (item) => payload?.includes(item.sortIndexes[item.sortIndexes.length - 1]) ? { ...item, isLock: true } : { ...item }
+                    )
+                }
             }
+        }
+
 
         case ActionTypes.UnLock:
             return {

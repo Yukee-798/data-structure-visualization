@@ -14,7 +14,7 @@ import { dequeueSeq, enqueueSeq, getStartPosX, initCubes, initSeq } from './util
 import { initState, IState, reducer } from './store';
 import config from './config'
 import { root } from '../../configs/router/config';
-import { randomArr, randomNum } from '../../utils';
+import { excuteSeq, randomArr, randomNum } from '../../utils';
 
 const { Step } = Steps;
 
@@ -43,25 +43,15 @@ const Queue = () => {
     /** 处理随机元素 */
     const handleRandom = () => {
         let sequence = initSeq(randomArr(randomNum(config.geoNumRange), config.geoValueRange));
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                if (!Array.isArray(event)) dispatch(event)
-                else {
-                    event.forEach((e) => { dispatch(e) })
-                }
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     /** 处理入队 */
     const handleEnqueue = (value: number) => {
         if (state.values.length < config.geoNumRange[1] + 5) {
             const sequence = enqueueSeq(value, state.values.length);
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    dispatch(event)
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
+
         } else {
             message.warning(`入队失败，队列最大容量为${config.geoNumRange[1] + 5}`)
         }
@@ -71,11 +61,8 @@ const Queue = () => {
     const handleDequeue = () => {
         if (state.values.length > 0) {
             const sequence = dequeueSeq();
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    dispatch(event)
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
+
         } else {
             message.warning('出队失败，当前队列为空')
         }
@@ -126,6 +113,7 @@ const Queue = () => {
                     deleteText='出队'
                     isAddIndex={false}
                     isDeleteIndex={false}
+                    spinning={state.loading}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>

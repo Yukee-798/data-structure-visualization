@@ -11,7 +11,7 @@ import { OpeDetailTypes, IReducer } from '../../types';
 import { initState, IState, reducer } from './store';
 import config from './config'
 import { root } from '../../configs/router/config';
-import { randomArr, randomNum } from '../../utils';
+import { excuteSeq, randomArr, randomNum } from '../../utils';
 
 const { Step } = Steps;
 
@@ -38,63 +38,37 @@ const Sort = () => {
     /** 渲染器生成数组 */
     const handleRender = (value: string) => {
         const parseRes = parseValue(value);
-        if (parseRes) {
+        if (Array.isArray(parseRes)) {
             let sequence = initSeq(parseRes);
-            sequence.forEach((event, i) => {
-                setTimeout(() => {
-                    if (!Array.isArray(event)) dispatch(event)
-                    else {
-                        event.forEach((e) => { dispatch(e) })
-                    }
-                }, i * config.animationSpeed)
-            })
+            excuteSeq(sequence, config.animationSpeed, dispatch);
         } else {
-            message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
+            message.warning(parseRes)
         }
     }
 
     /** 随机生成数组 */
     const handleRandom = () => {
         let sequence = initSeq(randomArr(randomNum(config.geoNumRange), config.geoValueRange));
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                if (!Array.isArray(event)) dispatch(event)
-                else {
-                    event.forEach((e) => { dispatch(e) })
-                }
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     /** 处理冒泡排序 */
     const handleBubbleSort = () => {
         let sequence = bubbleSortSeq(state.values);
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.indexes })
-            }, i * config.animationSpeed);
-        });
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     /** 处理选择排序 */
     const handleSelectSort = () => {
         let sequence = selectSortSeq(state.values);
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.indexes })
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     /** 处理快速排序 */
     const handleQuickSort = () => {
         let sequence: any[] = [];
         quickSortSeq([...state.values], 0, state.values.length - 1, sequence);
-        sequence.forEach((event, i) => {
-            setTimeout(() => {
-                dispatch({ type: event.type, payload: event.indexes })
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
     /** 处理添加元素 */
@@ -104,11 +78,7 @@ const Sort = () => {
                 message.warning('输入的序号不合法')
             } else {
                 const sequence = addEleSeq(state.values, value, index);
-                sequence.forEach((event, i) => {
-                    setTimeout(() => {
-                        dispatch({ type: event.type, payload: event.payload })
-                    }, i * config.animationSpeed)
-                })
+                excuteSeq(sequence, config.animationSpeed, dispatch);
             }
 
         } else {
@@ -124,11 +94,7 @@ const Sort = () => {
                 message.warning('输入的序号不合法')
             } else {
                 const sequence = deleteEleSeq(state.values, index);
-                sequence.forEach((event, i) => {
-                    setTimeout(() => {
-                        dispatch({ type: event.type, payload: event.payload })
-                    }, i * config.animationSpeed)
-                })
+                excuteSeq(sequence, config.animationSpeed, dispatch);
             }
         } else {
             message.warning('删除失败，当前数组为空')
@@ -191,7 +157,7 @@ const Sort = () => {
                     onDelete={handleDeleteEle}
                     indexRange={[0, 10]}
                     valueRange={[3, 35]}
-                    // spinning={true}
+                    spinning={state.loading}
                     onRender={handleRender}
                     operation={
                         <div className='btn-group'>

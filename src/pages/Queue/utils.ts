@@ -20,7 +20,7 @@ export function initCubes(values: number[]): IQueueCube[] {
 /** 返回初始化数组的细节 */
 export function initSeq(values: number[]) {
     const seq = [];
-    seq.push({ type: ActionTypes.Disappear })
+    seq.push([{ type: ActionTypes.Disappear }])
     seq.push([
         { type: ActionTypes.Generate, payload: values },
         { type: ActionTypes.Appear }])
@@ -31,8 +31,8 @@ export function initSeq(values: number[]) {
 export function enqueueSeq(value: number, arrLen: number) {
     let seq = [];
     // 入队时自动激活
-    seq.push({ type: ActionTypes.Enqueue, payload: value })
-    seq.push({ type: ActionTypes.Deactive, payload: arrLen });
+    seq.push([{ type: ActionTypes.Enqueue, payload: value }])
+    seq.push([{ type: ActionTypes.Deactive, payload: arrLen }]);
     return seq;
 }
 
@@ -40,7 +40,7 @@ export function enqueueSeq(value: number, arrLen: number) {
 export function dequeueSeq() {
     let seq = [];
     // seq.push({ type: ActionTypes.Active, payload: 0 });
-    seq.push({ type: ActionTypes.Disappear, payload: 0 });
-    seq.push({ type: ActionTypes.Dequeue })
+    seq.push([{ type: ActionTypes.Disappear, payload: 0 }]);
+    seq.push([{ type: ActionTypes.Dequeue }])
     return seq;
 }

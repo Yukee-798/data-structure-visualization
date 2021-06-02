@@ -65,27 +65,27 @@ export function addNodeSeq(bst: any[], indexOfRoot: number, nodeV: number, seq: 
 
     if (!bst[indexOfRoot]) return;
 
-    seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-    seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+    seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
+    seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
 
     // 判断传入结点的值和当前子树根结点的值的关系
     if (nodeV > bst[indexOfRoot]) {
         // 当前结点的右孩子不存在，则直接挂上去
         if (!getRChildValue(bst, indexOfRoot)) {
-            seq.push({
+            seq.push([{
                 type: ActionTypes.Add,
                 payload: { value: nodeV, index: indexOfRoot * 2 + 2 }
-            })
+            }])
         } else {
             addNodeSeq(bst, indexOfRoot * 2 + 2, nodeV, seq);
         }
     } else {
         // 当前结点的左孩子不存在，则直接挂上去
         if (!getLChildValue(bst, indexOfRoot)) {
-            seq.push({
+            seq.push([{
                 type: ActionTypes.Add,
                 payload: { value: nodeV, index: indexOfRoot * 2 + 1 }
-            })
+            }])
         } else {
             addNodeSeq(bst, indexOfRoot * 2 + 1, nodeV, seq);
         }
@@ -100,8 +100,8 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
 
     if (!bst[indexOfRoot]) return;
 
-    seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-    seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+    seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
+    seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
 
     if (judgeNode(bst, targetIndex) === 0) {
         // 如果删除的结点是叶子结点
@@ -111,10 +111,10 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
             // 则看其右子树
             if (getRChildValue(bst, indexOfRoot) === bst[targetIndex]) {
                 // 如果右结点等于nodeV则删除
-                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 })
-                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 });
-                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 })
-                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 })
+                seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 }])
+                seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 }]);
+                seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 }])
+                seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 }])
             } else {
                 // 否则递归搜索其右子树
                 deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 2, seq);
@@ -125,20 +125,20 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
             // 则看其左子树
             if (getLChildValue(bst, indexOfRoot) === bst[targetIndex]) {
                 // 如果左结点等于nodeV则删除
-                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 })
-                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 })
-                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 })
-                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 })
+                seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 }])
             } else {
                 // 否则递归搜索其右子树
                 deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 1, seq);
             }
         } else {
             // 如果当前结点等于nodeV则删除
-            seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Delete, payload: indexOfRoot })
+            seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot }])
         }
     } else if (judgeNode(bst, targetIndex) === 1) {
         // 如果删除的结点有一个子结点
@@ -148,17 +148,18 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
             // 则看其右子树
             if (getRChildValue(bst, indexOfRoot) === bst[targetIndex]) {
                 // 如果右结点等于nodeV则删除
-                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 })
-                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 });
-                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 });
-                seq.push({
+                seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 }])
+                seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 }]);
+                seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 }]);
+                seq.push([{
                     type: ActionTypes.Move,
+                    // 需要 move 的结点应该是多个 ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
                     payload: {
                         oldSortIndexes: getChildrenIndexes(bst, indexOfRoot * 2 + 2)[0] || getChildrenIndexes(bst, indexOfRoot * 2 + 2)[1],
                         targetIndexes: indexOfRoot * 2 + 2
                     }
-                })
-                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 })
+                }])
+                seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 }])
             } else {
                 // 否则递归搜索其右子树
                 deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 2, seq);
@@ -169,20 +170,20 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
             // 则看其左子树
             if (getLChildValue(bst, indexOfRoot) === bst[targetIndex]) {
                 // 如果左结点等于nodeV则删除
-                seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 })
-                seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 })
-                seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 })
-                seq.push({ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 })
+                seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 }])
             } else {
                 // 否则递归搜索其右子树
                 deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 1, seq);
             }
         } else {
             // 如果当前结点等于nodeV则删除
-            seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Disappear, payload: indexOfRoot })
-            seq.push({ type: ActionTypes.Delete, payload: indexOfRoot })
+            seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot }])
         }
     }
 }
@@ -195,8 +196,8 @@ export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: a
     // 如果结点不存在则直接返回
     if (!bst[indexOfRoot]) return;
 
-    seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-    seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
+    seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
+    seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
 
     // 判断传入结点的值和当前子树根结点的值的关系
     if (nodeV > bst[indexOfRoot]) {
@@ -204,9 +205,9 @@ export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: a
         // 则看其右子树
         if (getRChildValue(bst, indexOfRoot) === nodeV) {
             // 如果右结点等于nodeV则锁定
-            seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 })
-            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 })
-            seq.push({ type: ActionTypes.Lock, payload: indexOfRoot * 2 + 2 })
+            seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 }])
+            seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 }])
+            seq.push([{ type: ActionTypes.Lock, payload: indexOfRoot * 2 + 2 }])
         } else {
             // 否则递归搜索其右子树
             searchSeq(bst, nodeV, indexOfRoot * 2 + 2, seq);
@@ -217,18 +218,18 @@ export function searchSeq(bst: any[], nodeV: number, indexOfRoot: number, seq: a
         // 则看其左子树
         if (getLChildValue(bst, indexOfRoot) === nodeV) {
             // 如果左结点等于nodeV则锁定
-            seq.push({ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 })
-            seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 })
-            seq.push({ type: ActionTypes.Lock, payload: indexOfRoot * 2 + 1 })
+            seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 }])
+            seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 }])
+            seq.push([{ type: ActionTypes.Lock, payload: indexOfRoot * 2 + 1 }])
         } else {
             // 否则递归搜索其右子树
             searchSeq(bst, nodeV, indexOfRoot * 2 + 1, seq);
         }
     } else {
         // 如果当前结点等于nodeV则锁定
-        seq.push({ type: ActionTypes.Active, payload: indexOfRoot })
-        seq.push({ type: ActionTypes.Deactive, payload: indexOfRoot })
-        seq.push({ type: ActionTypes.Lock, payload: indexOfRoot })
+        seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
+        seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
+        seq.push([{ type: ActionTypes.Lock, payload: indexOfRoot }])
     }
 }
 
