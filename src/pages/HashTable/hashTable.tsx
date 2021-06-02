@@ -1,98 +1,28 @@
 import { useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
-import { Button, Drawer, Input, PageHeader } from 'antd';
+import { Button, Drawer, Input, PageHeader, Steps } from 'antd';
 import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import Scene3d from '../../components/Scene3d/scene3d';
-import { randomArr, randomNum } from '../../utils/index'
-import { ActionTypes, IGeometryProps } from '../../types';
 import {
     BarChartOutlined,
     DotChartOutlined,
     MinusSquareOutlined,
     PlusSquareOutlined,
 } from '@ant-design/icons';
-import './hashTable.scss'
+import { OpeDetailTypes } from '../../types';
+import config from './config'
 
-export interface IHashTableCube extends IGeometryProps {
-
-}
-type IReducer = (state: IState, action: IAction) => IState;
-
-interface IState {
-    // 是否随机化完毕
-    randomDone: boolean;
-}
-
-interface IAction {
-    type: ActionTypes;
-    payload?: any;
-}
-
-const initState: IState = {
-    randomDone: true,
-}
-
-function reducer(state: IState = initState, action: IAction): IState {
-
-    const { type, payload } = action;
-
-
-    switch (type) {
-        case ActionTypes.Active:
-            return {
-                ...state,
-            }
-
-        case ActionTypes.Deactive:
-            return {
-                ...state,
-            }
-
-        case ActionTypes.Lock:
-            return {
-                ...state,
-            }
-
-        case ActionTypes.UnLock:
-            return {
-                ...state,
-            }
-
-
-        // case ActionTypes.Add:
-
-        // case ActionTypes.Delete:
-
-        case ActionTypes.RandomDone:
-            {
-                return {
-                    ...state,
-                    randomDone: true
-                }
-            }
-
-        case ActionTypes.Random:
-            return {
-                ...state,
-                randomDone: false
-            };
-
-        // case ActionTypes.Search:
-
-        default:
-            return state;
-    }
-}
+const { Step } = Steps;
 
 const HashTable = () => {
 
     const history = useHistory();
-    const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
-        return {
-            ...state,
-        }
-    })
+    // const [state, dispatch] = useReducer<IReducer, IState>(reducer, initState, (state): IState => {
+    //     return {
+    //         ...state,
+    //     }
+    // })
 
     /** 控制抽屉是否展开 */
     const [isUnfold, setIsUnfold] = useState(false);
@@ -111,10 +41,7 @@ const HashTable = () => {
 
     /** 随机生成数据 */
     const handleRandom = () => {
-        dispatch({ type: ActionTypes.Random });
-        setTimeout(() => {
-            dispatch({ type: ActionTypes.RandomDone })
-        }, 400);
+
     }
     return (
         <div className='hashTable-warp'>
@@ -127,41 +54,91 @@ const HashTable = () => {
             />
 
             <div className='main'>
-                <Scene3d onLoaded={handleSceneLoaded}>
-
+                <Scene3d
+                    onLoaded={handleSceneLoaded}
+                    cameraPosZ={config.cameraPosZ}
+                >
+                    {/* {state.cubes.map((item, i, arr) => (
+                        <React.Fragment key={item.key}>
+                            <QueueCube3d
+                                value={item.value}
+                                position={[startPosX + (i * config.geoBaseDistance), config.geoBasePosY, 0]}
+                                isActive={item.isActive}
+                                disappear={item.disappear}
+                            />
+                            {i === 0 || i === arr.length - 1 ?
+                                <Text
+                                    fillOpacity={!state.disappearAll ? 1 : 0}
+                                    color='black'
+                                    fontSize={0.5}
+                                    position={[startPosX + (i * config.geoBaseDistance), config.geoBasePosY - 1, 0]}
+                                >
+                                    {i === 0 ? 'head' : 'tail'}
+                                </Text> : <></>
+                            }
+                        </React.Fragment>
+                    ))} */}
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
+                    showSilider={false}
+                    // onAdd={handleEnqueue}
+                    // onDelete={handleDequeue}
+                    addText='入队'
+                    deleteText='出队'
+                    isAddIndex={false}
+                    isDeleteIndex={false}
+                    // spinning={state.loading}
+                    operation={
+                        <div className='btn-group'>
+                            <div className='row'>
+                                <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
+                            </div>
+                        </div>
+                    }
+
+                    displayer={
+                        <Steps direction="vertical" size="small" /* current={state.opeDetails.length - 1} */>
+                            {/* {state.opeDetails.map((item, i) => {
+                                const { type, payload } = item;
+                                switch (type) {
+                                    case OpeDetailTypes.Enqueue:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`入队: v=${payload.enqueueValue}`}
+                                                description={`当前队列: [${payload.curValues.toString()}]`}
+                                            />
+                                        )
+
+                                    case OpeDetailTypes.Dequeue:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`出队: v=${payload.dequeueValue}`}
+                                                description={`当前队列: [${payload.curValues.toString()}]`}
+                                            />
+                                        )
+
+                                    default:
+                                        return (
+                                            <Step
+                                                key={'step' + i}
+                                                title={`当前队列: [${payload.toString()}]`}
+                                            />
+                                        )
+                                }
+                            })} */}
+                        </Steps>
+                    }
                 >
                     <Item
+                        key='item1'
                         icon={<DotChartOutlined />}
                         onClick={handleRandom}
                     >
                         随机生成
                     </Item>
-
-                    <SubMenu
-                        key='2'
-                        icon={<BarChartOutlined />}
-                        title='排序'
-                    >
-                        <Item>冒泡排序</Item>
-                        <Item>选择排序</Item>
-                        <Item>插入排序</Item>
-                        <Item>快速排序</Item>
-                        <Item>归并排序</Item>
-                    </SubMenu>
-
-                    <SubMenu
-                        icon={<PlusSquareOutlined />}
-                    >
-                        <Item>
-                            <Input />
-                            <Button>添加</Button>
-                        </Item>
-                    </SubMenu>
-
-                    <Item icon={<MinusSquareOutlined />}>删除</Item>
 
                 </Console>
             </div>
