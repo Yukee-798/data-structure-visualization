@@ -1,27 +1,28 @@
 {
   "files": {
-    "main.css": "/data-structure-visualization/static/css/main.5de6804b.chunk.css",
-    "main.js": "/data-structure-visualization/static/js/main.a6f1cbfb.chunk.js",
-    "main.js.map": "/data-structure-visualization/static/js/main.a6f1cbfb.chunk.js.map",
-    "runtime-main.js": "/data-structure-visualization/static/js/runtime-main.2dbef204.js",
-    "runtime-main.js.map": "/data-structure-visualization/static/js/runtime-main.2dbef204.js.map",
-    "static/css/2.7299e7d7.chunk.css": "/data-structure-visualization/static/css/2.7299e7d7.chunk.css",
-    "static/js/2.e7fe9a7a.chunk.js": "/data-structure-visualization/static/js/2.e7fe9a7a.chunk.js",
-    "static/js/2.e7fe9a7a.chunk.js.map": "/data-structure-visualization/static/js/2.e7fe9a7a.chunk.js.map",
+    "main.css": "/data-structure-visualization/static/css/main.aa00ac58.chunk.css",
+    "main.js": "/data-structure-visualization/static/js/main.2810fd49.chunk.js",
+    "main.js.map": "/data-structure-visualization/static/js/main.2810fd49.chunk.js.map",
+    "runtime-main.js": "/data-structure-visualization/static/js/runtime-main.17b9e68a.js",
+    "runtime-main.js.map": "/data-structure-visualization/static/js/runtime-main.17b9e68a.js.map",
+    "static/css/2.b529cb6c.chunk.css": "/data-structure-visualization/static/css/2.b529cb6c.chunk.css",
+    "static/js/2.6ddc044c.chunk.js": "/data-structure-visualization/static/js/2.6ddc044c.chunk.js",
+    "static/js/2.6ddc044c.chunk.js.map": "/data-structure-visualization/static/js/2.6ddc044c.chunk.js.map",
     "index.html": "/data-structure-visualization/index.html",
-    "static/css/2.7299e7d7.chunk.css.map": "/data-structure-visualization/static/css/2.7299e7d7.chunk.css.map",
-    "static/css/main.5de6804b.chunk.css.map": "/data-structure-visualization/static/css/main.5de6804b.chunk.css.map",
-    "static/js/2.e7fe9a7a.chunk.js.LICENSE.txt": "/data-structure-visualization/static/js/2.e7fe9a7a.chunk.js.LICENSE.txt",
+    "static/css/2.b529cb6c.chunk.css.map": "/data-structure-visualization/static/css/2.b529cb6c.chunk.css.map",
+    "static/css/main.aa00ac58.chunk.css.map": "/data-structure-visualization/static/css/main.aa00ac58.chunk.css.map",
+    "static/js/2.6ddc044c.chunk.js.LICENSE.txt": "/data-structure-visualization/static/js/2.6ddc044c.chunk.js.LICENSE.txt",
+    "static/media/84993086_p0.33708829.jpg": "/data-structure-visualization/static/media/84993086_p0.33708829.jpg",
     "static/media/BinarySearchTree.0ea5af15.jpg": "/data-structure-visualization/static/media/BinarySearchTree.0ea5af15.jpg",
     "static/media/Queue.5d3f80d2.jpg": "/data-structure-visualization/static/media/Queue.5d3f80d2.jpg",
     "static/media/Sort.af83f2f6.jpg": "/data-structure-visualization/static/media/Sort.af83f2f6.jpg",
     "static/media/Stack.83affc03.jpg": "/data-structure-visualization/static/media/Stack.83affc03.jpg"
   },
   "entrypoints": [
-    "static/js/runtime-main.2dbef204.js",
-    "static/css/2.7299e7d7.chunk.css",
-    "static/js/2.e7fe9a7a.chunk.js",
-    "static/css/main.5de6804b.chunk.css",
-    "static/js/main.a6f1cbfb.chunk.js"
+    "static/js/runtime-main.17b9e68a.js",
+    "static/css/2.b529cb6c.chunk.css",
+    "static/js/2.6ddc044c.chunk.js",
+    "static/css/main.aa00ac58.chunk.css",
+    "static/js/main.2810fd49.chunk.js"
   ]
 }
