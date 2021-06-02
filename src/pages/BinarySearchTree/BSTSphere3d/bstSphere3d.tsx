@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import Line3d from "../../../components/Line3d/line3d";
 import Sphere3d, { ISphere3dProps } from "../../../components/Sphere3d/sphere3d";
 import config, { cdnOfNodes } from '../config'
+import { defaultGeoColor } from "../../../configs/page/defaultConfig";
 
 export interface IBSTSphere3dProps extends ISphere3dProps { }
 
@@ -105,6 +106,13 @@ const BSTSphere3d: React.FC<IBSTSphere3dProps> = (props) => {
             }
         </>
     )
+}
+
+BSTSphere3d.defaultProps = {
+    colorConfig: {
+        ...defaultGeoColor,
+        lockColor: '#a69ad0'
+    }
 }
 
 export default BSTSphere3d;

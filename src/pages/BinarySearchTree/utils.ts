@@ -3,14 +3,14 @@ import { ActionTypes, Range } from '../../types';
 import { getChildrenIndexes, getDeepthByNodeIndex, getLChildValue, getRChildValue, judgeNode, setLChild, setRChild } from '../../utils/binaryTree';
 
 /** 为二叉搜索树添加结点 */
-export function addToBST(bst: any[], indexOfRoot: number, nodeV: number) {
+function addToBST(bst: (number | null)[], indexOfRoot: number, nodeV: number) {
     // 传入的 bst 必须有一个根结点
     if (bst.length === 0) throw new Error('the length of bst is 0');
 
-    if (!bst[indexOfRoot]) return;
+    if (!bst[indexOfRoot] && bst[indexOfRoot] !== 0) return;
 
     // 判断传入结点的值和当前子树根结点的值的关系
-    if (nodeV > bst[indexOfRoot]) {
+    if (nodeV > (bst as number[])[indexOfRoot]) {
         // 当前结点的右孩子不存在，则直接挂上去
         if (!getRChildValue(bst, indexOfRoot)) {
             setRChild(bst, indexOfRoot, nodeV);
@@ -36,7 +36,7 @@ export function randomBST(nodeNumsRange: Range, nodeValueRange: Range, maxDeepth
     // 初始化 cache
     let cache = new Array(500);
 
-    // 如果生成的二叉搜索树的层数大于了3则重新生成
+    // 如果生成的二叉搜索树的层数大于了maxDeepth则重新生成
     while (getDeepthByNodeIndex(cache.length - 1) > maxDeepth) {
         const arr = randomArr(randomNum(nodeNumsRange), nodeValueRange);
         cache.fill(null);

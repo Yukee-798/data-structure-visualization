@@ -78,12 +78,15 @@ const BinarySearchTree = () => {
             return message.warning('删除失败，输入的结点序号不存在')
         }
 
-        let sequence: any[] = [];
+        let sequence: SeqType = [];
         deleteNodeSeq(state.binaryTree, index, 0, sequence);
         console.log(sequence);
-        sequence.forEach((event, i) => {
+        sequence.forEach((events, i) => {
             setTimeout(() => {
-                dispatch(event)
+                events.forEach((event) => {
+                    dispatch(event)
+                })
+                
             }, i * config.animationSpeed)
         })
 
@@ -125,7 +128,6 @@ const BinarySearchTree = () => {
 
         dispatch({ type: ActionTypes.StartPreorder, payload: preOrderRes });
         excuteSeq(sequence, config.animationSpeed, dispatch);
-
     }
 
     /** 中序遍历 */
