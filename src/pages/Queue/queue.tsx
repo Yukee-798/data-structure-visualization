@@ -166,7 +166,6 @@ const Queue = () => {
                     </Item>
 
                 </Console>
-
             </div>
 
         </div>

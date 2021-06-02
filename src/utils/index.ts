@@ -1,5 +1,30 @@
 import { useEffect, useRef, useState } from "react"
-import { Range } from "../types";
+import { ActionTypes, IAction, Range, SeqType } from "../types";
+
+/** 交换数组两个元素 */
+export function swap<T>(arr: T[], i1: number, i2: number) {
+    const temp = arr[i1];
+    arr[i1] = arr[i2];
+    arr[i2] = temp;
+}
+
+/** 执行动画细节数组 */
+export function excuteSeq(seq: SeqType, speed: number, dispatch: React.Dispatch<IAction>) {
+    return new Promise((resolve) => {
+        dispatch({ type: ActionTypes.Loading })
+        seq.forEach((event, i) => {
+            setTimeout(() => {
+                event.forEach((e) => { dispatch(e) })
+                if (i === seq.length - 1) {
+                    resolve('Seq has been excuted.')
+                    dispatch({ type: ActionTypes.CancelLoading })
+                }
+            }, i * speed)
+        })
+    })
+
+}
+
 
 /** 随机生成一个 start ~ end 的整数 */
 export function randomNum(range: Range): number {
@@ -37,6 +62,7 @@ export function useHover() {
                 };
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [ref.current] // Recall only if ref changes
     );
     return [ref, value];

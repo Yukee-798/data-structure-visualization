@@ -15,7 +15,7 @@ export function parseValue(value: string) {
 /** 返回初始化二叉树的细节 */
 export function initSeq(values: (number | null)[]) {
     const seq = [];
-    seq.push({ type: ActionTypes.Disappear })
+    seq.push([{ type: ActionTypes.Disappear }])
     seq.push([
         { type: ActionTypes.Generate, payload: values },
         { type: ActionTypes.Appear }])
@@ -24,8 +24,31 @@ export function initSeq(values: (number | null)[]) {
 
 /** 传入结点下标，返回二叉树中以该结点为根结点的子树 */
 export function getSubTree(binaryTree: (number | null)[], indexOfNode: number) {
-    const tree: (number | null)[] = [];
-    
+    const queue: any[] = [];
+    const subTree: any[] = [];
+
+    if (binaryTree.length !== 0) {
+        queue.push({ value: binaryTree[indexOfNode], index: indexOfNode });   //根节点进队列
+    }
+    //队列不为空判断
+    while (queue.length !== 0) {
+
+        const lChildV = getLChildValue(binaryTree, queue[0].index);
+        const rChildV = getRChildValue(binaryTree, queue[0].index);
+
+        //如果有左孩子，leftChild入队列
+        if (lChildV || lChildV === 0) {
+            queue.push({ value: lChildV, index: queue[0].index * 2 + 1 })
+        }
+
+        //如果有右孩子，rightChild入队列
+        if (rChildV || rChildV === 0) {
+            queue.push({ value: rChildV, index: queue[0].index * 2 + 2 })
+        }
+        //已经遍历过的节点出队列
+        subTree.push(queue.shift())
+    }
+    return subTree;
 }
 
 /** 格式化二叉树：将spheres中的空元素设置为value为空的sphere */
@@ -64,7 +87,7 @@ export function initSpheres(values: (number | null)[]) {
 }
 
 /** 获取传入结点的父结点数据值 */
-export function getFatherValue<T>(binaryTree: T[], indexOfNode: number) {
+export function getFatherValue(binaryTree: (number | null)[], indexOfNode: number) {
     return binaryTree[Math.floor((indexOfNode - 1) / 2)];
 }
 
@@ -110,13 +133,13 @@ export function getDeepthByNodeIndex(indexOfNode: number) {
     return Math.floor(log(2, indexOfNode + 1));
 }
 
-/** 获取二叉树最大层数 */
+/** 获取二叉树层数 */
 export function getMaxDeepth(binaryTree: (number | null)[]) {
     return getDeepthByNodeIndex(binaryTree.length - 1);
 }
 
 /** 随机生成结点数为n的二叉树 */
-export function binaryTreeGenerator(n: number, binaryTree: (number | null)[], nodeValueRange: Range, indexOfRoot: number,) {
+function binaryTreeGenerator(n: number, binaryTree: (number | null)[], nodeValueRange: Range, indexOfRoot: number,) {
     if (n === 0) return;
 
     // 左孩子的值
@@ -158,30 +181,6 @@ export function randomBinaryTree(nodeNumsRange: Range, nodeValueRange: Range, ma
     return cache;
 }
 
-/** 为二叉搜索树添加结点 */
-export function addToBST(bst: any[], indexOfRoot: number, nodeV: number) {
-    // 传入的 bst 必须有一个根结点
-    if (bst.length === 0) throw new Error('the length of bst is 0');
-
-    if (!bst[indexOfRoot]) return;
-
-    // 判断传入结点的值和当前子树根结点的值的关系
-    if (nodeV > bst[indexOfRoot]) {
-        // 当前结点的右孩子不存在，则直接挂上去
-        if (!getRChildValue(bst, indexOfRoot)) {
-            setRChild(bst, indexOfRoot, nodeV);
-        } else {
-            addToBST(bst, indexOfRoot * 2 + 2, nodeV);
-        }
-    } else {
-        // 当前结点的左孩子不存在，则直接挂上去
-        if (!getLChildValue(bst, indexOfRoot)) {
-            setLChild(bst, indexOfRoot, nodeV);
-        } else {
-            addToBST(bst, indexOfRoot * 2 + 1, nodeV);
-        }
-    }
-}
 
 /** 判断二叉树的某个结点有几个子结点 */
 export function judgeNode(binaryTree: (number | null)[], indexOfNode: number) {
@@ -192,33 +191,33 @@ export function judgeNode(binaryTree: (number | null)[], indexOfNode: number) {
 }
 
 /** 获取二叉树前序遍历的细节 */
-export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
-    sequence.push({ type: ActionTypes.Active, index: indexOfNode });
-    // sequence.push({ type: ActionTypes.ActiveLeft, index: indexOfNode })
-    sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
-    sequence.push({ type: ActionTypes.Lock, index: indexOfNode });
-    if (getLChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
-    if (getRChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
+export function preOrderSeq(binaryTree: (number | null)[], indexOfNode: number, seq: any[]) {
+    seq.push([{ type: ActionTypes.Active, payload: indexOfNode }]);
+    // seq.push({ type: ActionTypes.ActiveLeft, payload: indexOfNode })
+    seq.push([{ type: ActionTypes.Deactive, payload: indexOfNode }]);
+    seq.push([{ type: ActionTypes.Lock, payload: indexOfNode }]);
+    if (getLChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 1, seq);
+    if (getRChildValue(binaryTree, indexOfNode)) preOrderSeq(binaryTree, indexOfNode * 2 + 2, seq);
 }
 
 /** 获取二叉树中序遍历的细节 */
-export function inOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
-    if (getLChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
-    sequence.push({ type: ActionTypes.Active, index: indexOfNode });
-    // sequence.push({ type: ActionTypes.ActiveRight, index: indexOfNode })
-    sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
-    sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
-    if (getRChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
+export function inOrderSeq(binaryTree: (number | null)[], indexOfNode: number, seq: any[]) {
+    if (getLChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 1, seq);
+    seq.push([{ type: ActionTypes.Active, payload: indexOfNode }]);
+    // seq.push({ type: ActionTypes.ActiveRight, payload: indexOfNode })
+    seq.push([{ type: ActionTypes.Deactive, payload: indexOfNode }]);
+    seq.push([{ type: ActionTypes.Lock, payload: indexOfNode }])
+    if (getRChildValue(binaryTree, indexOfNode)) inOrderSeq(binaryTree, indexOfNode * 2 + 2, seq);
 }
 
 /** 获取二叉树后序遍历的细节 */
-export function postOrderSeq(binaryTree: (number | null)[], indexOfNode: number, sequence: any[]) {
-    if (getLChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 1, sequence);
-    if (getRChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 2, sequence);
-    sequence.push({ type: ActionTypes.Active, index: indexOfNode });
-    sequence.push({ type: ActionTypes.ActiveLeft, index: indexOfNode })
-    sequence.push({ type: ActionTypes.Deactive, index: indexOfNode });
-    sequence.push({ type: ActionTypes.Lock, index: indexOfNode })
+export function postOrderSeq(binaryTree: (number | null)[], indexOfNode: number, seq: any[]) {
+    if (getLChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 1, seq);
+    if (getRChildValue(binaryTree, indexOfNode)) postOrderSeq(binaryTree, indexOfNode * 2 + 2, seq);
+    seq.push([{ type: ActionTypes.Active, payload: indexOfNode }]);
+    // seq.push([{ type: ActionTypes.ActiveLeft, payload: indexOfNode }])
+    seq.push([{ type: ActionTypes.Deactive, payload: indexOfNode }]);
+    seq.push([{ type: ActionTypes.Lock, payload: indexOfNode }])
 }
 
 

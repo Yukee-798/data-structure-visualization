@@ -1,20 +1,5 @@
 import React from "react";
 
-// /** 设置 SortCube 之间的间距 */
-// export const SORT_CUBE_INTERVAL_DISTANCE = 2;
-
-// /** 设置 StackCube 之间的间距 */
-// export const STACK_CUBE_INTERVAL_DISTANCE = 0.8;
-
-// /** 设置 QueueCube 之间的间距 */
-// export const QUEUE_CUBE_INTERVAL_DISTANCE = 2.2;
-
-// /** 设置 LinkCube 之间的间距 */
-// export const LINK_CUBE_INTERVAL_DISTANCE = 3.5;
-
-// /** 设置 3d 物品在 scene 中的基准 y 轴坐标 */
-// export const BASE_POSY = -2;
-
 
 /** 520 ~ 120
  
@@ -25,10 +10,15 @@ import React from "react";
 /** 遍历细节数组，分发任务的间隔时间 */
 // export const DISPATCH_INTERVAL = 320;
 
-
 export interface IBaseProps {
     style?: React.CSSProperties;
     className?: string;
+}
+
+export interface IBaseState {
+    loading: boolean;
+    disappearAll: boolean;
+    opeDetails: { type: OpeDetailTypes, payload?: any }[]
 }
 
 /** 主页的item类型 */
@@ -114,6 +104,8 @@ export interface IAction {
     payload?: any;
 }
 
+export type SeqType = IAction[][];
+
 export enum ActionTypes {
     Pop,
     PopDone,
@@ -150,7 +142,8 @@ export enum ActionTypes {
     StartInOrder,
     StartPostOrder,
     Generate,
-    
+    Loading,
+    CancelLoading,
 }
 
 export interface IColorConfig {
