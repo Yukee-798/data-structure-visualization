@@ -72,9 +72,10 @@ const Sort = () => {
     }
 
     /** 处理添加元素 */
-    const handleAddEle = (value: number, index: number) => {
+    const handleAddEle = (index: number, value: number) => {
+
         if (state.values.length < config.geoNumRange[1] + 3) {
-            if (index > state.values.length - 1 || index < 0) {
+            if (index > state.values.length || index < 0) {
                 message.warning('输入的序号不合法')
             } else {
                 const sequence = addEleSeq(state.values, value, index);
@@ -84,11 +85,10 @@ const Sort = () => {
         } else {
             message.warning(`添加失败，数组最大容量为${config.geoNumRange[1] + 3}`)
         }
-
     }
 
     /** 处理删除元素 */
-    const handleDeleteEle = (index: number) => {
+    const handleDeleteEle = (index: number, value: number) => {
         if (state.values.length > 0) {
             if (index > state.values.length - 1 || index < 0) {
                 message.warning('输入的序号不合法')
@@ -152,11 +152,23 @@ const Sort = () => {
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
+                    radioGroup={[1, 1, 0]}
+                    addConfig={{
+                        hasIndex: true,
+                        hasValue: true,
+                        indexRange: [0, state.values.length],
+                        valueRange: config.geoValueRange,
+                        radioName: '添加'
+                    }}
+                    deleteConfig={{
+                        hasIndex: true,
+                        hasValue: false,
+                        indexRange: [0, state.values.length - 1],
+                        radioName: '删除'
+                    }}
                     onSliderChange={handleSliderChange}
                     onAdd={handleAddEle}
                     onDelete={handleDeleteEle}
-                    indexRange={[0, 10]}
-                    valueRange={[3, 35]}
                     spinning={state.loading}
                     onRender={handleRender}
                     operation={

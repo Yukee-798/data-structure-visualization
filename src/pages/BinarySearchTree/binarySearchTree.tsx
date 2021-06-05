@@ -49,7 +49,7 @@ const BinarySearchTree = () => {
 
     // [32,27,56,n,n,54,n,n,n,n,n,n,55]
     /** 添加元素 */
-    const handleAddEle = (value: number, _: unknown) => {
+    const handleAddEle = (index: number, value: number) => {
         dispatch({ type: ActionTypes.UnLock })
         let sequence: any[] = [];
         addNodeSeq(state.binaryTree, 0, value, sequence);
@@ -86,14 +86,14 @@ const BinarySearchTree = () => {
                 events.forEach((event) => {
                     dispatch(event)
                 })
-                
+
             }, i * config.animationSpeed)
         })
 
     }
 
     /** 搜索元素 */
-    const handleSearch = (value: number) => {
+    const handleSearch = (index: number, value: number) => {
         dispatch({ type: ActionTypes.UnLock })
 
         let sequence: SeqType = [];
@@ -210,16 +210,32 @@ const BinarySearchTree = () => {
                                         {i}
                                     </Text>
                                 </React.Fragment>
-
                             )
                         )
                     })}
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
+                    radioGroup={[1, 1, 1]}
+                    addConfig={{
+                        hasIndex: false,
+                        hasValue: true,
+                        valueRange: config.geoValueRange,
+                        radioName: '添加'
+                    }}
+                    deleteConfig={{
+                        hasIndex: true,
+                        hasValue: false,
+                        indexRange: [0, state.binaryTree.length - 1],
+                        radioName: '删除'
+                    }}
+                    searchConfig={{
+                        hasIndex: false,
+                        hasValue: true,
+                        valueRange: config.geoValueRange,
+                        radioName: '查找'
+                    }}
                     // onSliderChange={handleSliderChange}
-                    isAddIndex={false}
-                    isSearch={true}
                     onAdd={handleAddEle}
                     onDelete={handleDeleteEle}
                     onSearch={handleSearch}

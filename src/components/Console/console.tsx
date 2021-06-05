@@ -1,61 +1,53 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Menu, InputNumber, Button, Drawer, Slider, Radio, Divider, Spin, Input } from "antd";
-import { LoadingOutlined } from '@ant-design/icons';
-import { MenuUnfoldOutlined } from "@ant-design/icons";
-import { useHover } from "../../utils";
+import { LoadingOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { randomNum, useHover } from "../../utils";
 import { IBaseProps, Range } from "../../types";
-import { animated, config, useSpring } from "react-spring/web";
+import { animated, config, useSpring } from "@react-spring/web";
 import './console.scss'
 
 const { Item, SubMenu } = Menu;
 
+interface radioConfig {
+    /** 是否具有序号输入框 */
+    hasIndex?: boolean;
+    /** 是否具有数值输入框 */
+    hasValue?: boolean;
+    /** index取值范围 */
+    indexRange?: Range;
+    /** value取值范围 */
+    valueRange?: Range;
+    /** radioName 同时对应 buttonName */
+    radioName?: string;
+}
+
 interface IConsoleProps extends IBaseProps {
+    /** 分别表示是否添加、删除、查找 */
+    radioGroup: [0 | 1, 0 | 1, 0 | 1];
     /** 控制台左边的操作界面 */
-    operation?: React.ReactNode;
+    operation: React.ReactNode;
     /** 控制台右边的显示器 */
-    displayer?: React.ReactNode;
+    displayer: React.ReactNode;
     /** drawer的高度 */
     drawerHeight?: number;
     /** 是否有silider */
     showSilider?: boolean;
-    /** 是否可以添加、删除元素 */
-    isUpdate?: boolean;
-    /** 是否可以搜索元素 */
-    isSearch?: boolean;
-    /** 添加元素时是否显示序号输入框 */
-    isAddIndex?: boolean;
-    /** 删除元素时是否显示序号输入框 */
-    isDeleteIndex?: boolean;
-    /** 设置value范围 */
-    valueRange?: Range;
-    /** 设置index范围 */
-    indexRange?: Range;
-    /** 设置value默认值 */
-    defaultValue?: number;
-    /** 设置index默认值 */
-    defaultIndex?: number;
-    /** 设置searchValue默认值 */
-    defaultSearchValue?: number;
-    /** 添加按钮的文字 */
-    addText?: string;
-    /** 删除按钮的文字 */
-    deleteText?: string;
+    /** 添加元素输入框配置 */
+    addConfig?: radioConfig;
+    /** 删除元素输入框配置 */
+    deleteConfig?: radioConfig;
+    /** 查找元素输入框配置 */
+    searchConfig?: radioConfig;
     /** 操作是否正在执行 */
     spinning?: boolean;
     /** slider变化时的回调 */
     onSliderChange?: (value: number) => void;
-    /** value改变时的回调 */
-    onValueChange?: (value: number) => void;
-    /** index改变时的回调 */
-    onIndexChange?: (index: number) => void;
-    /** searchValue改变时的回调 */
-    onSearchValueChange?: (value: number) => void;
     /** 点击添加时的回调 */
     onAdd?: (value: number, index: number) => void;
     /** 点击删除时的回调 */
-    onDelete?: (index: number) => void;
+    onDelete?: (value: number, index: number) => void;
     /** 点击搜索时的回调 */
-    onSearch?: (value: number) => void;
+    onSearch?: (value: number, index: number) => void;
     /** 渲染器输入框变化时的回调 */
     onRenderChange?: (value: string) => void;
     /** 点击渲染按钮时的回调 */
@@ -71,41 +63,37 @@ const Console: React.FC<IConsoleProps> = (props) => {
         displayer,
         drawerHeight,
         showSilider,
-        addText,
-        defaultIndex,
-        defaultSearchValue,
-        valueRange,
-        indexRange,
-        defaultValue,
-        deleteText,
-        isUpdate,
-        isAddIndex,
-        isDeleteIndex,
-        isSearch,
+        radioGroup,
+        addConfig,
+        deleteConfig,
+        searchConfig,
         spinning,
         onSliderChange,
         onAdd,
         onDelete,
         onSearch,
-        onIndexChange,
-        onValueChange,
-        onSearchValueChange,
         onRenderChange,
-        onRender
+        onRender,
     } = props;
 
     const [hoverLeftRef, isLeftHover] = useHover();
     const [hoverRenderRef, isRenderHover] = useHover();
 
     const [isUnfold, setIsUnfold] = useState(false);
-    /** 控制台的添加删除元素的value和index */
-    const [value, setValue] = useState(defaultValue || 8);
-    const [index, setIndex] = useState(defaultIndex || 0);
-    const [searchValue, setSearchValue] = useState(defaultSearchValue || 32);
+
+    const [addValue, setAddValue] = useState(randomNum(addConfig?.valueRange || [3, 37]));
+    const [addIndex, setAddIndex] = useState(randomNum(addConfig?.indexRange || [0, 3]));
+
+    const [deleteValue, setDeleteValue] = useState(randomNum(deleteConfig?.valueRange || [3, 37]));
+    const [deleteIndex, setDeleteIndex] = useState(randomNum(deleteConfig?.indexRange || [0, 3]));
+
+    const [searchValue, setSearchValue] = useState(randomNum(searchConfig?.valueRange || [3, 37]));
+    const [searchIndex, setSearchIndex] = useState(randomNum(searchConfig?.indexRange || [0, 3]));
+
     const [renderValue, setRenderValue] = useState('');
 
     // 被激活的 radio
-    const [radioActived, setRadioActived] = useState(1);
+    const [radioActived, setRadioActived] = useState(0);
 
     const displayConRef = useRef<HTMLDivElement>();
     const { leftOpacity, renderOpacity } = useSpring({
@@ -119,6 +107,14 @@ const Console: React.FC<IConsoleProps> = (props) => {
         if (displayConRef.current) displayConRef.current.scrollTop = displayConRef.current.scrollHeight;
     }, [displayConRef.current?.scrollHeight])
 
+    const getDefaultRadio = (radioGroup: any[]) => {
+        for (let i = 0; i <= radioGroup.length - 1; i++) {
+            if (radioGroup[i] === 1) {
+                return i;
+            }
+        }
+    }
+
     return (
         <>
             <animated.div
@@ -126,7 +122,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                 ref={hoverLeftRef as any}
                 style={{ ...style, opacity: leftOpacity }}
             >
-                {/* 右侧栏 */}
+                {/* 左侧栏 */}
                 <Menu
                     className='console'
                     mode="inline"
@@ -146,7 +142,6 @@ const Console: React.FC<IConsoleProps> = (props) => {
                 </Item>
                     {children}
                 </Menu>
-                {/*  */}
 
                 {/* 抽屉 */}
                 <Drawer
@@ -182,95 +177,127 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                 {operation}
 
                                 {/* 显示添加、删除 */}
-                                {
-                                    isUpdate &&
-                                    <div className='input-group'>
+
+                                <div className='input-group'>
+                                    {
+                                        !(radioGroup[0] === 0 && radioGroup[1] === 0 && radioGroup[2] === 0) &&
                                         <Radio.Group
                                             className='radio-group'
-                                            defaultValue={1}
+                                            defaultValue={getDefaultRadio(radioGroup)}
                                             onChange={(e) => setRadioActived(e.target.value)}
                                         >
-                                            <Radio value={1}>{addText}</Radio>
-                                            <Radio value={2}>{deleteText}</Radio>
-                                            {isSearch && <Radio value={3}>查找</Radio>}
-                                        </Radio.Group>
 
-                                        <div className='label-group'>
                                             {
+                                                radioGroup.map((value, i) => {
+                                                    if (value === 1 && i === 0) return <Radio key={i} value={i}>{addConfig?.radioName}</Radio>
+                                                    else if (value === 1 && i === 1) return <Radio key={i} value={i}>{deleteConfig?.radioName}</Radio>
+                                                    else if (value === 1 && i === 2) return <Radio key={i} value={i}>{searchConfig?.radioName}</Radio>
+                                                    else return <></>
+                                                })
+                                            }
+                                        </Radio.Group>
+                                    }
+
+                                    <div className='label-group'>
+                                        {
+                                            radioActived === 0 ?
+                                                <>
+                                                    {
+                                                        addConfig?.hasIndex &&
+                                                        (<label>
+                                                            <span className='label-name'>序号:</span>
+                                                            <InputNumber
+                                                                min={(addConfig?.indexRange as unknown as number[])[0]}
+                                                                max={(addConfig?.indexRange as unknown as number[])[1]}
+                                                                value={addIndex}
+                                                                onChange={(index) => {
+                                                                    setAddIndex(index)
+                                                                }}
+                                                            />
+                                                        </label>)
+                                                    }
+                                                    {
+                                                        addConfig?.hasValue &&
+                                                        (<label>
+                                                            <span className='label-name'>数值:</span>
+                                                            <InputNumber
+                                                                min={(addConfig?.valueRange as unknown as number[])[0]}
+                                                                max={(addConfig?.valueRange as unknown as number[])[1]}
+                                                                value={addValue}
+                                                                onChange={(value) => {
+                                                                    setAddValue(value)
+                                                                }}
+                                                            />
+                                                        </label>)
+                                                    }
+                                                    <Button type='primary' onClick={() => onAdd?.(addIndex, addValue)}>{addConfig?.radioName}</Button>
+                                                </> :
                                                 radioActived === 1 ?
-                                                    (
-                                                        <>
-                                                            {
-                                                                isAddIndex &&
-                                                                // 序号input
-                                                                (<label>
-                                                                    <span className='label-name'>序号:</span>
-                                                                    <InputNumber
-                                                                        // min={(indexRange as unknown as number[])?.[0]}
-                                                                        // max={(indexRange as unknown as number[])?.[0]}
-                                                                        defaultValue={defaultIndex}
-                                                                        onChange={(index) => {
-                                                                            setIndex(index as number)
-                                                                            onIndexChange?.(index)
-                                                                        }}
-                                                                    />
-                                                                </label>)
-                                                            }
-                                                            {/* 数值input */}
-                                                            <label>
-                                                                <span className='label-name'>数值:</span>
-                                                                <InputNumber
-                                                                    // min={(valueRange as unknown as number[])?.[0]}
-                                                                    // max={(valueRange as unknown as number[])?.[1]}
-                                                                    defaultValue={defaultValue}
-                                                                    onChange={(value) => {
-                                                                        setValue(value as number)
-                                                                        onValueChange?.(value)
-                                                                    }}
-                                                                />
-                                                            </label>
-                                                        </>
-                                                    ) : radioActived === 2 ?
-                                                        (
-                                                            isDeleteIndex &&
-                                                            // 序号input
+                                                    <>
+                                                        {
+                                                            deleteConfig?.hasIndex &&
                                                             (<label>
                                                                 <span className='label-name'>序号:</span>
                                                                 <InputNumber
-                                                                    // min={(indexRange as unknown as number[])?.[0]}
-                                                                    // max={(indexRange as unknown as number[])?.[0]}
-                                                                    defaultValue={defaultIndex}
+                                                                    min={(deleteConfig?.indexRange as unknown as number[])[0]}
+                                                                    max={(deleteConfig?.indexRange as unknown as number[])[1]}
+                                                                    value={deleteIndex}
                                                                     onChange={(index) => {
-                                                                        setIndex(index as number)
-                                                                        onIndexChange?.(index)
+                                                                        setDeleteIndex(index);
                                                                     }}
                                                                 />
                                                             </label>)
-                                                        ) : isSearch &&
-                                                        (
-                                                            // 搜索input
+                                                        }
+                                                        {
+                                                            deleteConfig?.hasValue &&
                                                             (<label>
                                                                 <span className='label-name'>数值:</span>
                                                                 <InputNumber
-                                                                    // min={(valueRange as unknown as number[])?.[0]}
-                                                                    // max={(valueRange as unknown as number[])?.[0]}
-                                                                    defaultValue={defaultSearchValue}
+                                                                    min={(deleteConfig?.valueRange as unknown as number[])[0]}
+                                                                    max={(deleteConfig?.valueRange as unknown as number[])[1]}
+                                                                    value={deleteValue}
                                                                     onChange={(value) => {
-                                                                        setSearchValue(value as number)
-                                                                        onSearchValueChange?.(value)
+                                                                        setDeleteValue(value)
                                                                     }}
                                                                 />
                                                             </label>)
-                                                        )
-                                            }
-
-                                            {radioActived === 1 && <Button type='primary' onClick={() => onAdd?.(value, index)}>{addText}</Button>}
-                                            {radioActived === 2 && <Button type='primary' onClick={() => onDelete?.(index)}>{deleteText}</Button>}
-                                            {radioActived === 3 && <Button type='primary' onClick={() => onSearch?.(searchValue)}>查找</Button>}
-
-                                        </div>
+                                                        }
+                                                        <Button type='primary' onClick={() => onDelete?.(deleteIndex, deleteValue)}>{deleteConfig?.radioName}</Button>
+                                                    </> :
+                                                    <>
+                                                        {
+                                                            searchConfig?.hasIndex &&
+                                                            (<label>
+                                                                <span className='label-name'>序号:</span>
+                                                                <InputNumber
+                                                                    min={(searchConfig?.indexRange as unknown as number[])[0]}
+                                                                    max={(searchConfig?.indexRange as unknown as number[])[1]}
+                                                                    value={searchIndex}
+                                                                    onChange={(index) => {
+                                                                        setSearchIndex(index);
+                                                                    }}
+                                                                />
+                                                            </label>)
+                                                        }
+                                                        {
+                                                            searchConfig?.hasValue &&
+                                                            (<label>
+                                                                <span className='label-name'>数值:</span>
+                                                                <InputNumber
+                                                                    min={(searchConfig.valueRange as unknown as number[])?.[0]}
+                                                                    max={(searchConfig.valueRange as unknown as number[])?.[1]}
+                                                                    value={searchValue}
+                                                                    onChange={(value) => {
+                                                                        setSearchValue(value);
+                                                                    }}
+                                                                />
+                                                            </label>)
+                                                        }
+                                                        <Button type='primary' onClick={() => onSearch?.(searchIndex, searchValue)}>{searchConfig?.radioName}</Button>
+                                                    </>
+                                        }
                                     </div>
-                                }
+                                </div>
                             </div>
                         </Spin>
 
@@ -291,7 +318,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
             <animated.div
                 className='console-render'
                 ref={hoverRenderRef as any}
-                style={{ ...style ,opacity: renderOpacity }}
+                style={{ ...style, opacity: renderOpacity }}
             >
                 <Input
                     bordered={false}
@@ -308,17 +335,28 @@ const Console: React.FC<IConsoleProps> = (props) => {
 
 Console.defaultProps = {
     showSilider: true,
-    addText: '添加',
-    deleteText: '删除',
-    defaultIndex: 2,
-    defaultValue: 3,
-    defaultSearchValue: 27,
-    valueRange: [3, 90] as Range,
-    indexRange: [0, 10] as Range,
-    isUpdate: true,
-    isSearch: false,
-    isAddIndex: true,
-    isDeleteIndex: true,
+    radioGroup: [1, 1, 1],
+    addConfig: {
+        hasIndex: true,
+        hasValue: true,
+        indexRange: [0, 10],
+        valueRange: [3, 37],
+        radioName: '添加'
+    },
+    deleteConfig: {
+        hasIndex: true,
+        hasValue: true,
+        indexRange: [0, 10],
+        valueRange: [3, 37],
+        radioName: '删除'
+    },
+    searchConfig: {
+        hasIndex: true,
+        hasValue: true,
+        indexRange: [0, 10],
+        valueRange: [3, 37],
+        radioName: '查找'
+    },
     spinning: false
 }
 

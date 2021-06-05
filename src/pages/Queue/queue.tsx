@@ -47,7 +47,7 @@ const Queue = () => {
     }
 
     /** 处理入队 */
-    const handleEnqueue = (value: number) => {
+    const handleEnqueue = (index: number, value: number) => {
         if (state.values.length < config.geoNumRange[1] + 5) {
             const sequence = enqueueSeq(value, state.values.length);
             excuteSeq(sequence, config.animationSpeed, dispatch);
@@ -106,13 +106,21 @@ const Queue = () => {
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
+                    radioGroup={[1, 1, 0]}
+                    addConfig={{
+                        hasIndex: false,
+                        hasValue: true,
+                        valueRange: config.geoValueRange,
+                        radioName: '入队'
+                    }}
+                    deleteConfig={{
+                        hasIndex: false,
+                        hasValue: false,
+                        radioName: '出队'
+                    }}
                     showSilider={false}
                     onAdd={handleEnqueue}
                     onDelete={handleDequeue}
-                    addText='入队'
-                    deleteText='出队'
-                    isAddIndex={false}
-                    isDeleteIndex={false}
                     spinning={state.loading}
                     operation={
                         <div className='btn-group'>

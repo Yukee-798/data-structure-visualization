@@ -60,7 +60,7 @@ const Stack = () => {
     }
 
     /** 处理压栈 */
-    const handlePush = (value: number) => {
+    const handlePush = (index: number, value: number) => {
         if (state.values.length < config.geoNumRange[1] + 4) {
             const sequence = pushSeq(value);
             excuteSeq(sequence, config.animationSpeed, dispatch);
@@ -112,15 +112,22 @@ const Stack = () => {
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
+                    radioGroup={[1, 1, 0]}
+                    addConfig={{
+                        hasIndex: false,
+                        hasValue: true,
+                        valueRange: config.geoValueRange,
+                        radioName: '压栈'
+                    }}
+                    deleteConfig={{
+                        hasIndex: false,
+                        hasValue: false,
+                        radioName: '弹栈'
+                    }}
                     showSilider={false}
                     onAdd={handlePush}
                     onDelete={handlePop}
-                    valueRange={[0, 90]}
                     onRender={handleRender}
-                    addText='压栈'
-                    deleteText='弹栈'
-                    isAddIndex={false}
-                    isDeleteIndex={false}
                     spinning={state.loading}
                     operation={
                         <div className='btn-group'>
