@@ -49,37 +49,51 @@ export function addEleSeq(arr: number[], newEle: number, targetIndex: number): S
     // 记录动画细节
     const seq = [];
 
-    // 记录待位移的元素下标
-    const oldIndexes: number[] = [];
-    arr.forEach((_, i) => { i >= targetIndex && oldIndexes.push(i) });
+    if (targetIndex === arr.length) {
+        // 单独处理尾部添加
+        
+        // 在 targetIndex 处添加元素
+        seq.push([{
+            type: ActionTypes.AddDone,
+            payload: {
+                newEle,
+                targetIndex
+            }
+        }]);
 
-    // 记录位移元素的目标下标
-    const targetIndexes: number[] = [];
-    oldIndexes.forEach((value) => { targetIndexes.push(value + 1) });
+    } else {
+        // 记录待位移的元素下标
+        const oldIndexes: number[] = [];
+        arr.forEach((_, i) => { i >= targetIndex && oldIndexes.push(i) });
 
-    // 先激活需要位移的元素
-    seq.push([{ type: ActionTypes.Active, payload: oldIndexes }]);
+        // 记录位移元素的目标下标
+        const targetIndexes: number[] = [];
+        oldIndexes.forEach((value) => { targetIndexes.push(value + 1) });
 
-    // 开始位移，并扩容出现新的下标
-    seq.push([{
-        type: ActionTypes.Move,
-        payload: {
-            oldIndexes,
-            targetIndexes
-        }
-    }]);
+        // 先激活需要位移的元素
+        seq.push([{ type: ActionTypes.Active, payload: oldIndexes }]);
 
-    // 取消激活
-    seq.push([{ type: ActionTypes.Deactive, payload: targetIndexes }])
+        // 开始位移，并扩容出现新的下标
+        seq.push([{
+            type: ActionTypes.Move,
+            payload: {
+                oldIndexes,
+                targetIndexes
+            }
+        }]);
 
-    // 在 targetIndex 处添加元素
-    seq.push([{
-        type: ActionTypes.AddDone,
-        payload: {
-            newEle,
-            targetIndex
-        }
-    }]);
+        // 取消激活
+        seq.push([{ type: ActionTypes.Deactive, payload: targetIndexes }])
+
+        // 在 targetIndex 处添加元素
+        seq.push([{
+            type: ActionTypes.AddDone,
+            payload: {
+                newEle,
+                targetIndex
+            }
+        }]);
+    }
 
     return seq;
 }
@@ -148,7 +162,7 @@ export function bubbleSortSeq(arr: number[]): SeqType {
 /** 返回选择排序细节 */
 export function selectSortSeq(arr: number[]): SeqType {
     if (judgeSorted(arr)) return [[{ type: ActionTypes.Lock }]];
-    
+
     let backup = [...arr];
     let sortSeq = [];
     for (let i = backup.length - 1; i >= 0; i--) {

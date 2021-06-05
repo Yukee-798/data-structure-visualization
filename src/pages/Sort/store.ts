@@ -255,7 +255,7 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
             // 更新 values
             let newValues = [...state.values];
             newValues.splice(targetIndex, 0, newEle);
-            newValues.pop();
+            if (targetIndex !== state.values.length) newValues.pop();
 
             const newOpeDetail = { type: OpeDetailTypes.Add, payload: { index: targetIndex, value: newEle, curValues: [...newValues] } }
 
