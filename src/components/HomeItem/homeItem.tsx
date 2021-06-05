@@ -3,7 +3,7 @@ import { Card } from 'antd'
 import { DataStrucTypes, IBaseProps } from '../../types'
 import { useHover } from '../../utils'
 import './homeItem.scss'
-import Tag, { TagType } from '../Tag/tag'
+import Tag, { MainTags, TagType } from '../Tag/tag'
 
 export interface IHomeItemProps extends IBaseProps {
     /** 数据结构类型 */
@@ -43,7 +43,7 @@ const HomeItem: React.FC<IHomeItemProps> = (props) => {
                 <Card.Meta
                     title={title}
                     description={tags?.map((tagName: TagType, i) => (
-                        <Tag key={i} type={tagName} />
+                        <Tag key={i} main={MainTags.includes(tagName)} type={tagName} />
                     ))}
                 />
             </Card>
