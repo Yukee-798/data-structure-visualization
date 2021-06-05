@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import { animated, config, useSpring } from 'react-spring/three';
+import { animated, config, useSpring } from '@react-spring/three';
 import { Icosahedron, Text } from '@react-three/drei'
 import { defaultGeoColor } from '../../configs/page/defaultConfig';
 import { IGeometryProps } from '../../types';

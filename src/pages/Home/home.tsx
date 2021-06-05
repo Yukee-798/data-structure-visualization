@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Col, Row } from 'antd';
 import { useHistory } from 'react-router';
-import { useSpring, animated, config, useSpringRef, useTransition, useChain } from 'react-spring/web'
+import { useSpring, animated, config, useSpringRef, useTransition, useChain } from '@react-spring/web'
 import HomeItem from '../../components/HomeItem/homeItem';
 import { DataStrucTypes } from '../../types';
 import { homeItemsConfig } from './config';

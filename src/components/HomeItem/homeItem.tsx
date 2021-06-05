@@ -1,4 +1,4 @@
-import { useSpring, animated, config } from 'react-spring'
+import { useSpring, animated, config } from '@react-spring/web'
 import { Card } from 'antd'
 import { DataStrucTypes, IBaseProps } from '../../types'
 import { useHover } from '../../utils'

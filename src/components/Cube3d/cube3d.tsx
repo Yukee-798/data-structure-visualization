@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, forwardRef } from "react";
 import { RoundedBox, Text } from "@react-three/drei";
-import { animated, config, useSpring } from "react-spring/three";
+import { animated, config, useSpring } from "@react-spring/three";
 import { IGeometryProps } from "../../types";
 import { defaultGeoColor } from "../../configs/page/defaultConfig";
 
