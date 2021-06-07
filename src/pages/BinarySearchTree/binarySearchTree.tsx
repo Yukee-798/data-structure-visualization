@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { useHistory } from 'react-router'
 import { Text } from '@react-three/drei'
 import { Button, PageHeader, Steps, message } from 'antd'
@@ -11,7 +11,7 @@ import { initState, IState, reducer } from './store'
 import BSTSphere3d from './BSTSphere3d/bstSphere3d'
 import { root } from '../../configs/router/config'
 import { addNodeSeq, deleteNodeSeq, randomBST, searchSeq } from './utils'
-import { getDeepthByNodeIndex, getLChildValue, getRChildValue, initSeq, initSpheres, inOrderSeq, parseValue, postOrderSeq, preOrderSeq, treeToString } from '../../utils/binaryTree'
+import { getDeepthByNodeIndex, getLChildValue, getRChildValue, getSubTree, initSeq, initSpheres, inOrderSeq, parseValue, postOrderSeq, preOrderSeq, treeToString } from '../../utils/binaryTree'
 import config from './config'
 import { excuteSeq } from '../../utils'
 
@@ -47,26 +47,19 @@ const BinarySearchTree = () => {
         }
     }
 
-    // [32,27,56,n,n,54,n,n,n,n,n,n,55]
     /** 添加元素 */
     const handleAddEle = (index: number, value: number) => {
         dispatch({ type: ActionTypes.UnLock })
-        let sequence: any[] = [];
+        let sequence: SeqType = [];
         addNodeSeq(state.binaryTree, 0, value, sequence);
-        sequence.forEach((event, i) => {
+
+        // 判断一下最后要添加的元素的下标对应的层数是不是小于等于配置项的最大层数
+        if (getDeepthByNodeIndex(sequence[sequence.length - 2][0].payload) === config.maxDeepth) {
             setTimeout(() => {
-                if (event.type !== ActionTypes.Add) {
-                    dispatch(event)
-                } else {
-                    // 判断一下最后要添加的元素的下标对应的层数是不是小于等于配置项的最大层数
-                    if (getDeepthByNodeIndex(event.payload.index) <= config.maxDeepth) {
-                        dispatch(event)
-                    } else {
-                        message.warning(`添加失败，二叉树最大层数为${config.maxDeepth + 1}`)
-                    }
-                }
-            }, i * config.animationSpeed)
-        })
+                message.warning(`添加失败，二叉树最大层数为${config.maxDeepth + 1}`)
+            }, sequence.length * config.animationSpeed)
+        }
+        excuteSeq(sequence, config.animationSpeed, dispatch)
     }
 
     /** 删除元素 */
@@ -74,22 +67,23 @@ const BinarySearchTree = () => {
         dispatch({ type: ActionTypes.UnLock })
 
         // 验证一下输入的序号
-        if (!state.binaryTree[index]) {
+        if (!state.binaryTree[index] && state.binaryTree[index] !== 0) {
             return message.warning('删除失败，输入的结点序号不存在')
         }
 
         let sequence: SeqType = [];
         deleteNodeSeq(state.binaryTree, index, 0, sequence);
-        console.log(sequence);
-        sequence.forEach((events, i) => {
-            setTimeout(() => {
-                events.forEach((event) => {
-                    dispatch(event)
-                })
 
-            }, i * config.animationSpeed)
-        })
+        excuteSeq(sequence, config.animationSpeed, dispatch)
+        // console.log(sequence);
+        // sequence.forEach((events, i) => {
+        //     setTimeout(() => {
+        //         events.forEach((event) => {
+        //             dispatch(event)
+        //         })
 
+        //     }, i * config.animationSpeed)
+        // })
     }
 
     /** 搜索元素 */
@@ -158,6 +152,17 @@ const BinarySearchTree = () => {
         excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
+    /** 处理动画速度改变 */
+    const handleSliderChange = (x: number) => {
+        config.animationSpeed = -7.95 * x + 1000
+    }
+
+
+    useEffect(() => {
+        console.log(state.spheres.map((sphere, i) => ({ index: i, value: sphere.value, sortIndex: sphere.sortIndex, sortIndexes: sphere.sortIndexes.toString() })));
+        console.log(state.binaryTree);
+    }, [state.spheres])
+
     return (
         <div className='binarySearchTree-warp'>
             <PageHeader
@@ -180,14 +185,14 @@ const BinarySearchTree = () => {
                         const lChildPos = sphere.lChildPos !== null && getLChildValue(cdnOfNodes, sphere.sortIndex);
 
                         // 判断当前结点是否有右孩子
-                        const hasRChild = sphere.rChildPos !== null && getRChildValue(state.spheres, sphere.sortIndex)?.value;
+                        const hasRChild = getRChildValue(state.spheres, sphere.sortIndex)?.value;
 
                         // 获取右结点的位置
-                        const rChildPos = getRChildValue(cdnOfNodes, sphere.sortIndex);
+                        const rChildPos = sphere.rChildPos !== null && getRChildValue(cdnOfNodes, sphere.sortIndex);
 
                         return (
                             sphere.value && (
-                                <React.Fragment key={'sphere' + i}>
+                                <React.Fragment key={'sphere' + sphere.sortIndex}>
                                     <BSTSphere3d
                                         value={sphere.value}
                                         sortIndex={sphere.sortIndex}
@@ -204,10 +209,10 @@ const BinarySearchTree = () => {
                                     <Text
                                         position={[cdnOfNodes[i][0], cdnOfNodes[i][1] - 1.2, cdnOfNodes[i][2]]}
                                         fontSize={0.4}
-                                        fillOpacity={!sphere.disappear && !state.disappearAll ? 1 : 0}
+                                        fillOpacity={!sphere.indexDisappear && !sphere.disappear && !state.disappearAll ? 1 : 0}
                                         color='black'
                                     >
-                                        {i}
+                                        {sphere.sortIndex}
                                     </Text>
                                 </React.Fragment>
                             )
@@ -235,7 +240,7 @@ const BinarySearchTree = () => {
                         valueRange: config.geoValueRange,
                         radioName: '查找'
                     }}
-                    // onSliderChange={handleSliderChange}
+                    onSliderChange={handleSliderChange}
                     onAdd={handleAddEle}
                     onDelete={handleDeleteEle}
                     onSearch={handleSearch}
@@ -323,7 +328,7 @@ const BinarySearchTree = () => {
                         随机生成
                     </Item>
 
-                    <SubMenu
+                    {/* <SubMenu
                         key='item2'
                         icon={<BarChartOutlined />}
                         title='遍历'
@@ -331,7 +336,7 @@ const BinarySearchTree = () => {
                         <Item onClick={handlePreorder}>前序遍历</Item>
                         <Item onClick={handleInorder}>中序遍历</Item>
                         <Item onClick={handlePostorder}>后序遍历</Item>
-                    </SubMenu>
+                    </SubMenu> */}
                 </Console>
 
             </div>

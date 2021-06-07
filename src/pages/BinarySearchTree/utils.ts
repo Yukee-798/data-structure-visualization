@@ -1,6 +1,7 @@
 import { randomArr, randomNum } from '../../utils';
 import { ActionTypes, Range } from '../../types';
-import { getChildrenIndexes, getDeepthByNodeIndex, getLChildValue, getRChildValue, judgeNode, setLChild, setRChild } from '../../utils/binaryTree';
+import { getChildrenIndexes, getDeepthByNodeIndex, getLChildValue, getRChildValue, getSubTree, judgeNode, setLChild, setRChild } from '../../utils/binaryTree';
+import config from './config';
 
 /** 为二叉搜索树添加结点 */
 function addToBST(bst: (number | null)[], indexOfRoot: number, nodeV: number) {
@@ -63,15 +64,15 @@ export function addNodeSeq(bst: any[], indexOfRoot: number, nodeV: number, seq: 
     // 传入的 bst 必须有一个根结点
     if (bst.length === 0) throw new Error('the length of bst is 0');
 
-    if (!bst[indexOfRoot]) return;
+    if (!bst[indexOfRoot] && bst[indexOfRoot] !== 0) return;
 
     seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
     seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
 
     // 判断传入结点的值和当前子树根结点的值的关系
     if (nodeV > bst[indexOfRoot]) {
-        // 当前结点的右孩子不存在，则直接挂上去
-        if (!getRChildValue(bst, indexOfRoot)) {
+        // 当前结点的右孩子不存在，并且添加新结点后的二叉树层数小于 maxDeepth，则挂上去
+        if (!getRChildValue(bst, indexOfRoot) && getDeepthByNodeIndex(indexOfRoot * 2 + 2) <= config.maxDeepth) {
             seq.push([{
                 type: ActionTypes.Add,
                 payload: { value: nodeV, index: indexOfRoot * 2 + 2 }
@@ -81,7 +82,7 @@ export function addNodeSeq(bst: any[], indexOfRoot: number, nodeV: number, seq: 
         }
     } else {
         // 当前结点的左孩子不存在，则直接挂上去
-        if (!getLChildValue(bst, indexOfRoot)) {
+        if (!getLChildValue(bst, indexOfRoot) && getDeepthByNodeIndex(indexOfRoot * 2 + 1) <= config.maxDeepth) {
             seq.push([{
                 type: ActionTypes.Add,
                 payload: { value: nodeV, index: indexOfRoot * 2 + 1 }
@@ -142,24 +143,48 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
         }
     } else if (judgeNode(bst, targetIndex) === 1) {
         // 如果删除的结点有一个子结点
-        // 判断传入结点的值和当前子树根结点的值的关系
+        // 判断删除结点的值和当前子树根结点的值的关系
         if (bst[targetIndex] > bst[indexOfRoot]) {
-            // 如果传入的值大于当前子树根结点的值
+            // 如果删除的值大于当前子树根结点的值
             // 则看其右子树
             if (getRChildValue(bst, indexOfRoot) === bst[targetIndex]) {
                 // 如果右结点等于nodeV则删除
                 seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 2 }])
                 seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 2 }]);
                 seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 2 }]);
+
+                // 获取删除结点的子结点
+                const childIndex = getChildrenIndexes(bst, indexOfRoot * 2 + 2)[0] || getChildrenIndexes(bst, indexOfRoot * 2 + 2)[1];
+                // 获取以这个子结点为根结点的子树的所有结点下标 (待移动的下标)
+                const oldIndexes = getSubTree(bst, childIndex).map((item) => item.index);
+                // 获取这些待移动下标的目的坐标
+                const targetIndexes = getSubTree(bst, childIndex).map((item, i) => {
+                    // 如果是第一个元素，则直接移动到 targetIndex
+                    if (i === 0) return targetIndex
+                    // 如果是父结点的左孩子，则移动到 targetIndex * 2 + 1
+                    else if (item.dir === 'l') {
+                        return targetIndex * 2 + 1
+                    }
+                    // 如果是父结点右孩子，则移动到 targetIndex * 2 + 2
+                    else {
+                        return targetIndex * 2 + 2
+                    }
+                })
+
                 seq.push([{
                     type: ActionTypes.Move,
-                    // 需要 move 的结点应该是多个 ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
                     payload: {
-                        oldSortIndexes: getChildrenIndexes(bst, indexOfRoot * 2 + 2)[0] || getChildrenIndexes(bst, indexOfRoot * 2 + 2)[1],
-                        targetIndexes: indexOfRoot * 2 + 2
+                        oldIndexes,
+                        targetIndexes
                     }
                 }])
-                seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 2 }])
+                seq.push([{
+                    type: ActionTypes.Delete,
+                    payload: {
+                        oldIndexes,
+                        targetIndexes
+                    }
+                }])
             } else {
                 // 否则递归搜索其右子树
                 deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 2, seq);
@@ -171,19 +196,71 @@ export function deleteNodeSeq(bst: any[], targetIndex: number, indexOfRoot: numb
             if (getLChildValue(bst, indexOfRoot) === bst[targetIndex]) {
                 // 如果左结点等于nodeV则删除
                 seq.push([{ type: ActionTypes.Active, payload: indexOfRoot * 2 + 1 }])
-                seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 }])
-                seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 }])
-                seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot * 2 + 1 }])
+                seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot * 2 + 1 }]);
+                seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot * 2 + 1 }]);
+
+                // 获取删除结点的子结点
+                const childIndex = getChildrenIndexes(bst, indexOfRoot * 2 + 1)[0] || getChildrenIndexes(bst, indexOfRoot * 2 + 1)[1];
+                // 获取以这个子结点为根结点的子树的所有结点下标 (待移动的下标)
+                const oldIndexes = getSubTree(bst, childIndex).map((item) => item.index);
+                // 获取这些待移动下标的目的坐标
+                const targetIndexes = getSubTree(bst, childIndex).map((item, i) => {
+                    // 如果是第一个元素，则直接移动到 targetIndex
+                    if (i === 0) return targetIndex
+                    // 如果是父结点的左孩子，则移动到 targetIndex * 2 + 1
+                    else if (item.dir === 'l') {
+                        return targetIndex * 2 + 1
+                    }
+                    // 如果是父结点右孩子，则移动到 targetIndex * 2 + 2
+                    else {
+                        return targetIndex * 2 + 2
+                    }
+                })
+
+                seq.push([{
+                    type: ActionTypes.Move,
+                    payload: {
+                        oldIndexes,
+                        targetIndexes
+                    }
+                }])
+                seq.push([{ type: ActionTypes.Delete, payload: oldIndexes }])
             } else {
-                // 否则递归搜索其右子树
+                // 否则递归搜索其左子树
                 deleteNodeSeq(bst, targetIndex, indexOfRoot * 2 + 1, seq);
             }
         } else {
             // 如果当前结点等于nodeV则删除
             seq.push([{ type: ActionTypes.Active, payload: indexOfRoot }])
-            seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }])
-            seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot }])
-            seq.push([{ type: ActionTypes.Delete, payload: indexOfRoot }])
+            seq.push([{ type: ActionTypes.Deactive, payload: indexOfRoot }]);
+            seq.push([{ type: ActionTypes.Disappear, payload: indexOfRoot }]);
+
+            // 获取删除结点的子结点
+            const childIndex = getChildrenIndexes(bst, indexOfRoot)[0] || getChildrenIndexes(bst, indexOfRoot)[1];
+            // 获取以这个子结点为根结点的子树的所有结点下标 (待移动的下标)
+            const oldIndexes = getSubTree(bst, childIndex).map((item) => item.index);
+            // 获取这些待移动下标的目的坐标
+            const targetIndexes = getSubTree(bst, childIndex).map((item, i) => {
+                // 如果是第一个元素，则直接移动到 targetIndex
+                if (i === 0) return targetIndex
+                // 如果是父结点的左孩子，则移动到 targetIndex * 2 + 1
+                else if (item.dir === 'l') {
+                    return targetIndex * 2 + 1
+                }
+                // 如果是父结点右孩子，则移动到 targetIndex * 2 + 2
+                else {
+                    return targetIndex * 2 + 2
+                }
+            })
+
+            seq.push([{
+                type: ActionTypes.Move,
+                payload: {
+                    oldIndexes,
+                    targetIndexes
+                }
+            }])
+            seq.push([{ type: ActionTypes.Delete, payload: oldIndexes }])
         }
     }
 }

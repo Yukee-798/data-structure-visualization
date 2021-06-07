@@ -130,7 +130,6 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
         case ActionTypes.Swap: {
 
             // 取出需要交换的两个下标
-            // 取出需要交换的两个下标
             let index1 = (payload as number[])[0];
             let index2 = (payload as number[])[1];
 

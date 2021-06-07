@@ -5,7 +5,7 @@ import StackPic from '../../assets/homeItemCovers/Stack.jpg';
 // import LinkedListPic from '../../assets/homeItemCovers/LinkedList.jpg';
 import QueuePic from '../../assets/homeItemCovers/Queue.jpg';
 import BinarySearchTree from '../../assets/homeItemCovers/BinarySearchTree.jpg';
-import Pic from '../../assets/homeItemCovers/84993086_p0.jpg'
+import BinaryHeap from '../../assets/homeItemCovers/BinaryHeap.jpg'
 
 /** home 的 item 数据配置 */
 export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
@@ -13,7 +13,7 @@ export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
     [
         {
             src: SortPic,
-            tags: ['数组', '冒泡', '选择', '插入', '快排', '归并'],
+            tags: ['数组', '冒泡', '选择', '快排'],
             title: '排序',
             type: DataStrucTypes.Sort
         },
@@ -36,8 +36,8 @@ export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
             type: DataStrucTypes.Queue
         },
         {
-            src: Pic,
-            tags: ['二叉堆'],
+            src: BinaryHeap,
+            tags: ['二叉堆', '大顶堆'],
             title: '二叉堆',
             type: DataStrucTypes.BinaryHeap
         },
@@ -46,22 +46,22 @@ export const homeItemsConfig: Omit<IHomeItemProps, 'onClick'>[][] = [
     [
         {
             src: BinarySearchTree,
-            tags: ['二叉搜索树', '遍历'],
+            tags: ['二叉搜索树', '遍历', '搜索'],
             title: '二叉搜索树',
             type: DataStrucTypes.BinarySearchTree
         },
-        {
-            src: Pic,
-            tags: ['哈希表'],
-            title: '哈希表',
-            type: DataStrucTypes.HashTable
-        },
-        {
-            src: Pic,
-            tags: ['图论'],
-            title: '图结构',
-            type: DataStrucTypes.Graph
-        },
+        // {
+        //     src: Pic,
+        //     tags: ['哈希表'],
+        //     title: '哈希表',
+        //     type: DataStrucTypes.HashTable
+        // },
+        // {
+        //     src: Pic,
+        //     tags: ['图论'],
+        //     title: '图结构',
+        //     type: DataStrucTypes.Graph
+        // },
     ]
     // 第二排
     // [

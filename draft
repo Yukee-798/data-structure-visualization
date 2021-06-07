@@ -1,0 +1,98 @@
+现在的问题是，删除二叉搜索树结点的时候，
+子树要同步移动到targetIndexes，这时子树中结点的线条也需要连接在一起，同步移动
+
+
+进度安排
+      (1) 排序中的添加、删除动画
+      (2) 链表、队列、栈的添加、删除动画
+      (3) 二叉搜索树的添加、删除、查找动画
+      (4) 哈希表完成
+      (5) 把 add、addDone、swap、swapDone、random、randomDone 这些优化一下
+      (6) 给动画的 action 添加一个 flag，具备无延迟 dispatch 效果
+
+
+      (7) 把 cube 的颜色配置提取出来
+      (8) 把每个页面的cube随机数量范围提取出来
+      (9) 给每个页面限制增删最大范围
+
+      有个想法：给每个页面加一个配置文件
+
+      搞清楚 sortIndex 和 index 设置 key 的区别：想一想 sort 页面和 queue 页面的 initIndex
+
+
+      把侧栏工作台新增：随机添加、删除，对应于展开工作台时添加删除时随机写入 index、value
+
+      把展开工作台新增查找功能
+
+      (10) 把 key 换成 uuid
+
+      (11) 封装一下遍历 sequence 数组的方法
+      (12) 封装一下公共 reducer
+      (13) 用 mobx 改写 reducer
+
+现在的问题：
+      1. 路由传参的时候，会导致 ev.jpg 加载不出来
+      2. 并且手动修改路由，会导致页面重新加载到主页
+      现在打算先不做这个了，感觉坑十分多！！
+
+
+
+目前需要完成的需求：
+      1. 先把二叉搜索树的删结点位移搞定
+      2. 实现二叉堆
+      5. 实现哈希表
+      6. 实现图
+
+
+      4. 实现b树 
+      3. 实现 avl 树
+
+
+
+      7. 新增 input 初始化数据结构，右上角展示出来
+      8. 给按钮加 loading
+
+      9. 适配移动端
+
+      10. 修改一下 ev.jpg 图片
+
+
+
+二叉搜索树删除结点的逻辑：
+情况1: 被删除结点是叶子结点
+    1. 先找到 targetNode
+    2. 删除 targetNode
+    3. 删除父结点与之的连线
+
+情况2: 被删除的结点含有一个子结点
+    1. 先找到 targetNode
+    2. 删除 targetNode
+    3. 删除 targetNode 与其子结点的连线
+    4. 删除父结点与之的连线
+    5. 子结点移动到被删除结点的位置
+
+
+
+遍历 seq 的时候，想一下如何标记同时 dispacth 多个 action
+
+需要同时发送的多个 dispatch 应该同时打包为作为 seq 里的一个元素
+
+
+关于 seq 的规则：
+seq 里面存放的数据类型：IAction | IAction[]
+1. 如果存放的是单一的 action，则说明同一时间 dispacth 一个 action
+2. 如果存放的是数组，则说明同一时间要 dispacth 多个 action
+3. 对于 Active、Deactive、Lock、Unlock、Disapper、Appear 这些类型的 action，如果 payload 为 undefined 则说明操作的对象为整个数组
+
+
+!!! 还可以简化，对于 seq 来说就直接存放 IAction[]，单一的 action 则数组长度为1，这样就可以不用判断 action isArray 了
+
+
+
+已知 BUG：
+      1. home主页的 item 点击中间的空白页也会当作被点击
+
+目前需要完成的需求：
+    1. 让 camera 能够通过 wasd 自由移动
+    2. 让 cube3d 的边线加深颜色
+    3. 进入 homeItem的时候进度条加载界面

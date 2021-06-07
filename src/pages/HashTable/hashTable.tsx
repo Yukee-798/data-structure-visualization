@@ -82,12 +82,9 @@ const HashTable = () => {
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
                     showSilider={false}
+                    radioGroup={[1,1,1]}
                     // onAdd={handleEnqueue}
                     // onDelete={handleDequeue}
-                    addText='入队'
-                    deleteText='出队'
-                    isAddIndex={false}
-                    isDeleteIndex={false}
                     // spinning={state.loading}
                     operation={
                         <div className='btn-group'>

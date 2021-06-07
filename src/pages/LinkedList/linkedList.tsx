@@ -148,7 +148,7 @@ const LinkedList = () => {
                         position={[7, 0, 0]}
                     /> */}
                 </Scene3d>
-                <Console
+                {/* <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
                     onSliderChange={handleSliderChange}
                     operation={
@@ -213,6 +213,7 @@ const LinkedList = () => {
                         <Item onClick={handleTailInsert}>尾插</Item>
                     </SubMenu>
                 </Console>
+          */}
             </div>
 
         </div>

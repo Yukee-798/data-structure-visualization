@@ -115,6 +115,17 @@ const Console: React.FC<IConsoleProps> = (props) => {
         }
     }
 
+    /** 统计radioGroup中取值为1的个数是否为1 */
+    const isRadioOneNum = (radioGroup: any[]) => {
+        let num = 0;
+        if (radioGroup[0] === 1) num++;
+        if (radioGroup[1] === 1) num++;
+        if (radioGroup[2] === 1) num++
+
+        if (num === 1) return true;
+        return false;
+    }
+
     return (
         <>
             <animated.div
@@ -160,7 +171,8 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                 动画速度：
                             <Slider
                                     className='slider'
-                                    defaultValue={32}
+                                    defaultValue={80}
+                                    min={40}
                                     onChange={(value: number) => onSliderChange?.(value)}
                                 />
                             </div>
@@ -177,10 +189,9 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                 {operation}
 
                                 {/* 显示添加、删除 */}
-
                                 <div className='input-group'>
                                     {
-                                        !(radioGroup[0] === 0 && radioGroup[1] === 0 && radioGroup[2] === 0) &&
+                                        !(isRadioOneNum(radioGroup)) ?
                                         <Radio.Group
                                             className='radio-group'
                                             defaultValue={getDefaultRadio(radioGroup)}
@@ -196,6 +207,7 @@ const Console: React.FC<IConsoleProps> = (props) => {
                                                 })
                                             }
                                         </Radio.Group>
+                                        : <div className='radio-empty'></div>
                                     }
 
                                     <div className='label-group'>

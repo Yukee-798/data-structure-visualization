@@ -6,7 +6,7 @@ let config: IPageConfig = {
     geoValueRange: [3, 37],
     geoBasePosY: 0,
     cameraPosZ: 19,
-    animationSpeed: 400,
+    animationSpeed: 800,
 }
 
 

@@ -19,6 +19,7 @@ const Line3d:React.FC<ILine3dProps> = (props) => {
 
     return (
         <Line
+            // ref={}
             lineWidth={lineWidth}
             points={points}
             color={isActive ? 'orange' : 'gray'}

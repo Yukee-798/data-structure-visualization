@@ -24,6 +24,86 @@ export const reducer: IReducer<IState> = (state = initState, action): IState => 
     const { type, payload } = action;
     switch (type) {
 
+        case ActionTypes.Add: {
+            const newGeo = [...state.geometries];
+            newGeo.push({
+                sortIndex: newGeo.length,
+                sortIndexes: [newGeo.length],
+                value: payload,
+            })
+            const newValues = [...state.values];
+            newValues.push(payload)
+
+            const newOpeDetail = {
+                type: OpeDetailTypes.Add,
+                payload: {
+                    value: payload,
+                    cur: newValues
+                }
+            }
+
+            return {
+                ...state,
+                geometries: newGeo,
+                values: newValues,
+                opeDetails: [...state.opeDetails, newOpeDetail]
+            }
+        }
+
+        case ActionTypes.Swap: {
+            // 取出需要交换的两个下标
+            let index1 = (payload as number[])[0];
+            let index2 = (payload as number[])[1];
+
+            // 向 cube 对应的 sortIndexes 中 push 新的下标
+            const newGeo: IBinaryHeapSphere3d[] = state.geometries.map((item) => {
+                const curSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
+                if (curSortIndex === index1) {
+                    const newSortIndexes = [...item.sortIndexes, index2]
+                    return { ...item, sortIndexes: newSortIndexes }
+                } else if (curSortIndex === index2) {
+                    const newSortIndexes = [...item.sortIndexes, index1]
+                    return { ...item, sortIndexes: newSortIndexes }
+                }
+                return { ...item };
+            })
+
+            // 交换 values 的值
+            let newValues = [...state.values];
+            let temp = newValues[index1];
+            newValues[index1] = newValues[index2];
+            newValues[index2] = temp;
+
+            const newOpeDetail = {
+                type: OpeDetailTypes.Swap,
+                payload: {
+                    indexes: [index1, index2],
+                    cur: [...newValues]
+                }
+            }
+
+            return {
+                ...state,
+                geometries: newGeo,
+                opeDetails: [...state.opeDetails, newOpeDetail],
+                values: newValues
+            }
+        }
+
+        case ActionTypes.SwapDone: {
+
+            // 交换完毕后，将对应的cube的sortIndex改为最新的sortIndex
+            const newGeo: IBinaryHeapSphere3d[] = state.geometries.map((item) => {
+                const newSortIndex = item.sortIndexes[item.sortIndexes.length - 1];
+                if (item.sortIndex !== newSortIndex) return { ...item, sortIndex: newSortIndex }
+                return { ...item }
+            })
+
+            return {
+                ...state,
+                geometries: newGeo,
+            }
+        }
 
         case ActionTypes.Loading:
             return {
@@ -87,7 +167,7 @@ export const reducer: IReducer<IState> = (state = initState, action): IState => 
                 ...state,
                 geometries: state.geometries.map((item) => ({
                     ...item,
-                    isActive: payload === item.sortIndex
+                    isActive: payload === item.sortIndex ? true : item.isActive
                 }))
             }
 

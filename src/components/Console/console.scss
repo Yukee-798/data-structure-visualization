@@ -99,9 +99,14 @@
                         margin: 8px 0;
                     }
 
+                    .radio-empty {
+                        height: 30px;
+                    }
+
                     .label-group {
                         display: flex;
                         justify-content: center;
+                        // margin-top: 5px;
 
                         label {
                             display: flex;

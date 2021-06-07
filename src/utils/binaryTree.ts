@@ -2,6 +2,7 @@ import { randomNum } from './index';
 import { ActionTypes, Range } from '../types';
 import { log } from './math';
 import { ISphere3dProps } from '../components/Sphere3d/sphere3d';
+import { IBSTSphere3d } from '../pages/BinarySearchTree/store';
 
 
 /** input输入的value解析为数组，如果输入的不合法则返回 undefined */
@@ -25,7 +26,7 @@ export function initSeq(values: (number | null)[]) {
 /** 传入结点下标，返回二叉树中以该结点为根结点的子树 */
 export function getSubTree(binaryTree: (number | null)[], indexOfNode: number) {
     const queue: any[] = [];
-    const subTree: any[] = [];
+    const subTree: { value: number, index: number, dir: 'l' | 'r' }[] = [];
 
     if (binaryTree.length !== 0) {
         queue.push({ value: binaryTree[indexOfNode], index: indexOfNode });   //根节点进队列
@@ -38,12 +39,12 @@ export function getSubTree(binaryTree: (number | null)[], indexOfNode: number) {
 
         //如果有左孩子，leftChild入队列
         if (lChildV || lChildV === 0) {
-            queue.push({ value: lChildV, index: queue[0].index * 2 + 1 })
+            queue.push({ value: lChildV, index: queue[0].index * 2 + 1, dir: 'l' })
         }
 
         //如果有右孩子，rightChild入队列
         if (rChildV || rChildV === 0) {
-            queue.push({ value: rChildV, index: queue[0].index * 2 + 2 })
+            queue.push({ value: rChildV, index: queue[0].index * 2 + 2, dir: 'r' })
         }
         //已经遍历过的节点出队列
         subTree.push(queue.shift())
@@ -82,8 +83,13 @@ export function treeToString(binaryTree: (number | null)[]) {
 }
 
 /** 初始化二叉树sphere */
-export function initSpheres(values: (number | null)[]) {
-    return values.map((value, index) => ({ sortIndex: index, sortIndexes: [index], value }))
+export function initSpheres(values: (number | null)[]): IBSTSphere3d[] {
+    return values.map((value, index) => ({
+        sortIndex: index,
+        sortIndexes: [index],
+        value,
+        indexDisappear: false
+    }))
 }
 
 /** 获取传入结点的父结点数据值 */

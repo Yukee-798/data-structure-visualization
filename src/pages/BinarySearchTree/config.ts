@@ -4,7 +4,7 @@ import { Points } from "../../types";
 let config: ISpherePageConfig = {
     geoBaseDistance: 2,
     geoNumRange: [5, 15],
-    geoValueRange: [10, 70],
+    geoValueRange: [1, 70],
     geoBasePosY: 3,
     cameraPosZ: 21,
     animationSpeed: 400,

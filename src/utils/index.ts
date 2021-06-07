@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import { ActionTypes, IAction, Range, SeqType } from "../types";
 
+/** 判断一个值是否是数字 */
+export function isNum(value: any) {
+    return typeof value === 'number' && !isNaN(value);
+}
+
 /** 交换数组两个元素 */
 export function swap<T>(arr: T[], i1: number, i2: number) {
     const temp = arr[i1];
@@ -22,9 +27,7 @@ export function excuteSeq(seq: SeqType, speed: number, dispatch: React.Dispatch<
             }, i * speed)
         })
     })
-
 }
-
 
 /** 随机生成一个 start ~ end 的整数 */
 export function randomNum(range: Range): number {

@@ -130,41 +130,7 @@ const Graph = () => {
                 <Scene3d onLoaded={handleSceneLoaded}>
 
                 </Scene3d>
-                <Console
-                    style={{ display: isSceneLoaded ? 'flex' : 'none' }}
-                >
-                    <Item
-                        icon={<DotChartOutlined />}
-                        onClick={handleRandom}
-                    >
-                        随机生成
-                    </Item>
 
-                    <SubMenu
-                        key='2'
-                        icon={<BarChartOutlined />}
-                        title='排序'
-                    >
-                        <Item>冒泡排序</Item>
-                        <Item>选择排序</Item>
-                        <Item>插入排序</Item>
-                        <Item>快速排序</Item>
-                        <Item>归并排序</Item>
-                    </SubMenu>
-
-                    <SubMenu
-                        icon={<PlusSquareOutlined />}
-                    >
-                        <Item>
-                            <Input />
-                            <Button>添加</Button>
-                        </Item>
-                    </SubMenu>
-
-                    <Item icon={<MinusSquareOutlined />}>删除</Item>
-
-                </Console>
- 
 
             </div>
 

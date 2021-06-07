@@ -5,6 +5,8 @@ import { defaultGeoColor } from '../../configs/page/defaultConfig';
 import { IGeometryProps } from '../../types';
 
 export interface ISphere3dProps extends IGeometryProps {
+    /** 取值 */
+    value: number | null;
     /** 结点的实际顺序 */
     sortIndex: number;
     /** 该sphere过去已存在或者未来将要到达的位置 */

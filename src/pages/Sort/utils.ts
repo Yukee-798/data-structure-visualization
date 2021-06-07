@@ -51,7 +51,7 @@ export function addEleSeq(arr: number[], newEle: number, targetIndex: number): S
 
     if (targetIndex === arr.length) {
         // 单独处理尾部添加
-        
+
         // 在 targetIndex 处添加元素
         seq.push([{
             type: ActionTypes.AddDone,
@@ -187,6 +187,47 @@ export function selectSortSeq(arr: number[]): SeqType {
     }
     sortSeq.push([{ type: ActionTypes.SortDone }]);
     return sortSeq
+}
+
+/** 返回归并排序细节 */
+export function mergeSortSeq(arr: number[], l: number, r: number, seq: SeqType) {
+    if (judgeSorted(arr)) return seq.push([{ type: ActionTypes.Lock }]);
+
+    if (l >= r) return;
+    let tmp = [...arr];
+
+    let mid = l + r >> 1;
+    mergeSortSeq(arr, l, mid, seq);
+    mergeSortSeq(arr, mid + 1, r, seq);
+
+    let k = 0, i = l, j = mid + 1;
+    while (i <= mid && j <= r) {
+        if (arr[i] <= arr[j]) {
+            seq.push([{ type: ActionTypes.Swap, payload: [k, i] }])
+            seq.push([{ type: ActionTypes.SwapDone, payload: [k, i] }])
+            tmp[k++] = arr[i++];
+            
+        }
+        else {
+            seq.push([{ type: ActionTypes.Swap, payload: [k, i] }])
+            seq.push([{ type: ActionTypes.SwapDone, payload: [k, i] }])
+            tmp[k++] = arr[j++];
+        }
+    }
+
+    while (i <= mid) {
+        seq.push([{ type: ActionTypes.Swap, payload: [k, i] }])
+        seq.push([{ type: ActionTypes.SwapDone, payload: [k, i] }])
+        tmp[k++] = arr[i++];
+    }
+    while (j <= r) {
+        seq.push([{ type: ActionTypes.Swap, payload: [k, i] }])
+        seq.push([{ type: ActionTypes.SwapDone, payload: [k, i] }])
+        tmp[k++] = arr[j++];
+    }
+
+    // for (i = l, j = 0; i <= r; i++, j++) arr[i] = tmp[j];
+
 }
 
 /** 返回快速排序细节 */

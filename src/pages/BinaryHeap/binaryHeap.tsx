@@ -11,9 +11,9 @@ import { initState, IState, reducer } from './store'
 import BinaryHeapSphere3d from './BinaryHeapSphere3d/binaryHeapSphere3d'
 import config from './config'
 import { root } from '../../configs/router/config'
-import { getLChildValue, getRChildValue, initSeq, initSpheres, treeToString } from '../../utils/binaryTree'
+import { getLChildValue, getMaxDeepth, getRChildValue, initSeq, initSpheres, parseValue, treeToString } from '../../utils/binaryTree'
 import { excuteSeq } from '../../utils'
-import { randomBh } from './utils'
+import { addSeq, randomBh } from './utils'
 
 const { Step } = Steps;
 
@@ -35,33 +35,24 @@ const BinaryHeap = () => {
         setIsSceneLoaded(true);
     }
 
-    /** 添加元素 */
-    const handleAddEle = (value: number, _: unknown) => {
-        dispatch({ type: ActionTypes.UnLock })
-        // let sequence: any[] = [];
-
-    }
-
-    /** 删除元素 */
-    const handleDeleteEle = (index: number) => {
-        dispatch({ type: ActionTypes.UnLock })
-
-        // 验证一下输入的序号
-        if (!state.values[index]) {
-            return message.warning('删除失败，输入的结点序号不存在')
+    const handleRender = (value: string) => {
+        const parseRes = parseValue(value);
+        if (parseRes) {
+            let sequence = initSeq(parseRes);
+            excuteSeq(sequence, config.animationSpeed, dispatch);
+        } else {
+            message.warning('输入的数据格式有误，请按照 "[1,3,8,2]" 类似格式输入')
         }
-
-        // let sequence: any[] = [];
-
-
     }
 
-    /** 搜索元素 */
-    const handleSearch = (value: number) => {
-        dispatch({ type: ActionTypes.UnLock })
-
-        // let sequence: any[] = [];
-
+    /** 添加元素 */
+    const handleAddEle = (index: number, value: number) => {
+        if (getMaxDeepth(state.values) === 4) {
+            message.warning('添加失败，二叉堆最大层数为4')
+        } else {
+            let sequence = addSeq(state.values, value);
+            excuteSeq(sequence, config.animationSpeed, dispatch)
+        }
     }
 
     /** 随机生成数据 */
@@ -70,20 +61,11 @@ const BinaryHeap = () => {
         excuteSeq(sequence, config.animationSpeed, dispatch);
     }
 
-    /** 前序遍历 */
-    const handlePreorder = () => {
-
+    /** 处理动画速度改变 */
+    const handleSliderChange = (x: number) => {
+        config.animationSpeed = -7.95 * x + 1000
     }
 
-    /** 中序遍历 */
-    const handleInorder = () => {
-
-    }
-
-    /** 后序遍历 */
-    const handlePostorder = () => {
-
-    }
 
     return (
         <div className='binaryHeap-warp'>
@@ -137,27 +119,28 @@ const BinaryHeap = () => {
                                         {i}
                                     </Text>
                                 </React.Fragment>
-
                             )
                         )
                     })}
                 </Scene3d>
                 <Console
                     style={{ display: isSceneLoaded ? 'flex' : 'none' }}
-                    // onSliderChange={handleSliderChange}
-                    isAddIndex={false}
-                    isSearch={true}
+                    onSliderChange={handleSliderChange}
+                    radioGroup={[1, 0, 0]}
+                    onRender={handleRender}
+                    addConfig={{
+                        hasIndex: false,
+                        hasValue: true,
+                        radioName: '添加',
+                        valueRange: config.geoValueRange
+                    }}
                     onAdd={handleAddEle}
-                    onDelete={handleDeleteEle}
-                    onSearch={handleSearch}
                     spinning={state.loading}
                     operation={
                         <div className='btn-group'>
                             <div className='row'>
                                 <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
-                                <Button icon={<BarChartOutlined />} onClick={handlePreorder}>前序遍历</Button>
-                                <Button icon={<BarChartOutlined />} onClick={handleInorder}>中序遍历</Button>
-                                <Button icon={<BarChartOutlined />} onClick={handlePostorder}>后序遍历</Button>
+
                             </div>
                         </div>
                     }
@@ -168,23 +151,23 @@ const BinaryHeap = () => {
                                 const { type, payload } = item;
                                 switch (type) {
                                     case OpeDetailTypes.Add: {
-                                        const { index, value, cur } = payload;
+                                        const { value, cur } = payload;
                                         return (
                                             <Step
                                                 key={'step' + i}
-                                                title={`新增结点: i=${index}, v=${value}`}
-                                                description={`当前二叉堆: ${treeToString(cur)}`}
+                                                title={`新增结点:  v=${value}`}
+                                                description={`当前满二叉树: ${treeToString(cur)}`}
                                             />
                                         )
                                     }
 
-                                    case OpeDetailTypes.Delete: {
-                                        const { index, value, cur } = payload;
+                                    case OpeDetailTypes.Swap: {
+                                        const { indexes, cur } = payload;
                                         return (
                                             <Step
                                                 key={'step' + i}
-                                                title={`删除结点: i=${index}, v=${value}`}
-                                                description={`当前二叉堆: ${treeToString(cur)}`}
+                                                title={`交换结点:  i=${indexes[0]}, v=${state.values[indexes[0]]} | i=${indexes[1]}, v=${state.values[indexes[1]]}`}
+                                                description={`当前满二叉树: ${treeToString(cur)}`}
                                             />
                                         )
                                     }
@@ -208,16 +191,6 @@ const BinaryHeap = () => {
                     >
                         随机生成
                     </Item>
-
-                    <SubMenu
-                        key='item2'
-                        icon={<BarChartOutlined />}
-                        title='遍历'
-                    >
-                        <Item onClick={handlePreorder}>前序遍历</Item>
-                        <Item onClick={handleInorder}>中序遍历</Item>
-                        <Item onClick={handlePostorder}>后序遍历</Item>
-                    </SubMenu>
                 </Console>
 
             </div>

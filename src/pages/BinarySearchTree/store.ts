@@ -1,10 +1,14 @@
 import { ActionTypes, IBaseState, IReducer, OpeDetailTypes } from "../../types";
+import { isNum } from "../../utils";
 import { formatBinaryTree, formatSpheres, getChildrenIndexes, getFatherIndex, initSpheres, judgeNode, treeToString } from "../../utils/binaryTree";
 import { IBSTSphere3dProps } from "./BSTSphere3d/bstSphere3d";
 import config, { cdnOfNodes } from "./config";
 import { randomBST } from "./utils";
 
-export interface IBSTSphere3d extends IBSTSphere3dProps { }
+export interface IBSTSphere3d extends IBSTSphere3dProps {
+    /** 其下面的下标是否消失 */
+    indexDisappear?: boolean;
+}
 
 export interface IState extends IBaseState {
     // 表示二叉树当前真实的结构
@@ -21,7 +25,7 @@ export const initState: IState = {
     disappearAll: false
 }
 
-export const reducer: IReducer<IState> = (state = initState, action) => {
+export const reducer: IReducer<IState> = (state = initState, action): IState => {
     const { type, payload } = action;
     switch (type) {
         case ActionTypes.Loading:
@@ -107,39 +111,33 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
 
                     // 找到被删除结点的子结点
                     let childrenIndexes = getChildrenIndexes(state.binaryTree, payload);
-                    let childIndex = childrenIndexes[0] || childrenIndexes[1]
+                    // let childIndex = childrenIndexes[0] || childrenIndexes[1]
 
                     let fatherIndex = getFatherIndex(payload);
                     // 判断是父结点左连线还是右连线(这里因为是二叉搜索树所以可以直接通过数值大小来判断)
                     let isLeft = (state.binaryTree[fatherIndex] as number) >= (state.binaryTree[payload] as number)
 
-                    // 把被删除的结点的子结点的 sortIndexes 中 push 被删除结点的 sortIndex，并且让其父节点与之的连线也消失
+                    // 把被删除的结点的子结点的父节点与之的连线消失
                     newSpheres = newSpheres.map((sphere) => {
                         let newSphere = { ...sphere };
                         if (sphere.sortIndex === fatherIndex) {
                             if (isLeft) newSphere.lChildPos = null;
                             else newSphere.rChildPos = null;
-                        } else if (sphere.sortIndex === childIndex) {
-                            newSphere.sortIndexes.push(payload);
                         }
                         return newSphere;
                     })
-                    // 被删除结点的子结点移动到该位置
-                    newBst[payload] = state.binaryTree[childIndex];
 
-                    // 之前子结点变为 null
-                    newBst[childIndex] = null;
 
                     return {
                         ...state,
                         spheres: newSpheres,
-                        opeDetails: [...state.opeDetails, {
-                            type: OpeDetailTypes.Delete, payload: {
-                                index: payload,
-                                value: state.binaryTree[payload],
-                                cur: formatBinaryTree(newBst)
-                            }
-                        }]
+                        // opeDetails: [...state.opeDetails, {
+                        //     type: OpeDetailTypes.Delete, payload: {
+                        //         index: payload,
+                        //         value: state.binaryTree[payload],
+                        //         cur: formatBinaryTree(newBst)
+                        //     }
+                        // }]
                     }
 
                 } else {
@@ -151,23 +149,62 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
         }
 
         case ActionTypes.Move: {
-            const { oldSortIndex, targetIndex } = payload;
-            const newSperes = [...state.spheres];
+            const { oldIndexes, targetIndexes }: { oldIndexes: number[], targetIndexes: number[] } = payload;
 
-            // 子结点
-            const sphere = newSperes.find((sphere) => sphere.sortIndex === oldSortIndex);
-            // 子结点移动到被删除结点的位置
-            sphere?.sortIndexes.push(targetIndex)
+            // 把包含在 oldIndexes 中的 sortIndex 找出来
+            const newSperes = state.spheres.map((item) => {
+                // 看 sortIndex 在 oldIndexes 中处于哪个位置，也对应 targetIndexes 的位置
+                let i = oldIndexes.findIndex((value) => value === item.sortIndex);
+                // 如果找到了，则往 sortIndexes 中添加 targetIndexes[i]
+                if (i >= 0) {
+                    return {
+                        ...item,
+                        sortIndexes: [...item.sortIndexes, targetIndexes[i]],
+                        indexDisappear: true
+                    }
+                }
+                return { ...item }
+            })
+
+            let newBst = [...state.binaryTree];
+
+            // 目标位置覆盖为：下标为oldIndex结点的取值
+            targetIndexes.forEach((value, i) => {
+                newBst[value] = newBst[oldIndexes[i]];
+            })
+
+            // 之前的旧位置取值变为null
+            oldIndexes.forEach((value) => {
+                newBst[value] = null;
+            })
+
+            newBst = formatBinaryTree(newBst);
 
             return {
                 ...state,
-                spheres: newSperes
+                spheres: newSperes,
+                binaryTree: newBst,
+                opeDetails: [...state.opeDetails, {
+                    type: OpeDetailTypes.Delete, payload: {
+                        index: targetIndexes[0],
+                        value: state.binaryTree[targetIndexes[0]],
+                        cur: newBst
+                    }
+                }]
+
             }
         }
 
         case ActionTypes.Delete: {
             // 判断删除的结点类型
-            const deleteType = judgeNode(state.binaryTree, payload);
+            let deleteType;
+
+            if (isNum(payload)) {
+                deleteType = 0;
+            } else {
+                deleteType = 1;
+            }
+
             let newSpheres = [...state.spheres];
             let newBst = [...state.binaryTree];
 
@@ -185,45 +222,34 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
                 }
 
 
-                /*
-
-                [32,27,56,null,null,54,null,null,null,null,null,null,55]
-                [32,27,54,n,n,n,55]
-
-                */
-
             } else if (deleteType === 1) { // 删除的结点有一个子结点
-                // 获取其父结点的下标
-                let fatherIndex = getFatherIndex(payload);
-                // 获取其子结点的下标
-                let childrenIndexes = getChildrenIndexes(state.binaryTree, payload);
-                let childIndex = childrenIndexes[0] && childrenIndexes[1];
+                const { oldIndexes, targetIndexes }: { oldIndexes: number[], targetIndexes: number[] } = payload
+                let newSpheres = [...state.spheres];
 
-                // newSpheres = newSpheres.map((sphere) => {
-                //     const newSphere = { ...sphere };
-                //     // 真正意义上删除该结点
-                //     if (sphere.sortIndex === payload) newSphere.value = null;
-                //     // 将其子结点 sortIndex 设置为该被删除的结点的 sortIndex
-                //     else if (sphere.sortIndex === childIndex) newSphere.sortIndex = payload;
-                //     // 连接其父结点和被删除位置的连线
-                //     else if (sphere.sortIndex === fatherIndex) {
-                //         // 判断是父结点左连线还是右连线(这里因为是二叉搜索树所以可以直接通过数值大小来判断)
-                //         let isLeft = (state.binaryTree[fatherIndex] as number) >= (state.binaryTree[payload] as number)
-                //         if (isLeft) newSphere.lChildPos = cdnOfNodes[payload]
-                //         else newSphere.rChildPos = cdnOfNodes[payload]
-                //     }
-                //     return newSphere;
-                // })
+                // 删除结点：sphere.value=null, binaryTree结点位移
+                newSpheres = newSpheres.map((sphere) => {
+                    // 如果是待位移的结点位置则赋值为null
+                    if (oldIndexes.includes(sphere.sortIndex)) return { ...sphere, value: null }
+                    // // 如果是删除结点的位置则赋值为 state.binaryTree[targetIndexes[0]]
+                    // else if (sphere.sortIndex === targetIndexes[0]) return { ...sphere, value: state.binaryTree[targetIndexes[0]] }
+                    // 如果是目标位置的结点，则更新其值
+                    else if (targetIndexes.includes(sphere.sortIndex)) {
+                        // let targetIndex = targetIndexes.find((value: number) => value === sphere.sortIndex);
+                        return { ...sphere, value: state.binaryTree[sphere.sortIndex] }
+                    }
+                    return sphere
+                })
 
-                // 被删除结点的子结点移动到该位置
-                // newBst[payload] = state.binaryTree[childIndex];
+                // 改变 sortIndex
+                newSpheres = newSpheres.map((sphere) => {
+                    return { ...sphere, sortIndex: sphere.sortIndexes[sphere.sortIndexes.length - 1] }
+                })
 
-                // 之前子结点变为 null
-                // newBst[childIndex] = null;
+                console.log('delete');
 
                 return {
                     ...state,
-                    // spheres: newSpheres,
+                    spheres: newSpheres,
                     // binaryTree: formatBinaryTree(newBst),
                 }
             } else {
@@ -236,6 +262,13 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
         case ActionTypes.Add: {
             const { value, index } = payload;
             let newSpheres = [...state.spheres];
+
+            // 找到其父结点坐标及取值
+            const fatherIndex = getFatherIndex(index);
+            const fatherValue = state.binaryTree[fatherIndex];
+
+            const isLeft = value <= (fatherValue as number) ? true : false;
+
             // 新结点
             const newNode: IBSTSphere3d = {
                 value,
@@ -244,6 +277,14 @@ export const reducer: IReducer<IState> = (state = initState, action) => {
             };
             // 添加新结点
             newSpheres[index] = newNode;
+
+            newSpheres =  newSpheres.map((sphere) => {
+                if (sphere.sortIndex === fatherIndex) {
+                    if (isLeft) return { ...sphere, lChildPos: cdnOfNodes[index]}
+                    else return {...sphere, rChildPos: cdnOfNodes[index]}
+                }
+                return sphere
+            })
             // 格式化
             newSpheres = formatSpheres(newSpheres);
 

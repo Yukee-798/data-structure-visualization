@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Button, PageHeader, Steps, message } from 'antd';
 import { BarChartOutlined, DotChartOutlined } from '@ant-design/icons';
@@ -6,8 +6,8 @@ import { Text } from '@react-three/drei';
 import Console, { Item, SubMenu } from '../../components/Console/console';
 import SortCube3d from './SortCube3d/sortCube3d';
 import Scene3d from '../../components/Scene3d/scene3d';
-import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, parseValue, quickSortSeq, initSeq, selectSortSeq } from './utils';
-import { OpeDetailTypes, IReducer } from '../../types';
+import { addEleSeq, bubbleSortSeq, deleteEleSeq, getStartPosX, initCubes, parseValue, quickSortSeq, initSeq, selectSortSeq, mergeSortSeq } from './utils';
+import { OpeDetailTypes, IReducer, SeqType } from '../../types';
 import { initState, IState, reducer } from './store';
 import config from './config'
 import { root } from '../../configs/router/config';
@@ -101,10 +101,20 @@ const Sort = () => {
         }
     }
 
-    /** 处理动画速度改变 */
-    const handleSliderChange = (value: number) => {
-        // console.log(value);
+    const handleMergeSort = () => {
+        const arr = [3, 2, 1];
+        const seq: SeqType = [];
+        mergeSortSeq(arr, 0, arr.length - 1, seq);
+        excuteSeq(seq, config.animationSpeed, dispatch)
+        // console.log(arr);
     }
+
+    /** 处理动画速度改变 */
+    const handleSliderChange = (x: number) => {
+        config.animationSpeed = -7.95 * x + 1000
+    }
+
+
 
     return (
         <div className='sort-warp'>
@@ -177,12 +187,12 @@ const Sort = () => {
                                 <Button icon={<BarChartOutlined />} onClick={handleRandom}>随机生成</Button>
                                 <Button icon={<BarChartOutlined />} onClick={handleBubbleSort}>冒泡排序</Button>
                                 <Button icon={<BarChartOutlined />} onClick={handleSelectSort}>选择排序</Button>
-                            </div>
-                            <div className='row'>
-                                <Button icon={<BarChartOutlined />}>插入排序</Button>
                                 <Button icon={<BarChartOutlined />} onClick={handleQuickSort}>快速排序</Button>
-                                <Button icon={<BarChartOutlined />}>归并排序</Button>
+
                             </div>
+                            {/* <div className='row'> */}
+                                {/* <Button icon={<BarChartOutlined />} onClick={handleMergeSort}>归并排序</Button> */}
+                            {/* </div> */}
                         </div>
                     }
 
@@ -238,7 +248,7 @@ const Sort = () => {
                         随机生成
                     </Item>
 
-                    <SubMenu
+                    {/* <SubMenu
                         key='item2'
                         icon={<BarChartOutlined />}
                         title='排序'
@@ -248,7 +258,7 @@ const Sort = () => {
                         <Item>插入排序</Item>
                         <Item onClick={handleQuickSort}>快速排序</Item>
                         <Item>归并排序</Item>
-                    </SubMenu>
+                    </SubMenu> */}
                 </Console>
 
             </div>
